@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senegal-Quiz – Schulfest GHS Dohr</title>
+<style>
+body{font-family:Arial,sans-serif;background:linear-gradient(90deg,#00853F,#FDEF42,#E31B23);margin:0}
+.wrap{max-width:800px;margin:20px auto;background:#fff;padding:25px;border-radius:16px}
+h1,h2{text-align:center}
+.btn{padding:12px 18px;border:none;border-radius:8px;cursor:pointer}
+.answer{display:block;width:100%;margin:8px 0;padding:12px}
+.hidden{display:none}
+#result{margin-top:15px;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🇸🇳 Senegal-Quiz – Schulfest GHS Dohr</h1>
+<div id="start">
+<p>Beantworte eine Frage über Senegal. Bei richtiger Antwort besteht eine Gewinnchance von 30 %.</p>
+<button class="btn" onclick="startQuiz()">Quiz starten</button>
+</div>
+
+<div id="quiz" class="hidden">
+<h2 id="q"></h2>
+<div id="answers"></div>
+<div id="result"></div>
+</div>
+</div>
+
+<script>
+const MAX_WINNERS=20;
+const WIN_RATE=0.30;
+
+const questions=[
+["Was ist die Hauptstadt des Senegal?","Dakar",["Dakar","Bamako","Lagos","Accra"]],
+["Welcher Fußballstar stammt aus Senegal?","Sadio Mané",["Sadio Mané","Yaya Touré","Didier Drogba","Hakimi"]],
+["Welche Amtssprache hat Senegal?","Französisch",["Französisch","Deutsch","Spanisch","Arabisch"]],
+["An welchem Ozean liegt Senegal?","Atlantischer Ozean",["Atlantischer Ozean","Pazifik","Indischer Ozean","Arktischer Ozean"]],
+["Nationalgericht Senegals?","Thieboudienne",["Thieboudienne","Pizza","Sushi","Tacos"]]
+];
+
+function startQuiz(){
+ if(localStorage.getItem("ghsdohr_played")){
+   document.getElementById("start").innerHTML="<h2>Du hast bereits teilgenommen.</h2>";
+   return;
+ }
+ document.getElementById("start").classList.add("hidden");
+ document.getElementById("quiz").classList.remove("hidden");
+ let q=questions[Math.floor(Math.random()*questions.length)];
+ document.getElementById("q").textContent=q[0];
+ let a=document.getElementById("answers");
+ q[2].sort(()=>Math.random()-0.5).forEach(ans=>{
+   let b=document.createElement("button");
+   b.className="answer btn";
+   b.textContent=ans;
+   b.onclick=()=>check(ans===q[1]);
+   a.appendChild(b);
+ });
+}
+
+function check(correct){
+ localStorage.setItem("ghsdohr_played","1");
+ let r=document.getElementById("result");
+ document.getElementById("answers").innerHTML="";
+ if(!correct){
+   r.innerHTML="❌ Leider falsch. Danke fürs Mitmachen!";
+   return;
+ }
+ let winners=parseInt(localStorage.getItem("ghsdohr_winners")||"0");
+ if(winners>=MAX_WINNERS){
+   r.innerHTML="✅ Richtig! Leider sind alle Gewinne bereits vergeben.";
+   return;
+ }
+ if(Math.random()<=WIN_RATE){
+   winners++;
+   localStorage.setItem("ghsdohr_winners", winners);
+   let prize=Math.random()<0.5?"🥤 Getränk":"🍽️ Essen";
+   let code="GHS-SEN-"+Math.floor(1000+Math.random()*9000);
+   r.innerHTML="🎉 Gewonnen!<br>"+prize+"<br>Gewinncode: <b>"+code+"</b>";
+ }else{
+   r.innerHTML="✅ Richtig beantwortet! Heute leider kein Gewinn, danke fürs Mitmachen.";
+ }
+}
+</script>
+</body>
+</html>
