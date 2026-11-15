@@ -1,4 +1,4 @@
-# Zahnputz Grand Prix
+# Zahnputz App
 
 3-Minuten-Zahnputz-Timer für Kinder im Rennfahrer-Look.
 
