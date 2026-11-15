@@ -3,7 +3,7 @@
 3-Minuten-Zahnputz-Timer für Kinder im Rennfahrer-Look.
 
 - Drehzahlmesser-Uhr zählt von 3:00 runter, mit Schaltblitzen, Runden- und Sektoranzeige
-- Tiger Tiko und Panda Pia (flauschige 3D-Babytiere mit Fell) putzen vor, was gerade dran ist
+- Tiger Maties und Panda Yannik (flauschige 3D-Babytiere mit Fell) putzen vor, was gerade dran ist
 - Die Zahn-Cam zeigt ein Milchzahngebiss mit 48 Zahnmonstern; die Bürste fährt Zahn für Zahn ab und putzt sie weg
 - Ablauf nach der KAI-Methode: **K**auflächen (hin und her), **A**ußenflächen (kleine Kreise, Zähne zusammen), **I**nnenflächen (von Rot nach Weiß)
 - Sprachansagen auf Deutsch, Soundeffekte, Pausetaste („Boxenstopp“), Pokal-Zähler und Morgens/Abends-Haken (nur auf dem Gerät gespeichert)

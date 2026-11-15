@@ -194,9 +194,9 @@ canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
   <section class="teeth" id="teethView" aria-label="Zahn-Kamera">
     <canvas id="teethCanvas"></canvas>
     <div class="banner" id="banner" aria-live="polite">
-      <div class="banner-tags"><span class="tag" id="sectorTag">STARTAUFSTELLUNG</span><span class="tag coach" id="coachTag">TIKO &amp; PIA</span></div>
+      <div class="banner-tags"><span class="tag" id="sectorTag">STARTAUFSTELLUNG</span><span class="tag coach" id="coachTag">MATIES &amp; YANNIK</span></div>
       <div class="banner-title" id="bannerTitle">Die Zahnmonster sind los!</div>
-      <div class="banner-hint" id="bannerHint">Tiger Tiko und Panda Pia zeigen dir, wie du jeden Zahn sauber putzt.</div>
+      <div class="banner-hint" id="bannerHint">Tiger Maties und Panda Yannik zeigen dir, wie du jeden Zahn sauber putzt.</div>
     </div>
     <div class="monster-chip"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 7l2 5M23 7l-2 5" stroke="#fff1c9" stroke-width="3" stroke-linecap="round"/><ellipse cx="16" cy="19" rx="11" ry="10" fill="#86e05a"/><circle cx="12" cy="17" r="3.2" fill="#fff"/><circle cx="20" cy="17" r="3.2" fill="#fff"/><circle cx="12.5" cy="17.5" r="1.6" fill="#15101a"/><circle cx="19.5" cy="17.5" r="1.6" fill="#15101a"/><path d="M11 23.5q5 3 10 0" stroke="#15101a" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span><b id="monsterCount">48</b> Zahnmonster</span></div>
     <div class="cam-label"><i></i>ZAHN-CAM</div>
@@ -205,8 +205,8 @@ canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
   <section class="cockpit" id="cockpit" aria-label="Cockpit">
     <canvas id="coachCanvas"></canvas>
     <div class="gauge" id="gauge"></div>
-    <div class="name-tag" id="tagTiko" style="--c:var(--tiger)">Tiger Tiko</div>
-    <div class="name-tag" id="tagPia" style="--c:var(--panda)">Panda Pia</div>
+    <div class="name-tag" id="tagMaties" style="--c:var(--tiger)">Tiger Maties</div>
+    <div class="name-tag" id="tagYannik" style="--c:var(--panda)">Panda Yannik</div>
   </section>
 </div>
 
@@ -236,7 +236,7 @@ canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
       <label class="song-pick" id="songPick" for="songFile" hidden><span id="songName">Lied vom Gerät wählen …</span></label>
       <input type="file" id="songFile" accept="audio/*" hidden>
     </div>
-    <p class="tip">Eine erbsengroße Portion Kinderzahnpasta auf die Bürste. Dann mach mit, was Tiko und Pia vormachen!</p>
+    <p class="tip">Eine erbsengroße Portion Kinderzahnpasta auf die Bürste. Dann mach mit, was Maties und Yannik vormachen!</p>
     <button class="go-btn" id="btnStart">Motor starten</button>
   </div>
 </div>
@@ -684,7 +684,7 @@ function updateTeeth(dt, t){
 }
 
 /* ------------------------------------------------------------------ */
-/* COCKPIT: Tiger Tiko & Panda Pia */
+/* COCKPIT: Tiger Maties & Panda Yannik */
 var C = {dist:14};
 /* Flauschiges Fell: Schalen-Technik (mehrere leicht vergrößerte Hüllen mit Härchen-Muster) */
 var FUR_NOISE = (function(){
@@ -973,10 +973,10 @@ function updateAnimal(A, t, ctx){
 }
 function updateCoach(t){
   var seg = (S.mode==='running'||S.mode==='paused') ? SEGS[Math.max(0,S.seg)] : null;
-  var leadTiko = seg ? seg.i % 2 === 0 : true;
+  var leadMaties = seg ? seg.i % 2 === 0 : true;
   var ctx = {mode:S.mode==='paused' ? 'idle' : S.mode, kind:seg ? seg.kind : null, arch:seg ? seg.arch : null};
-  ctx.lead = leadTiko; updateAnimal(C.tiger, t, ctx);
-  ctx.lead = !leadTiko; updateAnimal(C.panda, t + 0.37, ctx);
+  ctx.lead = leadMaties; updateAnimal(C.tiger, t, ctx);
+  ctx.lead = !leadMaties; updateAnimal(C.panda, t + 0.37, ctx);
   C.r.render(C.scene, C.cam);
 }
 function layoutCoach(){
@@ -999,8 +999,8 @@ function layoutCoach(){
   C.tiger.root.position.set(p1[0], p1[1], 0); C.tiger.root.scale.setScalar(sc); C.tiger.root.rotation.y = 0.25;
   C.panda.root.position.set(p2[0], p2[1], 0); C.panda.root.scale.setScalar(sc); C.panda.root.rotation.y = -0.25;
   var ty = Math.min(feet + 4, H - 26);
-  var t1 = $('tagTiko'), t2 = $('tagPia');
-  cx1 = Math.max(cx1, 58); cx2 = Math.min(cx2, W-58);
+  var t1 = $('tagMaties'), t2 = $('tagYannik');
+  cx1 = Math.max(cx1, 66); cx2 = Math.min(cx2, W-66);
   t1.style.left = cx1+'px'; t1.style.top = ty+'px'; t2.style.left = cx2+'px'; t2.style.top = ty+'px';
 }
 function layoutTeeth(){
@@ -1232,14 +1232,14 @@ function releaseWake(){ try{ if(wakeLock){ wakeLock.release(); wakeLock = null; 
 function show(id, on){ $(id).hidden = !on; }
 function setBanner(tag, tagColor, coach, title, hint){
   $('sectorTag').textContent = tag; $('sectorTag').style.background = tagColor;
-  var ct = $('coachTag'); ct.textContent = coach; ct.classList.toggle('pia', /PIA/.test(coach) && !/TIKO/.test(coach));
+  var ct = $('coachTag'); ct.textContent = coach; ct.classList.toggle('pia', /YANNIK/.test(coach) && !/MATIES/.test(coach));
   $('bannerTitle').textContent = title; $('bannerHint').textContent = hint;
   var b = $('banner'); b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
 }
-function idleBanner(){ setBanner('STARTAUFSTELLUNG', 'var(--warn)', 'TIKO & PIA', 'Die Zahnmonster sind los!', 'Tiger Tiko und Panda Pia zeigen dir, wie du jeden Zahn sauber putzt.'); }
+function idleBanner(){ setBanner('STARTAUFSTELLUNG', 'var(--warn)', 'MATIES & YANNIK', 'Die Zahnmonster sind los!', 'Tiger Maties und Panda Yannik zeigen dir, wie du jeden Zahn sauber putzt.'); }
 function setLead(i){
-  $('tagTiko').classList.toggle('lead', i >= 0 && i%2===0);
-  $('tagPia').classList.toggle('lead', i >= 0 && i%2===1);
+  $('tagMaties').classList.toggle('lead', i >= 0 && i%2===0);
+  $('tagYannik').classList.toggle('lead', i >= 0 && i%2===1);
 }
 function reset(){
   S.timers.forEach(clearTimeout); S.timers = [];
@@ -1253,7 +1253,7 @@ function reset(){
 }
 function startRace(){
   Snd.init();
-  Voice.say('Motoren an! Gleich geht es los.');
+  Voice.say('Motoren an! Maties und Yannik sind bereit. Gleich geht es los.');
   Music.start();
   requestWake();
   reset();
@@ -1276,7 +1276,7 @@ function startRace(){
 }
 function onSegment(i){
   var seg = SEGS[i], sec = SECTORS[seg.sector];
-  setBanner('SEKTOR '+(seg.sector+1)+' · '+sec.name.toUpperCase(), sec.color, i%2===0 ? 'TIKO ZEIGT ES' : 'PIA ZEIGT ES', seg.title, seg.hint);
+  setBanner('SEKTOR '+(seg.sector+1)+' · '+sec.name.toUpperCase(), sec.color, i%2===0 ? 'MATIES ZEIGT ES' : 'YANNIK ZEIGT ES', seg.title, seg.hint);
   setLead(i);
   if(i > 0) Snd.vroom();
   Voice.say(seg.say);
@@ -1285,7 +1285,7 @@ function finishRace(){
   S.mode = 'finished'; S.elapsed = TOTAL;
   T.monsters.forEach(function(m){ if(!m.gone) popMonster(m); });
   $('btnPause').hidden = true; setLead(-1);
-  setBanner('ZIEL', 'var(--purple)', 'TIKO & PIA', 'Alle Zahnmonster sind weg!', 'Blitzsauber! Jetzt ausspucken, aber nicht nachspülen.');
+  setBanner('ZIEL', 'var(--purple)', 'MATIES & YANNIK', 'Alle Zahnmonster sind weg!', 'Blitzsauber! Jetzt ausspucken, aber nicht nachspülen.');
   Music.stop(); Snd.fanfare();
   Voice.say('Ziel! Super gemacht! Alle Zahnmonster sind weg. Jetzt ausspucken, aber nicht ausspülen.');
   var now = new Date(), key = dayKey(now), slot = now.getHours() < 14 ? 'm' : 'a';
