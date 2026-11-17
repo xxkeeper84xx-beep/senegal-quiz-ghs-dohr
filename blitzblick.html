@@ -226,9 +226,9 @@ details ul{margin:10px 0 0;padding-left:20px;line-height:1.55}
 
   <!-- NAMENSWAHL -->
   <section id="who" class="panel who" hidden>
-    <h2>Wer spielt?</h2>
+    <h2>Hallo! Wer spielt?</h2>
     <div class="names" id="names"></div>
-    <label class="label" for="nameInput">Oder neuen Namen eingeben</label>
+    <label class="label" for="nameInput" id="nameLbl">Oder neuen Namen eingeben</label>
     <input class="nameinput" id="nameInput" maxlength="16" autocomplete="off" placeholder="Dein Name">
     <div class="err" id="nameErr" aria-live="polite"></div>
     <div class="row" style="justify-content:center">
@@ -484,7 +484,11 @@ S.player=store.get('player','');
 function cleanName(s){return String(s||'').replace(/[\u0000-\u001f<>]/g,'').replace(/\s+/g,' ').trim().slice(0,16);}
 function setPlayer(n){S.player=n;store.set('player',n);$('playerLbl').textContent=n||'–';
   const list=[n,...store.get('names',[]).filter(x=>x.toLowerCase()!==n.toLowerCase())].slice(0,8);store.set('names',list);}
-function openWho(){
+function openWho(next){
+  S.whoNext=next||'menu';
+  $('goBtn').textContent=S.whoNext==='start'?'Spielen!':'Weiter';
+  $('whoBack').hidden=!S.player;
+  $('nameLbl').textContent=store.get('names',[]).length?'Oder neuen Namen eingeben':'Wie heißt du?';
   const box=$('names');box.innerHTML='';
   store.get('names',[]).forEach(n=>{const b=document.createElement('button');b.textContent=n;b.setAttribute('aria-pressed',n===S.player);
     b.addEventListener('click',()=>{box.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));$('nameInput').value='';$('nameErr').textContent='';});
@@ -497,13 +501,13 @@ function go(){
   const sel=$('names').querySelector('[aria-pressed="true"]');
   const n=typed||(sel?sel.textContent:'');
   if(!n){$('nameErr').textContent='Tippe auf deinen Namen oder schreibe ihn ins Feld.';return;}
-  setPlayer(n); startGame();
+  setPlayer(n); if(S.whoNext==='start') startGame(); else show('menu');
 }
 $('goBtn').addEventListener('click',go);
 $('nameInput').addEventListener('input',()=>{ $('nameErr').textContent=''; if($('nameInput').value) $('names').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false')); });
 $('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go();}});
 $('whoBack').addEventListener('click',()=>show('menu'));
-$('playerChip').addEventListener('click',()=>{ if($('game').hidden||S.phase==='idle'){clearTimers();openWho();} });
+$('playerChip').addEventListener('click',()=>{ if($('game').hidden||S.phase==='idle'){clearTimers();openWho('menu');} });
 
 /* ---------- Rangliste ---------- */
 let online=null, onlineRows=[], lastEntry=null;
@@ -559,13 +563,13 @@ function confetti(){
     p.style.animationDuration=(1.8+Math.random()*1.8)+'s';p.style.animationDelay=(Math.random()*.6)+'s';box.appendChild(p);}
   setTimeout(()=>box.innerHTML='',4500);
 }
-$('startBtn').addEventListener('click',openWho);
+$('startBtn').addEventListener('click',()=>{ S.player?startGame():openWho('start'); });
 $('againBtn').addEventListener('click',startGame);
 $('menuBtn').addEventListener('click',()=>{refreshMenu();show('menu');});
 $('quitBtn').addEventListener('click',()=>{clearTimers();S.phase='idle';refreshMenu();show('menu');});
 
 /* Startzustand: Beispielfeld mit 37 zeigen */
-refreshMenu(); fill(37); $('playerLbl').textContent=S.player||'–'; renderLB('lbMenu');
+refreshMenu(); fill(37); $('playerLbl').textContent=S.player||'–'; renderLB('lbMenu'); openWho('menu');
 })();
 </script>
 </body>
