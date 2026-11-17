@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Blitzblick 100</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: Rechenheft-Kästchenpapier als Grund; links das Hunderterfeld, rechts das Bedienfeld (auf dem Handy untereinander). Abdeckblatt aus Pappe deckt das Feld nach dem Blitz ab. */
+:root{
+  --paper:#FAFCFF; --grid:#DFE8F4; --ink:#1F2B47; --muted:#5D6B88;
+  --red:#E2463B; --blue:#2E6FD8; --sun:#FFC53A; --ok:#25995A; --bad:#D9572B;
+  --card:#FFFFFF; --line:#C9D5E6; --dotline:#C3CFE0; --cover:#EBCB8F; --cover-ink:#6B4A12;
+  --display:"Fredoka","Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121A2B; --grid:#1D2840; --ink:#ECF2FC; --muted:#9AA8C4;
+  --red:#FF6A5C; --blue:#5C97F7; --sun:#FFD25A; --ok:#46C17E; --bad:#FF8A5C;
+  --card:#1A2439; --line:#2C3A58; --dotline:#34446A; --cover:#5A4626; --cover-ink:#FFE2A8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121A2B; --grid:#1D2840; --ink:#ECF2FC; --muted:#9AA8C4;
+  --red:#FF6A5C; --blue:#5C97F7; --sun:#FFD25A; --ok:#46C17E; --bad:#FF8A5C;
+  --card:#1A2439; --line:#2C3A58; --dotline:#34446A; --cover:#5A4626; --cover-ink:#FFE2A8; color-scheme:dark}
+
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;}
+.wrap{max-width:980px;margin:0 auto;padding-block:18px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:40px;height:40px;flex:none}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,5vw,2.4rem);margin:0;letter-spacing:.01em;line-height:1}
+h1 span{color:var(--red)} h1 em{font-style:normal;color:var(--blue)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:800;font-size:.9rem;display:flex;gap:6px;align-items:center;font-variant-numeric:tabular-nums}
+.chip b{font-family:var(--display);font-size:1.05rem}
+
+.panel{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px}
+h2{font-family:var(--display);font-weight:600;font-size:1.35rem;margin:0 0 10px;text-wrap:balance}
+p{margin:0;line-height:1.5}
+.muted{color:var(--muted)}
+
+/* Menü */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.mode{all:unset;cursor:pointer;background:var(--paper);border:3px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;transition:transform .12s,border-color .12s}
+.mode:hover{transform:translateY(-2px)}
+.mode:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.mode[aria-pressed="true"]{border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 22%,transparent)}
+.mode .t{font-family:var(--display);font-weight:600;font-size:1.15rem}
+.mode .d{font-size:.92rem;color:var(--muted);line-height:1.4}
+.mode .best{font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{all:unset;cursor:pointer;padding:8px 14px;border-radius:12px;border:2px solid var(--line);font-weight:800;background:var(--paper)}
+.seg button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.seg button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.label{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.big{all:unset;cursor:pointer;font-family:var(--display);font-weight:700;font-size:1.3rem;background:var(--sun);color:#3A2600;padding:12px 28px;border-radius:14px;box-shadow:0 4px 0 color-mix(in srgb,var(--sun) 55%,#000);text-align:center}
+.big:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--sun) 55%,#000)}
+.big:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.ghost{all:unset;cursor:pointer;font-weight:800;padding:10px 16px;border-radius:12px;border:2px solid var(--line);background:var(--paper)}
+.ghost:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+/* Spiel */
+.game{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.fieldbox{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.side{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.status{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800;font-variant-numeric:tabular-nums}
+.progress{height:10px;background:var(--grid);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--blue);width:0;transition:width .3s}
+
+.board{position:relative;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 12px 12px 6px;width:100%;max-width:470px;align-self:center}
+.field{display:grid;grid-template-columns:2.1em repeat(5,1fr) 7px repeat(5,1fr);grid-template-rows:repeat(5,auto) 7px repeat(5,auto);gap:4px}
+.dot{all:unset;aspect-ratio:1;border-radius:50%;border:2px solid var(--dotline);box-sizing:border-box;transition:background .15s,border-color .15s,transform .15s}
+.dot.on.r{background:var(--red);border-color:var(--red)}
+.dot.on.b{background:var(--blue);border-color:var(--blue)}
+.legen .dot{cursor:pointer}
+.legen .dot:hover{transform:scale(1.12)}
+.dot:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
+.rl{font-family:var(--display);font-weight:600;font-size:.8rem;color:var(--ok);display:flex;align-items:center;justify-content:flex-end;padding-right:4px;opacity:0;transition:opacity .2s;font-variant-numeric:tabular-nums}
+.showlabels .rl.full{opacity:1}
+
+.cover{position:absolute;inset:0;border-radius:14px;background:var(--cover);
+  background-image:repeating-linear-gradient(45deg,transparent 0 10px,color-mix(in srgb,var(--cover-ink) 7%,transparent) 10px 12px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--cover-ink);
+  transform:translateY(-104%);opacity:0;transition:transform .28s cubic-bezier(.3,1.4,.6,1),opacity .2s;pointer-events:none}
+.board{overflow:hidden}
+.cover.down{transform:none;opacity:1}
+.cover svg{width:56px;height:56px}
+.cover .q{font-family:var(--display);font-weight:700;font-size:2.4rem}
+
+.countdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:5rem;color:var(--blue);background:color-mix(in srgb,var(--card) 85%,transparent);border-radius:14px}
+
+.prompt{font-family:var(--display);font-weight:600;font-size:1.4rem;line-height:1.25;text-wrap:balance;min-height:1.8em}
+.prompt strong{color:var(--red);font-size:1.8rem}
+.answer{font-family:var(--display);font-weight:700;font-size:2.6rem;text-align:center;background:var(--paper);border:3px dashed var(--line);border-radius:14px;padding:6px;min-height:1.4em;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keys button{all:unset;cursor:pointer;text-align:center;font-family:var(--display);font-weight:600;font-size:1.6rem;padding:10px 0;border-radius:12px;background:var(--paper);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.keys button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.keys button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.keys .ok{background:var(--ok);border-color:var(--ok);color:#fff;box-shadow:0 3px 0 color-mix(in srgb,var(--ok) 60%,#000)}
+.keys .del{font-size:1.2rem}
+.keys[aria-disabled="true"]{opacity:.45;pointer-events:none}
+
+.feedback{border-radius:14px;padding:12px 14px;font-weight:800;line-height:1.4;display:flex;flex-direction:column;gap:8px}
+.feedback.good{background:color-mix(in srgb,var(--ok) 16%,var(--card));border:2px solid var(--ok)}
+.feedback.bad{background:color-mix(in srgb,var(--bad) 14%,var(--card));border:2px solid var(--bad)}
+.feedback .head{font-family:var(--display);font-size:1.35rem}
+.feedback .split{font-variant-numeric:tabular-nums}
+.speed{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--muted);font-size:.9rem}
+.speed .bolt{width:18px;height:18px}
+.flame{color:var(--bad)}
+.pop{animation:pop .4s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+/* Ende */
+.stars{display:flex;gap:10px;justify-content:center;margin:8px 0}
+.stars svg{width:64px;height:64px}
+.end{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.end .score{font-family:var(--display);font-weight:700;font-size:3rem;line-height:1}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+details{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 16px}
+summary{cursor:pointer;font-weight:800}
+details ul{margin:10px 0 0;padding-left:20px;line-height:1.55}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:520px){.board{padding:8px 8px 8px 2px}.field{gap:3px}.keys button{font-size:1.4rem;padding:8px 0}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="9" fill="var(--sun)"/><path d="M23 5 11 22h8l-3 13 13-18h-8z" fill="#3A2600"/></svg>
+      <h1><span>Blitz</span>blick <em>100</em></h1>
+    </div>
+    <div class="chips">
+      <div class="chip" title="Gesammelte Sterne">⭐ <b id="totalStars">0</b></div>
+      <div class="chip" title="Bester Punktestand">Rekord <b id="hiChip">0</b></div>
+    </div>
+  </header>
+
+  <!-- MENÜ -->
+  <section id="menu" class="panel">
+    <h2>Was möchtest du spielen?</h2>
+    <p class="muted">Das Hunderterfeld blitzt kurz auf. Nicht zählen! Schau auf die vollen Zehnerreihen und die Fünfer.</p>
+    <div class="modes" id="modes">
+      <button class="mode" data-mode="blitz" aria-pressed="true">
+        <span class="t">Blitzblick</span>
+        <span class="d">Das Feld blitzt auf und wird abgedeckt. Wie viele Punkte waren es?</span>
+        <span class="best" data-best="blitz">Rekord 0</span>
+      </button>
+      <button class="mode" data-mode="legen" aria-pressed="false">
+        <span class="t">Zahl legen</span>
+        <span class="d">Du bekommst eine Zahl. Tippe auf den letzten Punkt, und das Feld füllt sich bis dorthin.</span>
+        <span class="best" data-best="legen">Rekord 0</span>
+      </button>
+      <button class="mode" data-mode="rest" aria-pressed="false">
+        <span class="t">Profi: Bis 100</span>
+        <span class="d">Blitz! Wie viele Punkte sind <b>leer</b>? Also: Wie viele fehlen bis 100?</span>
+        <span class="best" data-best="rest">Rekord 0</span>
+      </button>
+    </div>
+    <div class="row" style="margin-top:16px;gap:18px;justify-content:space-between">
+      <div class="row">
+        <span class="label">Zahlen</span>
+        <div class="seg" id="ranges">
+          <button data-range="20" aria-pressed="false">bis 20</button>
+          <button data-range="50" aria-pressed="false">bis 50</button>
+          <button data-range="100" aria-pressed="true">bis 100</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="label">Start-Blitz</span>
+        <div class="seg" id="speeds">
+          <button data-ms="3000" aria-pressed="false">langsam</button>
+          <button data-ms="2000" aria-pressed="true">mittel</button>
+          <button data-ms="1200" aria-pressed="false">schnell</button>
+        </div>
+      </div>
+      <button class="big" id="startBtn">Los geht's!</button>
+    </div>
+  </section>
+
+  <!-- SPIEL -->
+  <section id="game" class="game" hidden>
+    <div class="fieldbox">
+      <div class="status">
+        <span id="taskLbl">Aufgabe 1 von 10</span>
+        <span><span id="streakLbl"></span> Punkte: <span id="scoreLbl">0</span></span>
+      </div>
+      <div class="progress"><i id="prog"></i></div>
+      <div class="board" id="board">
+        <div class="field" id="field"></div>
+        <div class="cover" id="cover">
+          <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M23 3 9 23h9l-3 14 15-21h-9z" fill="currentColor"/></svg>
+          <span class="q">?</span>
+        </div>
+        <div class="countdown" id="countdown" hidden>3</div>
+      </div>
+      <div class="speed"><svg class="bolt" viewBox="0 0 40 40" aria-hidden="true"><path d="M23 3 9 23h9l-3 14 15-21h-9z" fill="var(--sun)"/></svg> Blitz-Zeit: <span id="speedLbl">2,0 s</span></div>
+    </div>
+    <div class="side">
+      <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+        <div class="prompt" id="prompt">Mach dich bereit …</div>
+        <div class="answer" id="answer" aria-live="polite"></div>
+        <div class="keys" id="keys" aria-disabled="true">
+          <button>7</button><button>8</button><button>9</button>
+          <button>4</button><button>5</button><button>6</button>
+          <button>1</button><button>2</button><button>3</button>
+          <button class="del" data-k="del" aria-label="Löschen">⌫</button><button>0</button><button class="ok" data-k="ok">OK</button>
+        </div>
+        <div class="row" id="legenBtns" hidden>
+          <button class="ghost" id="clearBtn">Leeren</button>
+          <button class="big" id="checkBtn" style="flex:1">Fertig!</button>
+        </div>
+        <div id="fb" hidden></div>
+      </div>
+      <button class="ghost" id="quitBtn" style="align-self:flex-start">Zurück zum Menü</button>
+    </div>
+  </section>
+
+  <!-- ENDE -->
+  <section id="end" class="panel end" hidden>
+    <h2 id="endTitle">Super gemacht!</h2>
+    <div class="stars" id="stars"></div>
+    <div class="score" id="endScore">0</div>
+    <p class="muted" id="endText"></p>
+    <div class="row" style="justify-content:center">
+      <button class="big" id="againBtn">Nochmal!</button>
+      <button class="ghost" id="menuBtn">Menü</button>
+    </div>
+  </section>
+
+  <details>
+    <summary>Für Eltern: So funktioniert die Übung</summary>
+    <ul>
+      <li>Beim <b>Blitzblick</b> soll die Menge nicht gezählt, sondern auf einen Blick erfasst werden: „3 volle Reihen sind 30, dazu 5 rote und 2 blaue, also 37.“</li>
+      <li>Die Lücke in der Mitte und die Farben zeigen die <b>Fünferstruktur</b>. Die obere Hälfte sind 50 Punkte.</li>
+      <li>Nach jeder Antwort erscheint das Feld wieder, mit den Zehnern an den vollen Reihen. Sprechen Sie mit Ihrem Kind darüber, <i>wie</i> es die Zahl gesehen hat.</li>
+      <li>Die Blitz-Zeit passt sich an: Nach zwei richtigen Antworten in Folge wird sie kürzer, nach einem Fehler wieder etwas länger.</li>
+      <li>Steuerung mit Tastatur: Zahlen tippen, <kbd>Enter</kbd> für OK, <kbd>Rücktaste</kbd> zum Löschen.</li>
+    </ul>
+  </details>
+</div>
+<div class="confetti" id="confetti"></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const TOTAL=10, MIN_MS=500, MAX_MS=3500;
+const store={
+  get(k,d){try{const v=localStorage.getItem('bb100_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('bb100_'+k,JSON.stringify(v))}catch(e){}}
+};
+const S={mode:'blitz',range:100,startMs:2000,ms:2000,task:0,score:0,streak:0,correct:0,n:0,input:'',phase:'idle',placed:0,t0:0,last:-1,timers:[]};
+
+/* ---------- Hunderterfeld bauen ---------- */
+const field=$('field'); const dots=[]; const labels=[];
+for(let r=0;r<10;r++){
+  const gr=r+1+(r>=5?1:0);
+  const l=document.createElement('div'); l.className='rl'; l.style.gridRow=gr; l.style.gridColumn=1; l.textContent=(r+1)*10;
+  field.appendChild(l); labels.push(l);
+  for(let c=0;c<10;c++){
+    const d=document.createElement('button'); const i=r*10+c;
+    d.className='dot '+(((r<5)===(c<5))?'r':'b');
+    d.style.gridRow=gr; d.style.gridColumn=c+2+(c>=5?1:0);
+    d.tabIndex=-1; d.setAttribute('aria-label','Punkt '+(i+1));
+    d.addEventListener('click',()=>{ if(S.mode==='legen'&&S.phase==='answer'){S.placed=i+1;fill(S.placed);beep(500+S.placed*4,.05,'triangle',.06);} });
+    field.appendChild(d); dots.push(d);
+  }
+}
+function fill(n){ dots.forEach((d,i)=>d.classList.toggle('on',i<n)); labels.forEach((l,r)=>l.classList.toggle('full',(r+1)*10<=n)); }
+function cover(on){ $('cover').classList.toggle('down',on); }
+function labelsOn(on){ field.classList.toggle('showlabels',on); }
+
+/* ---------- Ton ---------- */
+let ac=null;
+function beep(f,d,type='sine',vol=.12,delay=0){
+  try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+delay;
+    o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+}
+const sfx={
+  flash(){beep(1200,.08,'square',.05)},
+  good(){beep(660,.12,'triangle');beep(880,.12,'triangle',.12,.1);beep(1320,.18,'triangle',.1,.2)},
+  bad(){beep(300,.2,'sine',.12);beep(240,.25,'sine',.1,.18)},
+  tick(){beep(700,.06,'sine',.08)},
+  win(){[523,659,784,1047,1319].forEach((f,i)=>beep(f,.2,'triangle',.1,i*.12))}
+};
+
+/* ---------- Menü ---------- */
+function pick(group,attr,btn){ group.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===btn)); return btn.dataset[attr]; }
+$('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b)S.mode=pick($('modes'),'mode',b);});
+$('ranges').addEventListener('click',e=>{const b=e.target.closest('button');if(b)S.range=+pick($('ranges'),'range',b);});
+$('speeds').addEventListener('click',e=>{const b=e.target.closest('button');if(b)S.startMs=+pick($('speeds'),'ms',b);});
+function refreshMenu(){
+  ['blitz','legen','rest'].forEach(m=>document.querySelector(`[data-best="${m}"]`).textContent='Rekord '+store.get('hi_'+m,0));
+  $('totalStars').textContent=store.get('stars',0);
+  $('hiChip').textContent=Math.max(...['blitz','legen','rest'].map(m=>store.get('hi_'+m,0)));
+}
+function show(id){ ['menu','game','end'].forEach(s=>$(s).hidden=s!==id); window.scrollTo({top:0}); }
+
+/* ---------- Spielablauf ---------- */
+function clearTimers(){S.timers.forEach(clearTimeout);S.timers=[];}
+function later(fn,ms){S.timers.push(setTimeout(fn,ms));}
+function fmt(ms){return (ms/1000).toFixed(1).replace('.',',')+' s';}
+
+function startGame(){
+  clearTimers();
+  Object.assign(S,{task:0,score:0,streak:0,correct:0,ms:S.startMs,phase:'idle',last:-1});
+  board().classList.toggle('legen',S.mode==='legen');
+  $('keys').hidden=S.mode==='legen'; $('answer').hidden=S.mode==='legen'; $('legenBtns').hidden=S.mode!=='legen';
+  dots.forEach(d=>d.tabIndex=S.mode==='legen'?0:-1);
+  $('speedLbl').parentElement.hidden=S.mode==='legen';
+  show('game'); updateStatus();
+  countdown(3,nextTask);
+}
+const board=()=>$('board');
+function countdown(k,done){
+  fill(0);cover(false);labelsOn(false);$('fb').hidden=true;$('prompt').textContent='Mach dich bereit …';$('answer').textContent='';
+  const c=$('countdown'); c.hidden=false;
+  const step=i=>{ if(i===0){c.hidden=true;done();return;} c.textContent=i;c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');sfx.tick();later(()=>step(i-1),650); };
+  step(k);
+}
+function newNumber(){
+  let n; do{ n=1+Math.floor(Math.random()*S.range); }while(n===S.last && S.range>1);
+  S.last=n; return n;
+}
+function updateStatus(){
+  $('taskLbl').textContent=`Aufgabe ${Math.min(S.task+1,TOTAL)} von ${TOTAL}`;
+  $('scoreLbl').textContent=S.score;
+  $('streakLbl').innerHTML=S.streak>=2?`<span class="flame">🔥 ${S.streak}er-Serie</span> ·`:'';
+  $('prog').style.width=(S.task/TOTAL*100)+'%';
+  $('speedLbl').textContent=fmt(S.ms);
+}
+function nextTask(){
+  clearTimers(); $('fb').hidden=true; S.input=''; $('answer').textContent=''; labelsOn(false);
+  S.n=newNumber(); updateStatus();
+  if(S.mode==='legen'){
+    S.placed=0; fill(0); cover(false); S.phase='answer'; S.t0=performance.now();
+    $('prompt').innerHTML=`Lege <strong>${S.n}</strong> Punkte!`;
+    return;
+  }
+  S.phase='flash'; cover(false); fill(0);
+  $('prompt').textContent='Schau genau hin …'; $('keys').setAttribute('aria-disabled','true');
+  later(()=>{ fill(S.n); sfx.flash();
+    later(()=>{ cover(true); S.phase='answer'; S.t0=performance.now();
+      $('prompt').innerHTML=S.mode==='rest'?'Wie viele Punkte waren <b>leer</b>?':'Wie viele Punkte waren es?';
+      $('keys').setAttribute('aria-disabled','false');
+    },S.ms);
+  },450);
+}
+function typeKey(k){
+  if(S.phase!=='answer'||S.mode==='legen')return;
+  if(k==='del'){S.input=S.input.slice(0,-1);}
+  else if(k==='ok'){ if(S.input!=='') submit(+S.input); return; }
+  else if(S.input.length<3){ S.input=(S.input+k).replace(/^0+(?=\d)/,''); }
+  $('answer').textContent=S.input; beep(520,.04,'sine',.05);
+}
+$('keys').addEventListener('click',e=>{const b=e.target.closest('button');if(b)typeKey(b.dataset.k||b.textContent);});
+document.addEventListener('keydown',e=>{
+  if($('game').hidden)return;
+  if(/^[0-9]$/.test(e.key))typeKey(e.key);
+  else if(e.key==='Backspace'){e.preventDefault();typeKey('del');}
+  else if(e.key==='Enter'){ e.preventDefault();
+    if(S.phase==='answer'){ S.mode==='legen'?$('checkBtn').click():typeKey('ok'); }
+    else if(S.phase==='feedback'){ const nb=$('nextBtn'); if(nb)nb.click(); }
+  }
+});
+$('clearBtn').addEventListener('click',()=>{S.placed=0;fill(0);});
+$('checkBtn').addEventListener('click',()=>{ if(S.phase==='answer'&&S.mode==='legen') submit(S.placed); });
+
+function split(n){ const z=Math.floor(n/10),e=n%10;
+  const zt=z===1?'1 Zehner':z+' Zehner', et=e===1?'1 Einer':e+' Einer';
+  if(z===0)return et; if(e===0)return zt; return `${zt} + ${et}`; }
+function submit(val){
+  S.phase='feedback'; $('keys').setAttribute('aria-disabled','true');
+  const target=S.mode==='rest'?100-S.n:S.n;
+  const ok=val===target; const secs=(performance.now()-S.t0)/1000;
+  fill(S.n); cover(false); labelsOn(true);
+  const fb=$('fb'); fb.hidden=false;
+  let gained=0;
+  if(ok){
+    S.correct++; S.streak++;
+    const speed=Math.max(0,Math.round(5-secs*1.2)); gained=10+speed+(S.streak>=3?5:0); S.score+=gained;
+    if(S.mode!=='legen' && S.streak%2===0) S.ms=Math.max(MIN_MS,S.ms-200);
+    sfx.good();
+  }else{
+    S.streak=0; if(S.mode!=='legen') S.ms=Math.min(MAX_MS,S.ms+200); sfx.bad();
+  }
+  const praise=['Super!','Klasse!','Blitzschnell!','Stark!','Richtig!','Wow!'][Math.floor(Math.random()*6)];
+  let explain = `<span class="split">${S.n} = ${split(S.n)}</span>`;
+  if(S.mode==='rest') explain+=`<span class="split">Leer: 100 − ${S.n} = ${100-S.n}</span>`;
+  if(S.mode==='legen' && !ok) explain=`<span class="split">Du hast ${val} gelegt. Gesucht war ${S.n} = ${split(S.n)}.</span>`;
+  fb.className='feedback '+(ok?'good':'bad');
+  fb.innerHTML= ok
+    ? `<span class="head">${praise} +${gained}</span>${explain}`
+    : `<span class="head">Fast! Richtig ist ${target}.</span>${explain}<span class="muted" style="font-weight:700">Schau dir das Feld nochmal an: Wo sind die vollen Zehnerreihen?</span>`;
+  const nb=document.createElement('button'); nb.className='big'; nb.id='nextBtn'; nb.textContent=S.task+1>=TOTAL?'Ergebnis ansehen':'Weiter';
+  nb.addEventListener('click',advance); fb.appendChild(nb);
+  $('scoreLbl').classList.remove('pop');void $('scoreLbl').offsetWidth;$('scoreLbl').classList.add('pop');
+  updateStatus();
+  if(ok) later(advance,2200);
+}
+function advance(){ if(S.phase!=='feedback')return; S.phase='idle'; S.task++; updateStatus(); if(S.task>=TOTAL) endGame(); else nextTask(); }
+
+const STAR=f=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.5l1.3-6.6L2.5 9.3l6.6-.8z" fill="${f?'var(--sun)':'var(--grid)'}" stroke="${f?'#C98A00':'var(--line)'}" stroke-width="1.2"/></svg>`;
+function endGame(){
+  clearTimers();
+  const stars=S.correct>=9?3:S.correct>=7?2:S.correct>=4?1:0;
+  const key='hi_'+S.mode, hi=store.get(key,0), rec=S.score>hi;
+  if(rec)store.set(key,S.score);
+  store.set('stars',store.get('stars',0)+stars);
+  $('stars').innerHTML=STAR(stars>=1)+STAR(stars>=2)+STAR(stars>=3);
+  $('endScore').textContent=S.score+' Punkte';
+  $('endTitle').textContent=stars===3?'Blitz-Profi!':stars===2?'Super gemacht!':stars===1?'Gut geübt!':'Weiter üben, du schaffst das!';
+  $('endText').innerHTML=`${S.correct} von ${TOTAL} richtig.`+(rec?' <b>Neuer Rekord!</b>':'')+(S.mode!=='legen'?` Dein schnellster Blitz: ${fmt(S.ms)}.`:'');
+  refreshMenu(); show('end');
+  if(stars>=2){sfx.win();confetti();}
+}
+function confetti(){
+  const box=$('confetti'),cols=['var(--red)','var(--blue)','var(--sun)','var(--ok)'];
+  for(let i=0;i<70;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'vw';p.style.background=cols[i%4];
+    p.style.animationDuration=(1.8+Math.random()*1.8)+'s';p.style.animationDelay=(Math.random()*.6)+'s';box.appendChild(p);}
+  setTimeout(()=>box.innerHTML='',4500);
+}
+$('startBtn').addEventListener('click',startGame);
+$('againBtn').addEventListener('click',startGame);
+$('menuBtn').addEventListener('click',()=>{refreshMenu();show('menu');});
+$('quitBtn').addEventListener('click',()=>{clearTimers();S.phase='idle';refreshMenu();show('menu');});
+
+/* Startzustand: Beispielfeld mit 37 zeigen */
+refreshMenu(); fill(37);
+})();
+</script>
+</body>
+</html>
