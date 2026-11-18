@@ -139,7 +139,7 @@ body.touch #clock{bottom:auto;left:auto;top:calc(150px + env(safe-area-inset-top
   <div class="card">
     <span class="tag">3D-Open-World · Mathe · Klasse 8/9</span>
     <h1 style="margin-top:12px">Pythagoras City</h1>
-    <p style="font-size:17px;margin-top:12px">Du bist neu in der Stadt und hast noch kein Fahrzeug. Feuerwehr, Baustelle, Taxi-Zentrale und Bauamt brauchen jemanden, der <b>rechnen</b> kann. Lauf zu den leuchtenden Lichtsäulen, löse die Pythagoras-Aufgabe und liefere pünktlich ab. Mit dem verdienten Geld kaufst du dir im <b>Autohaus 🚘</b> erst ein Fahrrad, dann einen Roller und irgendwann den Sportwagen.</p>
+    <p style="font-size:17px;margin-top:12px">Du bist neu in der Stadt und hast noch kein Fahrzeug. Feuerwehr, Baustelle, Taxi-Zentrale und Bauamt brauchen jemanden, der <b>rechnen</b> kann. Lauf zu den leuchtenden Lichtsäulen, löse die Pythagoras-Aufgabe und liefere pünktlich ab. Mit dem verdienten Geld kaufst du dir im <b>Autohaus 🚘</b> erst ein Fahrrad, dann einen Roller und später echte Autos: vom Smart über den Toyota Prius und den Aston Martin bis zum Maserati.</p>
     <div class="formula">a² + b² = c²</div>
     <div class="cols" style="margin-top:10px">
       <div>
@@ -296,9 +296,10 @@ const VEHICLES=[
   {id:"walk", name:"Zu Fuß",       icon:"🚶",price:0,   req:1,max:105,acc:520,rev:-55, r:6, grass:100,turn:3.4,agile:true,kmh:.07,cam:.5, lights:false,desc:"Kostenlos. Langsam, aber du kommst überall hin."},
   {id:"bike", name:"Fahrrad",      icon:"🚲",price:150, req:1,max:190,acc:260,rev:-50, r:8, grass:150,turn:3.0,agile:true,kmh:.13,cam:.62,lights:false,desc:"Fast doppelt so schnell wie zu Fuß."},
   {id:"moped",name:"Motorroller",  icon:"🛵",price:450, req:1,max:250,acc:280,rev:-60, r:9, grass:150,turn:2.8,kmh:.18,cam:.7, lights:true, desc:"Wendig und flott, mit Licht für die Nacht."},
-  {id:"small",name:"Kleinwagen",   icon:"🚗",price:1000,req:2,max:300,acc:240,rev:-110,r:11,grass:170,turn:2.5,kmh:.3, cam:.9, lights:true, desc:"Dein erstes Auto. Führerschein ab Rang 2."},
-  {id:"suv",  name:"Gelände-Pickup",icon:"🛻",price:2000,req:3,max:320,acc:230,rev:-120,r:14,grass:300,turn:2.3,kmh:.3, cam:1.05,lights:true,desc:"Fährt durch Parks fast ohne zu bremsen."},
-  {id:"sport",name:"Sportwagen",   icon:"🏎️",price:3800,req:4,max:430,acc:340,rev:-130,r:13,grass:180,turn:2.5,kmh:.3, cam:1,  lights:true, desc:"Der schnellste Wagen der Stadt."},
+  {id:"smart",name:"Smart",        icon:"🚙",price:700, req:2,max:270,acc:260,rev:-100,r:9, grass:170,turn:2.9,kmh:.3, cam:.8, lights:true, desc:"Dein erstes Auto: winzig, wendig, passt in jede Lücke. Führerschein ab Rang 2."},
+  {id:"prius",name:"Toyota Prius", icon:"🚗",price:1400,req:2,max:310,acc:230,rev:-110,r:11,grass:180,turn:2.5,kmh:.3, cam:.9, lights:true, desc:"Leiser Hybrid mit mehr Tempo für weite Lieferungen."},
+  {id:"aston",name:"Aston Martin", icon:"🏎️",price:2600,req:3,max:390,acc:320,rev:-125,r:13,grass:180,turn:2.5,kmh:.3, cam:1,  lights:true, desc:"Britischer Sportwagen mit langer Motorhaube."},
+  {id:"maser",name:"Maserati",     icon:"🏁",price:4000,req:4,max:440,acc:360,rev:-130,r:13,grass:190,turn:2.6,kmh:.3, cam:1.02,lights:true,desc:"Das Traumauto: der schnellste Wagen der Stadt."},
 ];
 const VEH=Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
 
@@ -356,6 +357,7 @@ const RANKS=[[0,"Rechen-Rookie"],[100,"Kathetenkurier"],[250,"Hypotenusen-Held"]
 const freshSave=()=>({xp:0,money:0,solved:0,firstTry:0,wrong:0,delivered:0,owned:["walk"],veh:"walk",tip:false});
 let save=freshSave();
 try{const s=JSON.parse(localStorage.getItem("pyCity")||"null");if(s)save=Object.assign(save,s)}catch(e){}
+{const MAP={small:"smart",suv:"prius",sport:"aston"};save.owned=[...new Set((save.owned||["walk"]).map(id=>MAP[id]||id))].filter(id=>VEH[id]);if(!save.owned.includes("walk"))save.owned.unshift("walk");save.veh=MAP[save.veh]||save.veh;if(!save.owned.includes(save.veh))save.veh="walk"}
 const persist=()=>{try{localStorage.setItem("pyCity",JSON.stringify(save))}catch(e){}};
 const V=()=>VEH[save.veh]||VEH.walk;
 const lvl=()=>{let l=0;RANKS.forEach((r,i)=>{if(save.xp>=r[0])l=i});return l+1};
@@ -634,7 +636,7 @@ function renderShop(){
       else if(save.money<v.price){btn=`<button type="button" disabled>Zu teuer</button>`;why=`Dir fehlen noch $${(v.price-save.money).toLocaleString("de-DE")}`}
       else{btn=`<button class="primary" type="button" data-buy="${v.id}">Kaufen</button>`;cls=""}}
     return `<div class="vcard ${cls}"><div class="vicon">${v.icon}</div><div class="vname">${v.name}</div>
-      <div class="vstat">Tempo<span class="vbar"><i style="width:${v.max/430*100}%"></i></span></div>
+      <div class="vstat">Tempo<span class="vbar"><i style="width:${v.max/440*100}%"></i></span></div>
       <div class="vstat">Wendig<span class="vbar"><i style="width:${v.turn/3.4*100}%"></i></span></div>
       <p>${v.desc}</p><div class="vprice">${v.price?"$"+v.price.toLocaleString("de-DE"):"gratis"}</div>${btn}${why?`<small>${why}</small>`:""}</div>`}).join("");
 }
@@ -840,7 +842,11 @@ function makeCar(color,player,o={}){
   const base=wr+lift, top=base+bh;
   add(L,bh,Wd,paint(color),0,base+bh/2,0);
   add(cabL,cabH,Wd-2.5,matGlass,cabX,top+cabH/2,0);
-  add(cabL-1,1,Wd-2,paint(color),cabX,top+cabH+.4,0);
+  add(cabL-1,1,Wd-2,paint(o.roof||color),cabX,top+cabH+.4,0);
+  if(o.grille)add(1,bh*.55,Wd*.55,matChrome,L/2+.3,base+bh*.45,0,false);
+  if(o.pillar)for(const z of [Wd/2-1.6,-Wd/2+1.6])add(2.2,cabH,1.2,paint(o.pillar),cabX-cabL/2+1.5,top+cabH/2,z);
+  if(o.badge)add(.6,1.6,3,paint(o.badge),-L/2-.5,base+bh*.3,0,false);
+  if(o.exhaust)for(const z of [3,1.4,-1.4,-3])add(1.2,1.1,1.1,matChrome,-L/2-.6,base+1,z,false);
   if(o.pickup){add(L*.42,3,1,paint(color),-L*.27,top+1.5,Wd/2-.5);add(L*.42,3,1,paint(color),-L*.27,top+1.5,-Wd/2+.5);add(1,3,Wd,paint(color),-L/2+.5,top+1.5,0);add(L*.4,.6,Wd-2,matTire,-L*.27,top+.3,0)}
   if(o.spoiler){add(4,1,Wd,paint("#111"),-L/2+2,top+5,0);add(1.2,4,1.2,paint("#111"),-L/2+2,top+2.5,Wd/2-3);add(1.2,4,1.2,paint("#111"),-L/2+2,top+2.5,-Wd/2+3)}
   if(o.stripe){add(L+.4,.6,4,paint(o.stripe),0,top+.3,0)}
@@ -884,9 +890,10 @@ function makeMoped(){
 }
 const walker=makePerson(); scene.add(walker);
 const vehMeshes={walk:walker,bike:makeBike(),moped:makeMoped(),
-  small:makeCar("#e04e39",true,{len:31,wid:17,cabL:16,cabX:-1.5,wheel:4.2}),
-  suv:makeCar("#3d5a3a",true,{len:44,wid:21,lift:3,wheel:5.8,cabL:17,cabX:6,cabH:9,pickup:true}),
-  sport:makeCar("#d8b21e",true,{len:42,wid:20,bh:6,cabL:15,cabH:6,cabX:-4,spoiler:true,stripe:"#1a2147",wheel:4.4})};
+  smart:makeCar("#9ccc2e",true,{len:25,wid:16,bh:8,cabL:15,cabH:10,cabX:-2,wheel:4,roof:"#1b1b1b",pillar:"#1b1b1b"}),
+  prius:makeCar("#a9bccd",true,{len:39,wid:18.5,bh:8,cabL:23,cabH:8,cabX:-2,wheel:4.4,badge:"#2a6fd8"}),
+  aston:makeCar("#1f5c4a",true,{len:44,wid:20,bh:6,cabL:15,cabH:6,cabX:-7,wheel:4.7,grille:true}),
+  maser:makeCar("#1b2f6b",true,{len:46,wid:20.5,bh:6.5,cabL:17,cabH:6,cabX:-6,wheel:4.9,grille:true,exhaust:true,stripe:"#c9a23a"})};
 npcs.forEach(n=>n.mesh=makeCar(n.col,false));
 // Fußgänger
 const pedBody=new THREE.CylinderGeometry(2.4,2.8,10,8); pedBody.translate(0,8,0);
