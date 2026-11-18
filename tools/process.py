@@ -110,6 +110,7 @@ WALK = {"pedestrian": 8, "footway": 2.6, "path": 2.2, "cycleway": 2.4, "steps": 
 
 roads, nodes_idx, nodes = [], {}, []
 buildings, parts, areas, rails, trees, pois = [], [], [], [], [], []
+BLOCKED = set()  # nicht jugendfreie Orte: weder als Ort noch als Gebäudename übernehmen
 
 
 def nid(n, lat, lon):
@@ -154,7 +155,9 @@ for e in d["elements"]:
             x, y = centroid(pts) if pts else (9e9, 9e9)
         else:
             x = y = 9e9
-        if inside_box(x, y):
+        adult = t.get("amenity") in ("brothel", "nightclub", "stripclub", "swingerclub", "gambling", "casino", "love_hotel") or t.get("shop") in ("erotic", "pawnbroker") or t.get("leisure") == "adult_gaming_centre"
+        if adult and t.get("name"): BLOCKED.add(t["name"])
+        if inside_box(x, y) and not adult:
             kind = next((f"{k}={t[k]}" for k in POI_KEYS if k in t), "")
             pois.append({"n": t.get("name", ""), "k": kind, "x": r1(x), "y": r1(y)})
     if typ == "node":
@@ -244,6 +247,8 @@ for b in buildings:
         b["skip"] = 1  # Teile übernehmen
     kept.append(b)
 buildings = [b for b in kept if not b.get("skip")] + parts
+for b in buildings:
+    if b.get("n") in BLOCKED or "pfandhaus" in b.get("n", "").lower(): b.pop("n")
 
 data = {"origin": [LAT0, LON0], "half": [HALF_X, HALF_Y], "nodes": nodes, "roads": roads, "buildings": buildings,
         "areas": areas, "rails": rails, "trees": trees, "pois": pois}
