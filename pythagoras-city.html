@@ -80,6 +80,19 @@ button.primary:hover{filter:brightness(1.08)}
 .giverlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;font-size:14px}
 .giverlist div{background:#fff;border-radius:10px;padding:8px 10px;box-shadow:inset 0 0 0 1.5px #d4d9f3}
 .close{position:absolute;top:12px;right:12px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-top:14px}
+.vcard{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:inset 0 0 0 1.5px #d4d9f3;display:flex;flex-direction:column;gap:6px;min-width:0}
+.vcard.active{box-shadow:inset 0 0 0 3px #14874a}
+.vcard.locked{opacity:.78}
+.vicon{font-size:40px;line-height:1.1}
+.vname{font-weight:700;font-size:16px}
+.vstat{display:grid;grid-template-columns:52px 1fr;gap:6px;align-items:center;font-size:12px;color:#56609a}
+.vbar{height:6px;background:#e3e7fb;border-radius:3px;overflow:hidden}.vbar i{display:block;height:100%;background:#3a47a0}
+.vcard p{font-size:13px;margin:2px 0;line-height:1.4}
+.vprice{font-family:var(--display);font-size:18px}
+.vcard small{color:#56609a;font-size:12.5px}
+.vcard button{margin-top:auto}
+.vcard button:disabled{opacity:.6;cursor:not-allowed}
 #touch{position:fixed;inset:auto 0 0 0;z-index:6;display:none;justify-content:space-between;padding:0 max(14px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));pointer-events:none}
 #touch .grp{display:flex;gap:10px;pointer-events:auto}
 #touch button{width:68px;height:68px;border-radius:50%;font-size:26px;background:rgba(13,17,36,.7);box-shadow:inset 0 0 0 2px var(--line)}
@@ -101,10 +114,12 @@ body.touch #clock{bottom:auto;left:auto;top:calc(150px + env(safe-area-inset-top
   <div class="rank" id="hRank">Rechen-Rookie</div>
   <div class="xpbar"><i id="hXp"></i></div>
   <div class="small" id="hSmall">XP 0 · gelöst 0</div>
+  <div class="small" id="hVeh">🚶 Zu Fuß</div>
 </div>
 <div id="topbtns">
   <button id="btnHelp" type="button">📐 Theorie (H)</button>
   <button id="btnCam" type="button">🎥 Kamera (V)</button>
+  <button id="btnGarage" type="button">🔑 Garage (G)</button>
   <button id="btnMenu" type="button">☰ Menü</button>
 </div>
 <canvas class="hud" id="mm" width="380" height="380"></canvas>
@@ -124,17 +139,18 @@ body.touch #clock{bottom:auto;left:auto;top:calc(150px + env(safe-area-inset-top
   <div class="card">
     <span class="tag">3D-Open-World · Mathe · Klasse 8/9</span>
     <h1 style="margin-top:12px">Pythagoras City</h1>
-    <p style="font-size:17px;margin-top:12px">Du bist neu in der Stadt und sitzt hinterm Steuer. Feuerwehr, Baustelle, Taxi-Zentrale und Bauamt brauchen jemanden, der <b>fahren</b> und <b>rechnen</b> kann. Fahr zu den leuchtenden Lichtsäulen, löse die Pythagoras-Aufgabe und liefere pünktlich ab. Jede richtige Rechnung bringt XP, jede Lieferung Geld.</p>
+    <p style="font-size:17px;margin-top:12px">Du bist neu in der Stadt und hast noch kein Fahrzeug. Feuerwehr, Baustelle, Taxi-Zentrale und Bauamt brauchen jemanden, der <b>rechnen</b> kann. Lauf zu den leuchtenden Lichtsäulen, löse die Pythagoras-Aufgabe und liefere pünktlich ab. Mit dem verdienten Geld kaufst du dir im <b>Autohaus 🚘</b> erst ein Fahrrad, dann einen Roller und irgendwann den Sportwagen.</p>
     <div class="formula">a² + b² = c²</div>
     <div class="cols" style="margin-top:10px">
       <div>
         <h3>Steuerung</h3>
         <div class="keys">
-          <kbd>W / ↑</kbd><span>Gas</span>
+          <kbd>W / ↑</kbd><span>Gehen / Gas</span>
           <kbd>S / ↓</kbd><span>Bremse / rückwärts</span>
           <kbd>A D / ← →</kbd><span>Lenken</span>
           <kbd>E / Enter</kbd><span>Auftrag annehmen</span>
           <kbd>V</kbd><span>Kamera wechseln</span>
+          <kbd>G</kbd><span>Garage: Fahrzeug wechseln</span>
           <kbd>H</kbd><span>Theorie &amp; Formeln</span>
         </div>
         <p style="font-size:13px;color:#56609a">Auf dem Tablet erscheinen Touch-Tasten.</p>
@@ -189,6 +205,16 @@ body.touch #clock{bottom:auto;left:auto;top:calc(150px + env(safe-area-inset-top
         <div class="row" id="dGo" hidden><button class="primary" type="button" id="bGo">Auftrag starten ▶</button></div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="shop" hidden>
+  <div class="card">
+    <button class="close" type="button" id="shopClose">Schließen ✕</button>
+    <span class="tag" id="shopTag">Autohaus</span>
+    <h2 id="shopTitle">Autohaus Hypotenuse</h2>
+    <p id="shopInfo"></p>
+    <div class="vgrid" id="vgrid"></div>
   </div>
 </div>
 
@@ -263,7 +289,18 @@ const GIVERS=[
   {id:"amt",  name:"Bauamt",     icon:"🏛️", col:"#c59bff", bx:4,by:4, about:"Ist der Winkel 90°?"},
   {id:"park", name:"Park-Kurier",icon:"🌳", col:"#3ddc84", bx:7,by:4, about:"Abkürzung diagonal"},
   {id:"taxi", name:"Taxi-Zentrale",icon:"🚕",col:"#ffe066", bx:2,by:7, about:"Luftlinie per Koordinaten"},
+  {id:"shop", name:"Autohaus",   icon:"🚘", col:"#ff8a3d", bx:5,by:6, about:"Fahrrad, Roller & Autos kaufen"},
 ];
+/* Fahrzeuge: man startet zu Fuß und kauft sich bessere Fahrzeuge (Preis + Mindest-Rang) */
+const VEHICLES=[
+  {id:"walk", name:"Zu Fuß",       icon:"🚶",price:0,   req:1,max:105,acc:520,rev:-55, r:6, grass:100,turn:3.4,agile:true,kmh:.07,cam:.5, lights:false,desc:"Kostenlos. Langsam, aber du kommst überall hin."},
+  {id:"bike", name:"Fahrrad",      icon:"🚲",price:150, req:1,max:190,acc:260,rev:-50, r:8, grass:150,turn:3.0,agile:true,kmh:.13,cam:.62,lights:false,desc:"Fast doppelt so schnell wie zu Fuß."},
+  {id:"moped",name:"Motorroller",  icon:"🛵",price:450, req:1,max:250,acc:280,rev:-60, r:9, grass:150,turn:2.8,kmh:.18,cam:.7, lights:true, desc:"Wendig und flott, mit Licht für die Nacht."},
+  {id:"small",name:"Kleinwagen",   icon:"🚗",price:1000,req:2,max:300,acc:240,rev:-110,r:11,grass:170,turn:2.5,kmh:.3, cam:.9, lights:true, desc:"Dein erstes Auto. Führerschein ab Rang 2."},
+  {id:"suv",  name:"Gelände-Pickup",icon:"🛻",price:2000,req:3,max:320,acc:230,rev:-120,r:14,grass:300,turn:2.3,kmh:.3, cam:1.05,lights:true,desc:"Fährt durch Parks fast ohne zu bremsen."},
+  {id:"sport",name:"Sportwagen",   icon:"🏎️",price:3800,req:4,max:430,acc:340,rev:-130,r:13,grass:180,turn:2.5,kmh:.3, cam:1,  lights:true, desc:"Der schnellste Wagen der Stadt."},
+];
+const VEH=Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
 
 /* ============ Stadt generieren ============ */
 const blocks=[], buildings=[], trees=[], lamps=[];
@@ -316,13 +353,15 @@ GIVERS.forEach(g=>{Object.assign(g,giverPos(g))});
 
 /* ============ Spielstand ============ */
 const RANKS=[[0,"Rechen-Rookie"],[100,"Kathetenkurier"],[250,"Hypotenusen-Held"],[450,"Wurzel-Profi"],[700,"Pythagoras-Legende"]];
-let save={xp:0,money:0,solved:0,firstTry:0,wrong:0,delivered:0};
+const freshSave=()=>({xp:0,money:0,solved:0,firstTry:0,wrong:0,delivered:0,owned:["walk"],veh:"walk",tip:false});
+let save=freshSave();
 try{const s=JSON.parse(localStorage.getItem("pyCity")||"null");if(s)save=Object.assign(save,s)}catch(e){}
 const persist=()=>{try{localStorage.setItem("pyCity",JSON.stringify(save))}catch(e){}};
+const V=()=>VEH[save.veh]||VEH.walk;
 const lvl=()=>{let l=0;RANKS.forEach((r,i)=>{if(save.xp>=r[0])l=i});return l+1};
 
 /* ============ Spieler & Verkehr (Logik in Stadt-Koordinaten x/y) ============ */
-const car={x:(3*BS+4)*T,y:4*BS*T+1.5*T,a:0,v:0,r:13,h:0,steer:0,pv:0};
+const car={x:(3*BS+4)*T,y:4*BS*T+1.5*T,a:0,v:0,r:6,h:0,steer:0,pv:0,ph:0};
 const npcs=[], peds=[];
 const DV=[[1,0],[0,1],[-1,0],[0,-1]], DA=[0,Math.PI/2,Math.PI,-Math.PI/2];
 const laneCoord=(band,dir)=>band*BS*T+((dir===0||dir===3)?1.5:.5)*T;
@@ -389,7 +428,8 @@ addEventListener("keydown",e=>{
   if((k==="e"||k==="enter")&&state.mode==="play"&&nearGiver)openMission(nearGiver);
   if(k==="h"){if(state.mode==="play")openHelp();else if(state.mode==="help")closeHelp()}
   if(k==="v"&&!e.repeat)cycleCam();
-  if(k==="escape"){if(state.mode==="help")closeHelp();else if(state.mode==="dialog"&&!cur.solved)closeDlg()}
+  if(k==="g"&&!e.repeat){if(state.mode==="play")openShop(false);else if(state.mode==="shop")closeShop()}
+  if(k==="escape"){if(state.mode==="shop")closeShop();else if(state.mode==="help")closeHelp();else if(state.mode==="dialog"&&!cur.solved)closeDlg()}
 });
 addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false});
 addEventListener("blur",()=>{for(const k in keys)keys[k]=false});
@@ -453,7 +493,7 @@ function makeTask(g){
       q:"Wie lang ist der Weg quer durch den Park (die Diagonale)?",deliver:"Nimm die Abkürzung quer durch den Park!",tag:"Park-Kurier",extra:`Ersparnis: ${fmt(a+b)} m − ${fmt(c)} m ≈ <span class="hl">${fmt(a+b-c)} m</span>`};
   }
   if(g.id==="taxi"){
-    let dx,dy; if(L===1){[dx,dy]=pick([[3,4],[4,3]])}else{do{dx=ri(1,6);dy=ri(1,6)}while(dx===dy)}
+    const slow=save.veh==='walk'||save.veh==='bike'; let dx,dy; if(L===1||(slow&&Math.random()<.5)){[dx,dy]=pick([[3,4],[4,3]])}else{do{dx=ri(1,slow?4:6);dy=ri(1,slow?4:6)}while(dx===dy)}
     const a=dy*100,b=dx*100,c=Math.hypot(a,b);
     t={a,b,c,unk:"c",unit:"m",lab:{a:"Δy (Nord)",b:"Δx (Ost)",c:"Luftlinie"},title:"Navi ausgefallen!",
       story:`Ein Fahrgast will zu einer Adresse <b>${dx} Blöcke nach Osten</b> und <b>${dy} Blöcke nach Norden</b>. Ein Block (von Kreuzung zu Kreuzung) ist 100 m.`,
@@ -514,6 +554,7 @@ function triSVG(t){
 
 /* ============ Dialog ============ */
 function openMission(g){
+  if(g.id==="shop"){openShop(true);return}
   if(state.task)return;
   cur=makeTask(g); state.mode="dialog"; car.v=0;
   $("dTag").textContent=cur.tag; $("dTitle").textContent=cur.title;
@@ -564,17 +605,54 @@ function startDelivery(t){
   if(t.taxi){const b=blocks.find(b=>b.bx===g.bx+t.taxi.dx&&b.by===g.by-t.taxi.dy);tx=(b.x0+3)*T;ty=(b.y0+.5)*T}
   else if(g.id==="park"){const b=blocks.find(b=>b.bx===g.bx&&b.by===g.by);tx=(b.x0+5.5)*T;ty=(b.y0+5.5)*T}
   else {
-    const cands=blocks.filter(b=>b.type==="build"&&Math.hypot((b.x0+3)*T-g.x,(b.y0+3)*T-g.y)>T*14&&Math.hypot((b.x0+3)*T-g.x,(b.y0+3)*T-g.y)<T*40);
+    const [lo,hi]={walk:[6,16],bike:[9,24],moped:[11,30]}[save.veh]||[14,40];
+    const dd=b=>Math.hypot((b.x0+3)*T-g.x,(b.y0+3)*T-g.y);
+    let cands=blocks.filter(b=>b.type==="build"&&dd(b)>T*lo&&dd(b)<T*hi); if(!cands.length)cands=blocks.filter(b=>b.type==="build"&&dd(b)>T*5);
     const b=pick(cands); const pos=[[3,.5],[5.5,3],[3,5.5],[.5,3]][ri(0,3)]; tx=(b.x0+pos[0])*T; ty=(b.y0+pos[1])*T;
   }
   const d=Math.hypot(tx-car.x,ty-car.y);
-  state.task={t,x:tx,y:ty,time:Math.round(14+d/90+(g.id==="park"?6:0)),reward:Math.round(40+d/T*3+lvl()*10),label:t.deliver};
+  state.task={t,x:tx,y:ty,time:Math.round(12+d/(V().max*.5)+(g.id==="park"?6:0)),reward:Math.round(40+d/T*3+lvl()*10),label:t.deliver};
   toast("Los geht's!",t.deliver,"#ffc933");
+}
+
+/* ============ Autohaus & Garage ============ */
+let shopAt=false;
+function openShop(atShop){shopAt=atShop;state.mode="shop";car.v=0;renderShop();$("shop").hidden=false;$("shopClose").focus()}
+function closeShop(){$("shop").hidden=true;state.mode="play"}
+function renderShop(){
+  $("shopTag").textContent=shopAt?"Autohaus · Euklid-Allee":"Garage";
+  $("shopTitle").textContent=shopAt?"Autohaus Hypotenuse":"Deine Garage";
+  $("shopInfo").innerHTML=`Kontostand: <b>$${save.money.toLocaleString("de-DE")}</b> · Rang ${lvl()} (${RANKS[lvl()-1][1]}). `+(shopAt?"Gekaufte Fahrzeuge kannst du jederzeit in der Garage (Taste G) wechseln.":"Neue Fahrzeuge kaufst du im Autohaus 🚘 in der Euklid-Allee.");
+  $("vgrid").innerHTML=VEHICLES.map(v=>{
+    const own=save.owned.includes(v.id), act=save.veh===v.id;
+    let btn,why="",cls="";
+    if(act){btn=`<button type="button" disabled>✓ Unterwegs damit</button>`;cls="active"}
+    else if(own)btn=`<button class="primary" type="button" data-use="${v.id}">Nehmen</button>`;
+    else{cls="locked";
+      if(!shopAt){btn=`<button type="button" disabled>Nicht gekauft</button>`;why="Kaufen im Autohaus"}
+      else if(lvl()<v.req){btn=`<button type="button" disabled>🔒 Gesperrt</button>`;why=`Ab Rang ${v.req}: ${RANKS[v.req-1][1]}`}
+      else if(save.money<v.price){btn=`<button type="button" disabled>Zu teuer</button>`;why=`Dir fehlen noch $${(v.price-save.money).toLocaleString("de-DE")}`}
+      else{btn=`<button class="primary" type="button" data-buy="${v.id}">Kaufen</button>`;cls=""}}
+    return `<div class="vcard ${cls}"><div class="vicon">${v.icon}</div><div class="vname">${v.name}</div>
+      <div class="vstat">Tempo<span class="vbar"><i style="width:${v.max/430*100}%"></i></span></div>
+      <div class="vstat">Wendig<span class="vbar"><i style="width:${v.turn/3.4*100}%"></i></span></div>
+      <p>${v.desc}</p><div class="vprice">${v.price?"$"+v.price.toLocaleString("de-DE"):"gratis"}</div>${btn}${why?`<small>${why}</small>`:""}</div>`}).join("");
+}
+$("vgrid").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.buy){const v=VEH[b.dataset.buy];if(save.money<v.price||lvl()<v.req)return;
+    save.money-=v.price;save.owned.push(v.id);setVehicle(v.id);persist();updateHud();jingle();renderShop();toast(`${v.icon} ${v.name}`,"gekauft! Viel Spaß beim Fahren.","#3ddc84")}
+  if(b.dataset.use){setVehicle(b.dataset.use);renderShop()}});
+$("shopClose").onclick=closeShop;
+$("btnGarage").onclick=()=>{if(state.mode==="play")openShop(false)};
+function setVehicle(id){
+  save.veh=id;persist();car.v=0;car.r=V().r;
+  if(carHits(car.x,car.y)){outer:for(let rr=8;rr<=96;rr+=8)for(let k=0;k<16;k++){const a=k*Math.PI/8,x=car.x+Math.cos(a)*rr,y=car.y+Math.sin(a)*rr;if(!carHits(x,y)){car.x=x;car.y=y;break outer}}}
+  updateHud();
 }
 
 /* ============ Overlays & HUD ============ */
 function openHelp(){state.prev=state.mode;state.mode="help";
-  $("progress").innerHTML=`Rang: <b>${RANKS[lvl()-1][1]}</b> · ${save.xp} XP · ${save.solved} Aufgaben gelöst (${save.firstTry} beim ersten Versuch) · ${save.delivered} Lieferungen · $${save.money}`;
+  $("progress").innerHTML=`Rang: <b>${RANKS[lvl()-1][1]}</b> · ${save.xp} XP · ${save.solved} Aufgaben gelöst (${save.firstTry} beim ersten Versuch) · ${save.delivered} Lieferungen · $${save.money} · Fahrzeuge: ${save.owned.map(id=>VEH[id].icon).join(" ")}`;
   $("help").hidden=false; $("helpClose").focus()}
 function closeHelp(){$("help").hidden=true;state.mode=state.prev==="start"?"start":"play"; if(state.mode==="start")$("start").hidden=false}
 $("helpClose").onclick=closeHelp; $("btnHelp").onclick=()=>{if(state.mode==="play")openHelp()};
@@ -582,7 +660,7 @@ $("btnCam").onclick=()=>cycleCam();
 $("btnMenu").onclick=()=>{if(state.mode==="play"){state.mode="start";$("start").hidden=false;$("btnStart").textContent="Weiterfahren ▶"}};
 $("btnStart").onclick=()=>{$("start").hidden=true;state.mode="play";beep(440,.08,"triangle")};
 $("btnTheory").onclick=()=>{$("start").hidden=true;openHelp()};
-$("btnReset").onclick=()=>{save={xp:0,money:0,solved:0,firstTry:0,wrong:0,delivered:0};persist();updateHud();state.lvlShown=1;$("resetMsg").textContent="Spielstand gelöscht. Du startest wieder als Rechen-Rookie."};
+$("btnReset").onclick=()=>{save=freshSave();setVehicle("walk");persist();updateHud();state.lvlShown=1;$("resetMsg").textContent="Spielstand gelöscht. Du startest wieder als Rechen-Rookie."};
 $("giverList").innerHTML=GIVERS.map(g=>`<div><b>${g.icon} ${g.name}</b><br><span style="color:#56609a">${g.about}</span></div>`).join("");
 $("prompt").addEventListener("pointerdown",e=>{e.preventDefault();if(nearGiver&&state.mode==="play")openMission(nearGiver)});
 let toastT=0;
@@ -595,8 +673,9 @@ function updateHud(){
   const lo=RANKS[L-1][0], hi=RANKS[L]?RANKS[L][0]:lo+300;
   $("hXp").style.width=Math.min(100,(save.xp-lo)/(hi-lo)*100)+"%";
   $("hSmall").textContent=`XP ${save.xp}${RANKS[L]?" / "+hi:""} · gelöst ${save.solved}`;
+  $("hVeh").textContent=`${V().icon} ${V().name}`;
 }
-updateHud(); state.lvlShown=lvl();
+car.r=V().r; updateHud(); state.lvlShown=lvl();
 
 /* ============ Physik ============ */
 const blockedAt=(x,y)=>{const t=tileAt(Math.floor(x/T),Math.floor(y/T));return t===BLD||t===WATER};
@@ -605,17 +684,17 @@ function update(dt){
   state.time=(state.time+dt*6)%1440;
   const up=keys.w||keys.arrowup, dn=keys.s||keys.arrowdown, lf=keys.a||keys.arrowleft, rt=keys.d||keys.arrowright;
   const tile=tileAt(Math.floor(car.x/T),Math.floor(car.y/T)), onGrass=tile===GRASS;
-  const maxF=onGrass?200:340, maxB=-120;
-  if(up)car.v+=(car.v<0?600:250)*dt; else if(dn)car.v-=(car.v>0?520:200)*dt; else car.v*=Math.pow(.3,dt);
+  const VH=V(), maxF=onGrass?VH.grass:VH.max, maxB=VH.rev;
+  if(up)car.v+=(car.v<0?600:VH.acc)*dt; else if(dn)car.v-=(car.v>0?(VH.agile?700:520):200)*dt; else car.v*=Math.pow(VH.agile?.02:.3,dt);
   if(keys[" "])car.v*=Math.pow(.02,dt);
   car.v=clamp(car.v,maxB,maxF); if(onGrass&&car.v>maxF*.9)car.v*=Math.pow(.4,dt);
   const steer=(rt?1:0)-(lf?1:0);
   car.steer+=(steer-car.steer)*Math.min(1,dt*8);
-  car.a+=car.steer*2.4*dt*clamp(Math.abs(car.v)/110,0,1)*Math.sign(car.v||1);
+  car.a+=car.steer*VH.turn*dt*(VH.agile?1:clamp(Math.abs(car.v)/110,0,1)*Math.sign(car.v||1));
   const nx=car.x+Math.cos(car.a)*car.v*dt, ny=car.y+Math.sin(car.a)*car.v*dt;
-  if(!carHits(nx,car.y))car.x=nx; else {if(Math.abs(car.v)>60){shake=.35;beep(90,.08,"square",.03)}car.v*=-.25}
+  if(!carHits(nx,car.y))car.x=nx; else {if(Math.abs(car.v)>60&&!VH.agile){shake=.35;beep(90,.08,"square",.03)}car.v*=VH.agile?0:-.25}
   if(!carHits(car.x,ny))car.y=ny; else car.v*=.6;
-  for(const n of npcs){const dx=car.x-n.x,dy=car.y-n.y,d=Math.hypot(dx,dy);if(d<28&&d>0){const p=(28-d);car.x+=dx/d*p;car.y+=dy/d*p;if(carHits(car.x,car.y)){car.x-=dx/d*p;car.y-=dy/d*p}if(Math.abs(car.v)>80)shake=.3;car.v*=.5}}
+  for(const n of npcs){const dx=car.x-n.x,dy=car.y-n.y,d=Math.hypot(dx,dy),rr=car.r+15;if(d<rr&&d>0){const p=(rr-d);car.x+=dx/d*p;car.y+=dy/d*p;if(carHits(car.x,car.y)){car.x-=dx/d*p;car.y-=dy/d*p}if(Math.abs(car.v)>80)shake=.3;car.v*=.5}}
   car.h+=((tile===R?0:3)-car.h)*Math.min(1,dt*12);
   for(const n of npcs)stepNpc(n,dt);
   for(const p of peds){
@@ -625,9 +704,9 @@ function update(dt){
     p.ox=clamp(p.ox,-30,30);p.oy=clamp(p.oy,-30,30);
   }
   nearGiver=null;
-  if(!state.task)for(const g of GIVERS){if(Math.hypot(g.x-car.x,g.y-car.y)<62){nearGiver=g;break}}
+  for(const g of GIVERS){if(state.task&&g.id!=="shop")continue;if(Math.hypot(g.x-car.x,g.y-car.y)<62){nearGiver=g;break}}
   const pr=$("prompt");
-  if(nearGiver&&state.mode==="play"){pr.hidden=false;pr.innerHTML=`<kbd>${isTouch?"Tippen":"E"}</kbd>${nearGiver.icon} Auftrag: ${nearGiver.name}`}else pr.hidden=true;
+  if(nearGiver&&state.mode==="play"){pr.hidden=false;pr.innerHTML=`<kbd>${isTouch?"Tippen":"E"}</kbd>${nearGiver.icon} ${nearGiver.id==="shop"?"Autohaus betreten":"Auftrag: "+nearGiver.name}`}else pr.hidden=true;
   const tk=state.task;
   if(tk){
     tk.time-=dt;
@@ -636,6 +715,7 @@ function update(dt){
       save.money+=tk.reward+bonus; save.xp+=10; save.delivered++; persist();
       toast(`+$${tk.reward+bonus}`,`Geliefert! ${bonus?`Zeitbonus $${bonus} · `:""}+10 XP`,"#3ddc84"); jingle();
       state.task=null; updateHud(); checkLevel();
+      if(!save.tip&&save.owned.length===1&&save.money>=150){save.tip=true;persist();setTimeout(()=>toast("Genug Geld gespart!","Kauf dir im Autohaus 🚘 ein Fahrrad","#ff8a3d"),2800)}
     } else if(tk.time<=0){state.task=null;toast("Zu spät!","Die Lieferung ist abgelaufen. Hol dir einen neuen Auftrag.","#ff5d6c");beep(150,.4,"sawtooth",.04)}
   }
   const dn2=districtOf(car.x,car.y).name; if(dn2!==lastDistrict){lastDistrict=dn2;showDistrict(dn2)}
@@ -749,24 +829,64 @@ const poolTex=canvasTex(128,128,(c)=>{const g=c.createRadialGradient(64,64,0,64,
 const poolMat=new THREE.MeshBasicMaterial({map:poolTex,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
 instanced(flatPlane,poolMat,lamps.map(l=>[l.x+l.dx*10,3.4,l.y+l.dy*10,170,170])).renderOrder=2;
 // Autos
-const geoBody=new THREE.BoxGeometry(38,8,19); geoBody.translate(0,8,0);
-const geoHood=new THREE.BoxGeometry(10,2,18); geoHood.translate(13,12.5,0);
-const geoCab=new THREE.BoxGeometry(19,8,16.5); geoCab.translate(-3,16,0);
-const geoWheel=new THREE.CylinderGeometry(4.6,4.6,3.2,12); geoWheel.rotateX(Math.PI/2);
-const geoLamp=new THREE.BoxGeometry(1,2.4,4.5);
 const matGlass=new THREE.MeshPhongMaterial({color:0x1b2430,shininess:120,specular:0x8899aa}), matTire=new THREE.MeshLambertMaterial({color:0x111111});
-const matHead=new THREE.MeshBasicMaterial({color:0xfff6d8}), matTail=new THREE.MeshBasicMaterial({color:0xcc1122});
+const matHead=new THREE.MeshBasicMaterial({color:0xfff6d8}), matTail=new THREE.MeshBasicMaterial({color:0xcc1122}), matChrome=new THREE.MeshPhongMaterial({color:0x9aa3ad,shininess:90});
 const paintCache={}; const paint=c=>paintCache[c]||(paintCache[c]=new THREE.MeshPhongMaterial({color:c,shininess:70,specular:0x666666}));
-function makeCar(color,player){
+const geoWheel=new THREE.CylinderGeometry(1,1,1,14); geoWheel.rotateX(Math.PI/2);
+function makeCar(color,player,o={}){
+  const L=o.len||38,Wd=o.wid||19,lift=o.lift||0,bh=o.bh||8,wr=o.wheel||4.6,cabL=o.cabL||19,cabH=o.cabH||8,cabX=o.cabX??-3;
   const g=new THREE.Group(), body=new THREE.Group(); g.add(body);
-  const add=(geo,mat,x=0,y=0,z=0,sh=true)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=sh;body.add(m);return m};
-  add(geoBody,paint(color)); add(geoHood,paint(color)); add(geoCab,matGlass);
-  if(player){const s=new THREE.Mesh(new THREE.BoxGeometry(38.4,.6,4),paint("#1a2147"));s.position.set(0,12.4,0);body.add(s);const s2=new THREE.Mesh(new THREE.BoxGeometry(19.4,.6,4),paint("#1a2147"));s2.position.set(-3,20.2,0);body.add(s2)}
-  for(const [x,z] of [[12,9.5],[12,-9.5],[-12,9.5],[-12,-9.5]]){const w=new THREE.Mesh(geoWheel,matTire);w.position.set(x,4.6,z);g.add(w)}
-  for(const z of [6,-6]){add(geoLamp,matHead,19.2,9,z,false);add(geoLamp,matTail,-19.2,9,z,false)}
+  const add=(w,h,d,mat,x,y,z,sh=true)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=sh;body.add(m);return m};
+  const base=wr+lift, top=base+bh;
+  add(L,bh,Wd,paint(color),0,base+bh/2,0);
+  add(cabL,cabH,Wd-2.5,matGlass,cabX,top+cabH/2,0);
+  add(cabL-1,1,Wd-2,paint(color),cabX,top+cabH+.4,0);
+  if(o.pickup){add(L*.42,3,1,paint(color),-L*.27,top+1.5,Wd/2-.5);add(L*.42,3,1,paint(color),-L*.27,top+1.5,-Wd/2+.5);add(1,3,Wd,paint(color),-L/2+.5,top+1.5,0);add(L*.4,.6,Wd-2,matTire,-L*.27,top+.3,0)}
+  if(o.spoiler){add(4,1,Wd,paint("#111"),-L/2+2,top+5,0);add(1.2,4,1.2,paint("#111"),-L/2+2,top+2.5,Wd/2-3);add(1.2,4,1.2,paint("#111"),-L/2+2,top+2.5,-Wd/2+3)}
+  if(o.stripe){add(L+.4,.6,4,paint(o.stripe),0,top+.3,0)}
+  for(const [x,z] of [[L*.32,Wd/2],[L*.32,-Wd/2],[-L*.32,Wd/2],[-L*.32,-Wd/2]]){const w=new THREE.Mesh(geoWheel,matTire);w.scale.set(wr,wr,3.2);w.position.set(x,wr,z);g.add(w)}
+  for(const z of [Wd*.32,-Wd*.32]){add(1,2.4,4.5,matHead,L/2+.2,base+bh*.6,z,false);add(1,2.4,4.5,matTail,-L/2-.2,base+bh*.6,z,false)}
   g.userData.body=body; scene.add(g); return g;
 }
-const playerMesh=makeCar("#f2b81f",true);
+const skinMat=new THREE.MeshLambertMaterial({color:0xd9a27a}), hairMat=new THREE.MeshLambertMaterial({color:0x3b2a1f}), pantsMat=new THREE.MeshLambertMaterial({color:0x2c3a5a}), shirtMat=paint("#3f7fd6");
+const legGeo=new THREE.BoxGeometry(2.2,8,2.2); legGeo.translate(0,-4,0);
+const armGeo=new THREE.BoxGeometry(1.6,6.5,1.6); armGeo.translate(0,-3.2,0);
+function makePerson(){
+  const g=new THREE.Group(), legs=[], arms=[];
+  for(const z of [1.5,-1.5]){const l=new THREE.Mesh(legGeo,pantsMat);l.position.set(0,8,z);l.castShadow=true;g.add(l);legs.push(l)}
+  const torso=new THREE.Mesh(new THREE.BoxGeometry(3.4,7,5.6),shirtMat);torso.position.y=11.5;torso.castShadow=true;g.add(torso);
+  for(const z of [3.7,-3.7]){const a=new THREE.Mesh(armGeo,shirtMat);a.position.set(0,14.6,z);a.castShadow=true;g.add(a);arms.push(a)}
+  const head=new THREE.Mesh(new THREE.SphereGeometry(2.3,12,10),skinMat);head.position.y=17.6;head.castShadow=true;g.add(head);
+  const hair=new THREE.Mesh(new THREE.SphereGeometry(2.45,12,8,0,Math.PI*2,0,Math.PI/2),hairMat);hair.position.set(-.3,17.9,0);hair.rotation.z=.3;g.add(hair);
+  const bag=new THREE.Mesh(new THREE.BoxGeometry(2.6,5,4.6),paint("#ffc933"));bag.position.set(-3,12.4,0);bag.castShadow=true;g.add(bag);
+  g.userData={legs,arms}; return g;
+}
+function bar(g,mat,x1,y1,x2,y2,t=1.1){const L=Math.hypot(x2-x1,y2-y1);const m=new THREE.Mesh(new THREE.BoxGeometry(L,t,t),mat);m.position.set((x1+x2)/2,(y1+y2)/2,0);m.rotation.z=Math.atan2(y2-y1,x2-x1);m.castShadow=true;g.add(m);return m}
+function makeBike(){
+  const g=new THREE.Group(), fm=paint("#22a39a"), wheels=[];
+  const tg=new THREE.TorusGeometry(5.2,.8,6,18);
+  for(const x of [8.5,-8.5]){const w=new THREE.Group();const t=new THREE.Mesh(tg,matTire);w.add(t);for(let i=0;i<3;i++){const sp=new THREE.Mesh(new THREE.BoxGeometry(10,.3,.3),matChrome);sp.rotation.z=i*Math.PI/3;w.add(sp)}w.position.set(x,6,0);g.add(w);wheels.push(w)}
+  bar(g,fm,-8.5,6,-1.5,13.5);bar(g,fm,-1.5,13.5,7,13.5);bar(g,fm,7,13.5,8.5,6);bar(g,fm,-1.5,13.5,-2.5,6);bar(g,fm,-2.5,6,-8.5,6);bar(g,fm,-2.5,6,7,13.5);bar(g,matChrome,7,13.5,6.5,17.5,.9);
+  const hb=new THREE.Mesh(new THREE.BoxGeometry(1,1,9),matChrome);hb.position.set(6.5,17.5,0);g.add(hb);
+  const seat=new THREE.Mesh(new THREE.BoxGeometry(4.5,1.2,3),paint("#111"));seat.position.set(-1.8,14.4,0);g.add(seat);
+  const p=makePerson();p.position.set(-1.8,6.2,0);p.rotation.z=-.18;g.add(p);
+  g.userData={rider:p,wheels}; scene.add(g); return g;
+}
+function makeMoped(){
+  const g=new THREE.Group(), wheels=[], c=paint("#e2523a");
+  for(const x of [10,-10]){const w=new THREE.Mesh(geoWheel,matTire);w.scale.set(4.3,4.3,2.6);w.position.set(x,4.3,0);g.add(w);wheels.push(w)}
+  const add=(w,h,d,m,x,y,z)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.castShadow=true;g.add(b);return b};
+  add(16,6,8,c,-4,9,0); add(4,3,9,c,4,6,0); add(3,13,6,c,9,11,0); add(9,2,6,paint("#1b1b1b"),-5,13,0);
+  const hb=new THREE.Mesh(new THREE.BoxGeometry(1,1,11),matChrome);hb.position.set(9,18.5,0);g.add(hb);
+  add(1,2.5,3.5,matHead,10.6,15,0); add(1,2,4,matTail,-12.1,10,0);
+  const p=makePerson();p.position.set(-4,6,0);g.add(p);
+  g.userData={rider:p,wheels}; scene.add(g); return g;
+}
+const walker=makePerson(); scene.add(walker);
+const vehMeshes={walk:walker,bike:makeBike(),moped:makeMoped(),
+  small:makeCar("#e04e39",true,{len:31,wid:17,cabL:16,cabX:-1.5,wheel:4.2}),
+  suv:makeCar("#3d5a3a",true,{len:44,wid:21,lift:3,wheel:5.8,cabL:17,cabX:6,cabH:9,pickup:true}),
+  sport:makeCar("#d8b21e",true,{len:42,wid:20,bh:6,cabL:15,cabH:6,cabX:-4,spoiler:true,stripe:"#1a2147",wheel:4.4})};
 npcs.forEach(n=>n.mesh=makeCar(n.col,false));
 // Fußgänger
 const pedBody=new THREE.CylinderGeometry(2.4,2.8,10,8); pedBody.translate(0,8,0);
@@ -821,11 +941,21 @@ function render3D(dt,now){
   sun.position.set(car.x+Math.cos(sa)*700,900,car.y+500); sun.target.position.set(car.x,0,car.y);
   for(const m of facadeMats)m.emissiveIntensity=dk*1.1;
   lampBulbMat.color.setRGB(.35+dk*.65,.35+dk*.6,.35+dk*.3); poolMat.opacity=dk*.55;
-  headL.intensity=dk>.05?2.2*dk:0;
+  headL.intensity=dk>.05&&V().lights?2.2*dk:0;
   // Spielerauto
-  playerMesh.position.set(car.x,car.h,car.y); playerMesh.rotation.y=-car.a;
-  const body=playerMesh.userData.body; body.rotation.x=-car.steer*clamp(car.v/340,-1,1)*.06;
-  body.rotation.z=dt>0?clamp((car.v-car.pv)/dt/5000,-.035,.035):0; car.pv=car.v;
+  const VH=V(), pm=vehMeshes[VH.id];
+  for(const id in vehMeshes)vehMeshes[id].visible=id===VH.id;
+  pm.position.set(car.x,car.h,car.y); pm.rotation.y=-car.a;
+  const body=pm.userData.body;
+  if(body){body.rotation.x=-car.steer*clamp(car.v/340,-1,1)*.06;body.rotation.z=dt>0?clamp((car.v-car.pv)/dt/5000,-.035,.035):0}
+  else if(VH.id!=="walk")pm.rotation.x=-car.steer*clamp(car.v/250,-1,1)*.22;
+  car.pv=car.v;
+  const amp=clamp(Math.abs(car.v)/VH.max,0,1);
+  car.ph+=dt*car.v*(VH.id==="walk"?.11:.06);
+  if(VH.id==="walk"){const u=walker.userData,s=Math.sin(car.ph)*.75*amp;u.legs[0].rotation.z=s;u.legs[1].rotation.z=-s;u.arms[0].rotation.z=-s*.8;u.arms[1].rotation.z=s*.8;walker.position.y=car.h+Math.abs(Math.cos(car.ph))*amp*1.2}
+  if(pm.userData.rider){const u=pm.userData.rider.userData,bike=VH.id==="bike";
+    u.legs[0].rotation.z=bike?1.0+Math.sin(car.ph)*.5:1.35;u.legs[1].rotation.z=bike?1.0-Math.sin(car.ph)*.5:1.35;u.arms[0].rotation.z=u.arms[1].rotation.z=bike?1.15:1.25;
+    for(const w of pm.userData.wheels)w.rotation.z-=car.v*dt/5}
   const fx=Math.cos(car.a),fz=Math.sin(car.a);
   headL.position.set(car.x+fx*20,car.h+12,car.y+fz*20); headL.target.position.set(car.x+fx*220,0,car.y+fz*220);
   for(const n of npcs){n.mesh.position.set(n.x,0,n.y);n.mesh.rotation.y=-n.ang}
@@ -836,13 +966,13 @@ function render3D(dt,now){
   // Marker & Navi
   const tk=state.task, bob=Math.sin(now/300)*4;
   const fade=(mk,x,y)=>{const d=Math.hypot(x-car.x,y-car.y);mk.userData.beam.material.opacity=d<160?.06+.22*d/160:.28};
-  for(const g of GIVERS){g.mesh.visible=!tk;g.mesh.userData.sp.position.y=70+bob;g.mesh.userData.ring.rotation.z+=dt;fade(g.mesh,g.x,g.y)}
+  for(const g of GIVERS){g.mesh.visible=g.id==="shop"||!tk;g.mesh.userData.sp.position.y=70+bob;g.mesh.userData.ring.rotation.z+=dt;fade(g.mesh,g.x,g.y)}
   targetMesh.visible=!!tk; arrow.visible=!!tk;
   for(const r of [ribX,ribY,ribD,labX,labY,labD])r.visible=!!tk;
   if(tk){
     targetMesh.position.set(tk.x,0,tk.y); targetMesh.userData.sp.position.y=70+bob; fade(targetMesh,tk.x,tk.y);
     const ang=Math.atan2(tk.y-car.y,tk.x-car.x);
-    arrow.position.set(car.x,car.h+42+Math.sin(now/250)*2,car.y); arrow.rotation.set(0,-ang,0);
+    arrow.position.set(car.x,car.h+20+22*V().cam+Math.sin(now/250)*2,car.y); arrow.rotation.set(0,-ang,0);
     const cx=tk.x, cz=car.y;
     setRib(ribX,car.x,cz,cx,cz,3,4.2); setRib(ribY,cx,cz,tk.x,tk.y,3,4.2); setRib(ribD,car.x,car.y,tk.x,tk.y,4,4.4);
     const m=v=>Math.round(Math.abs(v)/T*M_PER_TILE);
@@ -855,14 +985,14 @@ function render3D(dt,now){
   let da=car.a-camYaw; while(da>Math.PI)da-=2*Math.PI; while(da<-Math.PI)da+=2*Math.PI;
   camYaw+=da*Math.min(1,dt*(Math.abs(car.v)>20?3.2:1.2));
   const sp=Math.abs(car.v)/340;
-  let dist=C.dist*(1+sp*.18), hgt=C.h;
+  const cs=V().cam; let dist=C.dist*cs*(1+sp*.18), hgt=C.h*Math.max(.6,cs);
   const bx=-Math.cos(camYaw), bz=-Math.sin(camYaw);
-  for(let s=.15;s<=1.001;s+=.085){if(blockedAt(car.x+bx*dist*s,car.y+bz*dist*s)){dist=Math.max(26,dist*s*.85);hgt=Math.max(hgt*.8,22);break}}
+  for(let s=.15;s<=1.001;s+=.085){if(blockedAt(car.x+bx*dist*s,car.y+bz*dist*s)){dist=Math.max(22,dist*s*.85);hgt=Math.max(hgt*.8,20);break}}
   want.set(car.x+bx*dist,car.h+hgt,car.y+bz*dist);
   camPos.lerp(want,Math.min(1,dt*7));
   camera.position.copy(camPos);
   if(shake>0){shake-=dt;camera.position.x+=(Math.random()-.5)*shake*14;camera.position.y+=(Math.random()-.5)*shake*14}
-  camera.lookAt(car.x+Math.cos(camYaw)*C.look*3,car.h+C.look,car.y+Math.sin(camYaw)*C.look*3);
+  camera.lookAt(car.x+Math.cos(camYaw)*C.look*3*cs,car.h+C.look*Math.max(.75,cs),car.y+Math.sin(camYaw)*C.look*3*cs);
   const fov=62+sp*12; if(Math.abs(camera.fov-fov)>.05){camera.fov=fov;camera.updateProjectionMatrix()}
   renderer.render(scene,camera);
 }
@@ -881,7 +1011,7 @@ function drawMinimap(){
   const W=(x,y)=>[(x-car.x)/T*4*sc,(y-car.y)/T*4*sc];
   mctx.save();mctx.scale(sc,sc);mctx.drawImage(mmBase,-car.x/T*4,-car.y/T*4);mctx.restore();
   const edge=(p,q)=>{const d=Math.hypot(p,q),lim=S/2-16;return d>lim?[p/d*lim,q/d*lim]:[p,q]};
-  if(!state.task)for(const g of GIVERS){const[p,q]=edge(...W(g.x,g.y));mctx.save();mctx.translate(p,q);mctx.rotate(up);mctx.fillStyle=g.col;mctx.beginPath();mctx.arc(0,0,13,0,7);mctx.fill();mctx.font="15px sans-serif";mctx.textAlign="center";mctx.textBaseline="middle";mctx.fillText(g.icon,0,1);mctx.restore()}
+  for(const g of GIVERS){if(state.task&&g.id!=="shop")continue;const[p,q]=edge(...W(g.x,g.y));mctx.save();mctx.translate(p,q);mctx.rotate(up);mctx.fillStyle=g.col;mctx.beginPath();mctx.arc(0,0,13,0,7);mctx.fill();mctx.font="15px sans-serif";mctx.textAlign="center";mctx.textBaseline="middle";mctx.fillText(g.icon,0,1);mctx.restore()}
   if(state.task){const[p0,q0]=W(state.task.x,state.task.y);const[p,q]=edge(p0,q0);
     mctx.strokeStyle="#ffc933";mctx.lineWidth=4;mctx.setLineDash([8,6]);mctx.beginPath();mctx.moveTo(0,0);mctx.lineTo(p,q);mctx.stroke();mctx.setLineDash([]);
     mctx.fillStyle="#ffc933";mctx.beginPath();mctx.arc(p,q,12,0,7);mctx.fill()}
@@ -891,7 +1021,7 @@ function drawMinimap(){
   mctx.fillStyle="#fff";mctx.strokeStyle="#000";mctx.lineWidth=2;mctx.beginPath();mctx.moveTo(15,0);mctx.lineTo(-10,-10);mctx.lineTo(-5,0);mctx.lineTo(-10,10);mctx.closePath();mctx.fill();mctx.stroke();mctx.restore();
 }
 function hudTexts(){
-  $("speed").innerHTML=`${Math.round(Math.abs(car.v)*.3)}<small>km/h</small>`;
+  $("speed").innerHTML=`${Math.round(Math.abs(car.v)*V().kmh)}<small>km/h · ${V().icon}</small>`;
   const hh=Math.floor(state.time/60),mm=Math.floor(state.time%60);
   $("clock").textContent=`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")} Uhr · ${districtOf(car.x,car.y).name}`;
   const tk=state.task, mi=$("mission");
