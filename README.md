@@ -1,1 +1,1 @@
-# senegal-quiz-ghs-dohr
+Open World
