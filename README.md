@@ -11,6 +11,9 @@ Nordpark, Schloss Rheydt). Wege und Entfernungen sind vereinfacht, alle Maße in
 - Kurier-Aufträge (Feuerwehr, Baustelle, Elektromarkt, Rathaus, Park-Kurier, Taxi, Luftrettung) und Fahrzeuge
   vom E-Scooter bis zum Hubschrauber.
 
+Grafik: leicht erhöhte, drehbare Third-Person-Kamera, animierte Spielfigur, Autos mit Radkästen und Scheiben,
+modellierte Bordsteine, GHS Dohr als 3D-Gebäude (vorläufige Gestaltung ohne Fotovorlage). Beispielbilder in `screenshots/`.
+
 Beide Dateien müssen im selben Ordner liegen. Im Browser öffnen, Internetverbindung für three.js nötig.
-Steuerung: WASD/Pfeiltasten, E Aktion, J Auftragsheft, M Karte, N Wegmarkierung, V Kamera, G Garage, H Theorie.
+Steuerung: WASD/Pfeiltasten, E Aktion, X aussteigen, Maus ziehen/wischen dreht die Kamera, J Auftragsheft, M Karte, N Wegmarkierung, V Kamera, G Garage, H Theorie.
 Auf Tablets erscheinen Touch-Tasten. Die Karte wird mit `python3 tools/spielkarte.py mg-data.js` erzeugt.

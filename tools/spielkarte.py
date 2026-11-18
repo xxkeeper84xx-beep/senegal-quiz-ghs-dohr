@@ -84,16 +84,20 @@ area("plaza", -290.4, -39.4, -214.6, 30, None)
 box(-333, -60.5, -327, -58.6, 2.6, "roof", n="Haltestelle Am Torfbend", c="#4a7fa8", k="plain")
 # GHS Dohr · Standort Torfbend: Schulgelände nördlich der Straße (Gebäude als Detailmodell im Spiel, hier nur Kollision)
 SCHOOL = {"label": "GHS Dohr · Standort Torfbend",
-          "wings": [{"r": [-318, -122, -258, -108], "f": 3, "win": "ns"}, {"r": [-318, -108, -304, -80], "f": 2, "win": "ew"},
-                    {"r": [-258, -120, -234, -102], "f": 1, "hall": 1}],
-          "door": [-246, -102], "gate": [-276, -268, -63.2], "sign": [-279, -61.6]}
+          "wings": [{"r": [-318, -84, -262, -70], "f": 3, "win": "ns"}, {"r": [-318, -114, -304, -84], "f": 2, "win": "ew"},
+                    {"r": [-262, -86, -238, -70], "f": 1, "hall": 1}],
+          "door": [-250, -70], "sign": [-268.5, -61.9]}
 for wg in SCHOOL["wings"]:
     x0, y0, x1, y1 = wg["r"]
     buildings.append({"p": [x0, y0, x1, y0, x1, y1, x0, y1], "h": wg["f"] * 3.4 + .8, "m": 0, "t": "school", "x": 1})
 area("plaza", -326, -128, -200, -63.4, "Schulhof")
 box(-226, -124, -204, -94, 8, "school", n="Sporthalle Am Torfbend", c="#d8d2c4", k="plain", rc="#6b6d70")
 F = .22
-for fx0, fy0, fx1, fy1 in [(-326, -63.4, -276, -63.4 + F), (-268, -63.4, -200, -63.4 + F), (-326, -128, -326 + F, -63.4),
+area("grass", -326, -69.6, -264, -63.7, "Grünstreifen"); area("grass", -236, -69.6, -200, -63.7)
+for tx in (-314, -300, -286, -272, -228, -212): trees.extend([tx, -66.6])
+SIGNS = [{"x": -296, "y": -56.4, "k": "zone30"}, {"x": -246.6, "y": -56.4, "k": "zebra"}]
+DECALS = [{"x": -292, "y": -48.3, "t": "30", "a": 1.5708}]
+for fx0, fy0, fx1, fy1 in [(-326, -63.4, -264, -63.4 + F), (-236, -63.4, -200, -63.4 + F), (-326, -128, -326 + F, -63.4),
                            (-200 - F, -128, -200, -63.4), (-326, -128, -200, -128 + F)]:
     box(fx0, fy0, fx1, fy1, 1.7, "fence", k="fence", c="#5d646b")
 houses_x(-365, -112, -74, -62, skip=[(-346, -196)])                           # Am Torfbend Nordseite
@@ -111,9 +115,9 @@ for x in range(-450, 90, 14):
     if abs(x + 100) > 12: box(x, 48.7, x + 6.4, 49.5, 1.2, "hedge", k="hedge")
 for x in range(-196, -112, 14):
     box(x, -58.8, x + 6.4, -58, 1.2, "hedge", k="hedge")
-PARKED = [[-384, -47.5, 0, "#2d5fa8"], [-377.5, -47.5, 0, "#d9d4c6"], [-298, -52.5, 3.1416, "#6b6f78"], [-150, -47.5, 0, "#b8262e"],
+PARKED = [[-385, -47.6, 0, "#2d5fa8"], [-378, -47.6, 0, "#d9d4c6"], [-234.5, -52.4, 3.1416, "#6b6f78"], [-227.5, -52.4, 3.1416, "#b8262e"], [-262, -47.6, 0, "#1d3a5f"], [-150, -47.6, 0, "#8a8f96"],
           [-204, 43.2, 0, "#2b2f3d"], [-197.5, 43.2, 0, "#e8eaf2"], [-60, 36.8, 3.1416, "#3f7f4f"], [60, 43.2, 0, "#c9952e"]]
-ZEBRA = [{"x": -272, "y": -50, "w": 7, "dir": "x"}, {"x": 120, "y": 222, "w": 10, "dir": "y"}]
+ZEBRA = [{"x": -250, "y": -50, "w": 7, "dir": "x"}, {"x": 120, "y": 222, "w": 10, "dir": "y"}]
 
 # ------------------------------------------------------------------ Achse Gladbach – Rheydt
 road("Rheydter Straße", [(120, -330), (120, -150), (120, 40)], "secondary", 10)
@@ -205,7 +209,7 @@ houses_x(-180, -20, -356, -342, step=28, w=22, t="apartments", hmin=12, hmax=15)
 area("rail", -424, -236, -416, -54, "Verbindungsweg (im Bau)")
 
 # ------------------------------------------------------------------ Bäume an Straßen und Plätzen
-for x in range(-400, -110, 28):
+for x in list(range(-400, -332, 28)) + list(range(-190, -110, 28)):
     trees.extend([x, -56.5])
 for y in range(-300, 30, 30):
     if abs(y + 150) > 14: trees.extend([113.5, y + 9])
@@ -237,8 +241,8 @@ for r in raw_roads:
 
 data = {
     "origin": [51.17, 6.43], "half": [HX, HY], "nodes": nodes, "roads": roads, "buildings": buildings, "areas": areas,
-    "rails": rails, "trees": trees, "pois": pois, "spielkarte": True, "school": SCHOOL, "parked": PARKED, "zebra": ZEBRA,
-    "start": [-325, -50, 0],
+    "rails": rails, "trees": trees, "pois": pois, "spielkarte": True, "school": SCHOOL, "parked": PARKED, "zebra": ZEBRA, "signs": SIGNS, "decals": DECALS,
+    "start": [-243, -55.3, -2.2],
     "districts": [
         {"n": "Dohr/Torfbend", "b": [-505, -140, 62, 125], "hint": "Werkhof mit gelbem Tor"},
         {"n": "Rheydt", "b": [0, 190, 310, 470], "hint": "Rathausturm und Hauptkirche am Markt"},
