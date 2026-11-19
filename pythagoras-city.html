@@ -210,7 +210,7 @@ body.touch #prompt{bottom:calc(98px + env(safe-area-inset-bottom,0px))}
   <div class="card">
     <span class="tag">3D-Open-World · Mönchengladbach · Mathe Klasse 9</span>
     <h1 style="margin-top:12px">Pythagoras City</h1>
-    <p style="font-size:17px;margin-top:12px">Du startest in <b>Dohr</b> auf dem Gehweg vor der <b>GHS Dohr</b> am Torfbend. Du entscheidest selbst: die Gegend erkunden oder zum <b>Werkhof</b> um die Ecke gehen, wo Herr Maaß von der Technik-AG deine Hilfe braucht. Für Aufträge nimmst du Maße an den 📏-Punkten auf und rechnest mit Pythagoras. Gelöste Aufträge verändern die Stadt. Mit verdientem Geld kaufst du im <b>Autohaus 🚘</b> Fahrzeuge, vom E-Scooter bis zum Hubschrauber.</p>
+    <p style="font-size:17px;margin-top:12px">Du startest in <b>Dohr</b> auf dem Gehweg vor der <b>GHS Dohr</b> am Torfbend. Du entscheidest selbst: die Gegend erkunden oder zum <b>Werkhof</b> um die Ecke gehen, wo Sportlehrer Herr Maaß deine Hilfe braucht. Für Aufträge nimmst du Maße an den 📏-Punkten auf und rechnest mit Pythagoras. Gelöste Aufträge verändern die Stadt. Mit verdientem Geld kaufst du im <b>Autohaus 🚘</b> Fahrzeuge, vom E-Scooter bis zum Hubschrauber.</p>
     <div class="formula">a² + b² = c²</div>
     <div class="cols" style="margin-top:10px">
       <div>
@@ -1355,8 +1355,8 @@ save.q=save.q||{};
 const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,done:false,pick:null,tries:0});
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
-  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Lehrer an der GHS Dohr, leitet die Technik-AG im Werkhof",shirt:"#e07a2f"},
-  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, meine Technik-AG arbeitet hier im Werkhof. Am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
+  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zur Dohrer Straße, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
