@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14161a">
+<title>Notfall Kollegium</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Anmeldung -->
+<section id="login" class="screen hidden">
+  <div class="login-card">
+    <div class="logo">🚨</div>
+    <h1>Notfall Kollegium</h1>
+    <p class="muted" id="school-name"></p>
+    <form id="login-form">
+      <label>Name<input name="name" autocomplete="name" placeholder="z. B. Anna Müller" required></label>
+      <label>Kürzel<input name="shortName" maxlength="8" placeholder="z. B. MÜL" required></label>
+      <label>Zugangscode der Schule<input name="code" autocomplete="off" required></label>
+      <button class="btn primary" type="submit">Anmelden</button>
+      <p class="error" id="login-error"></p>
+    </form>
+    <p class="small muted">Diese App ersetzt keinen Notruf. Im Ernstfall immer <b>110</b> (Polizei) bzw. <b>112</b> (Rettungsdienst/Feuerwehr) wählen.</p>
+  </div>
+</section>
+
+<!-- Hauptansicht -->
+<section id="main" class="screen hidden">
+  <header class="topbar">
+    <div>
+      <div class="title">Notfall Kollegium</div>
+      <div class="small muted"><span id="conn" class="dot"></span> <span id="me-label"></span></div>
+    </div>
+    <button class="loc-btn" id="loc-btn" title="Standort ändern">📍 <span id="loc-label">Standort setzen</span></button>
+  </header>
+
+  <div id="banner-area"></div>
+
+  <main>
+    <!-- Notfall -->
+    <div class="tab" id="tab-alarm">
+      <p class="hint">Knopf <b>gedrückt halten</b>, bis der Balken voll ist, um Alarm auszulösen.</p>
+      <div class="alarm-grid" id="alarm-grid"></div>
+      <div class="callbar">
+        <a class="btn call" href="tel:110">📞 110 Polizei</a>
+        <a class="btn call" href="tel:112">📞 112 Rettung</a>
+      </div>
+      <h2>Verlauf</h2>
+      <div id="history" class="list"></div>
+    </div>
+
+    <!-- Chat -->
+    <div class="tab hidden" id="tab-chat">
+      <div class="chat-head">
+        <select id="chat-channel"></select>
+      </div>
+      <div id="chat-list" class="chat-list"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" placeholder="Nachricht an das Kollegium…" autocomplete="off" maxlength="1000">
+        <button class="btn primary" type="submit">Senden</button>
+      </form>
+    </div>
+
+    <!-- Kollegium / Einstellungen -->
+    <div class="tab hidden" id="tab-team">
+      <h2>Gerade online (<span id="online-count">0</span>)</h2>
+      <div id="online-list" class="list"></div>
+      <h2>Benachrichtigungen</h2>
+      <div class="card">
+        <p id="push-status" class="small"></p>
+        <button class="btn" id="push-enable">Push-Benachrichtigungen aktivieren</button>
+        <button class="btn" id="push-test">Test senden</button>
+        <button class="btn" id="sound-test">Alarmton testen</button>
+        <p class="small muted">Auf dem iPhone: zuerst über „Teilen → Zum Home-Bildschirm“ installieren, dann die App vom Home-Bildschirm öffnen und Push aktivieren.</p>
+      </div>
+      <h2>Konto</h2>
+      <div class="card">
+        <button class="btn" id="logout">Abmelden</button>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <button data-tab="alarm" class="active">🚨<span>Notfall</span></button>
+    <button data-tab="chat">💬<span>Chat</span><b class="badge hidden" id="chat-badge"></b></button>
+    <button data-tab="team">👥<span>Kollegium</span></button>
+  </nav>
+</section>
+
+<!-- Vollbild-Alarm -->
+<section id="overlay" class="overlay hidden" role="alertdialog" aria-live="assertive">
+  <div class="overlay-inner">
+    <div class="ov-icon" id="ov-icon"></div>
+    <div class="ov-title" id="ov-title"></div>
+    <div class="ov-loc" id="ov-loc"></div>
+    <div class="ov-meta" id="ov-meta"></div>
+    <ol class="ov-steps" id="ov-steps"></ol>
+    <div class="ov-responses" id="ov-responses"></div>
+    <div class="ov-resp-list" id="ov-resp-list"></div>
+    <div class="ov-chat">
+      <div id="ov-chat-list" class="chat-list"></div>
+      <form id="ov-chat-form" class="chat-form">
+        <input id="ov-chat-input" placeholder="Lagemeldung schreiben…" autocomplete="off" maxlength="1000">
+        <button class="btn" type="submit">Senden</button>
+      </form>
+    </div>
+    <div class="ov-actions">
+      <button class="btn ghost" id="ov-minimize">Minimieren</button>
+      <button class="btn ghost" id="ov-resolve">Entwarnung geben</button>
+    </div>
+  </div>
+</section>
+
+<!-- Dialog -->
+<dialog id="dialog">
+  <form method="dialog" id="dialog-form">
+    <h3 id="dlg-title"></h3>
+    <div id="dlg-body"></div>
+    <div class="dlg-actions" id="dlg-actions"></div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
