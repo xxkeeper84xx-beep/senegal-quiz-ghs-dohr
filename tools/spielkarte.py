@@ -81,26 +81,35 @@ box(-214.6, -41, -213, 31.6, 3, "wall", c="#9a9388", k="plain")             # Os
 box(-288, -32, -262, 12, 8, "industrial", n="Werkhof Dohr", c="#c9c6bf", k="plain", rc="#5e6064")
 box(-238, -4, -220, 22, 4.5, "industrial", c="#b9b4a8", k="plain", rc="#6b6d70")
 area("plaza", -290.4, -39.4, -214.6, 30, None)
-box(-333, -60.5, -327, -58.6, 2.6, "roof", n="Haltestelle Am Torfbend", c="#4a7fa8", k="plain")
-# GHS Dohr · Standort Torfbend: Schulgelände nördlich der Straße (Gebäude als Detailmodell im Spiel, hier nur Kollision)
-SCHOOL = {"label": "GHS Dohr · Standort Torfbend",
-          "wings": [{"r": [-318, -84, -262, -70], "f": 3, "win": "ns"}, {"r": [-318, -114, -304, -84], "f": 2, "win": "ew"},
-                    {"r": [-262, -86, -238, -70], "f": 1, "hall": 1}],
-          "door": [-250, -70], "sign": [-268.5, -61.9]}
-for wg in SCHOOL["wings"]:
-    x0, y0, x1, y1 = wg["r"]
-    buildings.append({"p": [x0, y0, x1, y0, x1, y1, x0, y1], "h": wg["f"] * 3.4 + .8, "m": 0, "t": "school", "x": 1})
-area("plaza", -326, -128, -200, -63.4, "Schulhof")
-box(-226, -124, -204, -94, 8, "school", n="Sporthalle Am Torfbend", c="#d8d2c4", k="plain", rc="#6b6d70")
-F = .22
-area("grass", -326, -69.6, -264, -63.7, "Grünstreifen"); area("grass", -236, -69.6, -200, -63.7)
-for tx in (-314, -300, -286, -272, -228, -212): trees.extend([tx, -66.6])
-SIGNS = [{"x": -296, "y": -56.4, "k": "zone30"}, {"x": -246.6, "y": -56.4, "k": "zebra"}]
+# GHS Dohr · Standort Torfbend (Am Torfbend 16), nach Fotos vom 19.11.
+# Das sichtbare Modell baut tools/school.js; hier stehen nur Kollision, Gelände und Bäume.
+SCHOOL = {"label": "GHS Dohr · Standort Torfbend", "v": 2}
+def solid(x0, y0, x1, y1, h, t="school"):
+    buildings.append({"p": [x0, y0, x1, y0, x1, y1, x0, y1], "h": h, "m": 0, "t": t, "x": 1})
+solid(-332, -84, -318, -66, 16)          # Altbau West mit Rautenfries
+solid(-318, -82, -293, -70, 12.4)        # Klassentrakt mit Bogenfenstern
+solid(-293, -90, -279, -67, 16.5)        # Giebelbau mit Fachwerk und Reliefs
+solid(-279, -90, -268, -80, 11.2)        # Eingangsbau
+solid(-276.6, -80, -270.4, -77, 5.4)     # Windfang mit Rundbogentür
+solid(-296, -106, -268, -90, 7.9)        # Erweiterungsbau mit Flachdach
+solid(-295.3, -111.6, -286.5, -109.8, 3.9, "stairs")  # Außentreppe
+solid(-292, -132, -266, -125, 3.9)       # Turnhalle, Umkleiden
+solid(-290, -148, -268, -132, 8.3)       # Turnhalle
+solid(-270, -133.4, -269.2, -132.6, 10.6, "chimney")
+solid(-258, -82, -245, -66, 13, "house")   # Nachbarhaus
+solid(-334, -63.8, -276.5, -63.4, 1.9, "wall")   # Mäuerchen mit Schmiedezaun
+for px in (-276.2, -271.0, -265.3):
+    solid(px - .3, -63.9, px + .3, -63.3, 2.9, "wall")  # Torpfeiler
+solid(-265.0, -63.8, -261.2, -63.4, 1.8, "wall")   # rote Mauer
+solid(-261.8, -149.8, -261.2, -63.4, 2.4, "wall")  # weiße Hofmauer an der Feuerwehrzufahrt
+for fx0, fy0, fx1, fy1 in [(-334.2, -149.8, -334.0, -63.8), (-334.0, -150.0, -261.8, -149.8)]:
+    box(fx0, fy0, fx1, fy1, 2.0, "fence", k="fence", c="#5d646b")
+area("yard", -334, -149.8, -261.5, -63.4, "Schulhof")
+for tx, ty in [(-306, -65.2), (-287.5, -65.0), (-308, -118), (-286, -118), (-322, -140), (-330, -98), (-330, -112), (-300, -142.5)]:
+    trees.extend([tx, ty])
+SIGNS = [{"x": -298, "y": -56.4, "k": "zone30"}, {"x": -246.6, "y": -56.4, "k": "zebra"}]
 DECALS = [{"x": -292, "y": -48.3, "t": "30", "a": 1.5708}]
-for fx0, fy0, fx1, fy1 in [(-326, -63.4, -264, -63.4 + F), (-236, -63.4, -200, -63.4 + F), (-326, -128, -326 + F, -63.4),
-                           (-200 - F, -128, -200, -63.4), (-326, -128, -200, -128 + F)]:
-    box(fx0, fy0, fx1, fy1, 1.7, "fence", k="fence", c="#5d646b")
-houses_x(-365, -112, -74, -62, skip=[(-346, -196)])                           # Am Torfbend Nordseite
+houses_x(-365, -112, -74, -62, skip=[(-346, -240)])                           # Am Torfbend Nordseite
 houses_x(-410, -300, -38, -28)                                                # Am Torfbend Südseite (West)
 houses_x(-410, -300, 18, 28)                                                  # Dohrer Straße Nordseite (West)
 houses_x(-450, 96, 52, 62, skip=[(-104, -96)])                                # Dohrer Straße Südseite
@@ -131,11 +140,11 @@ houses_y(165, 205, 96, 110, step=22, w=16, t="apartments", hmin=11, hmax=14)
 houses_y(165, 205, 130, 144, step=22, w=16, t="apartments", hmin=11, hmax=14)
 box(134, 52, 168, 74, 7, "retail", n="Autohaus Gartenstraße", c="#e8eef2", k="glass", rc="#5e6064")
 # Bahndamm mit Lärmschutzwand trennt Nord und Süd; Durchlass nur an der Rheydter Straße
-box(-520, -152, 112, -150.4, 3.2, "wall", c="#7f8a7c", k="plain")
-box(128, -152, 520, -150.4, 3.2, "wall", c="#7f8a7c", k="plain")
-rails.append([-520, -146, 112, -146]); rails.append([128, -146, 520, -146])
-rails.append([-520, -142, 112, -142]); rails.append([128, -142, 520, -142])
-area("rail", -520, -150, 112, -138); area("rail", 128, -150, 520, -138)
+box(-520, -164, 112, -162.4, 3.2, "wall", c="#7f8a7c", k="plain")
+box(128, -164, 520, -162.4, 3.2, "wall", c="#7f8a7c", k="plain")
+rails.append([-520, -158, 112, -158]); rails.append([128, -158, 520, -158])
+rails.append([-520, -154, 112, -154]); rails.append([128, -154, 520, -154])
+area("rail", -520, -162, 112, -150); area("rail", 128, -162, 520, -150)
 
 # ------------------------------------------------------------------ Rheydt: Marktplatz
 road("Limitenstraße", [(40, 200), (40, 230), (40, 410)])
@@ -184,8 +193,8 @@ box(252, -375, 312, -344, 18, "retail", n="Minto", c="#e9edf0", k="glass", rc="#
 houses_x(320, 390, -375, -360, step=24, w=21, t="retail", hmin=14, hmax=19)
 box(412, -412, 452, -358, 14, "train_station", n="Mönchengladbach Hbf", c="#d9cdb4", rc="#5e6064")
 area("plaza", 392, -412, 412, -352, "Europaplatz")
-rails.append([462, -470, 462, -152]); rails.append([468, -470, 468, -152])
-area("rail", 455, -470, 475, -152)
+rails.append([462, -470, 462, -164]); rails.append([468, -470, 468, -164])
+area("rail", 455, -470, 475, -164)
 houses_x(140, 380, -318, -304, step=26, w=22, t="apartments", hmin=13, hmax=16)
 
 # ------------------------------------------------------------------ Nordpark
@@ -212,7 +221,7 @@ area("rail", -424, -236, -416, -54, "Verbindungsweg (im Bau)")
 for x in list(range(-400, -332, 28)) + list(range(-190, -110, 28)):
     trees.extend([x, -56.5])
 for y in range(-300, 30, 30):
-    if abs(y + 150) > 14: trees.extend([113.5, y + 9])
+    if abs(y + 156) > 14: trees.extend([113.5, y + 9])
 for x, y in [(60, 250), (60, 390), (180, 250), (180, 390), (100, 395), (140, 395), (84, -355), (140, -355), (84, -415), (140, -415)]:
     trees.extend([x, y])
 for x in range(-250, -205, 15):
@@ -242,9 +251,9 @@ for r in raw_roads:
 data = {
     "origin": [51.17, 6.43], "half": [HX, HY], "nodes": nodes, "roads": roads, "buildings": buildings, "areas": areas,
     "rails": rails, "trees": trees, "pois": pois, "spielkarte": True, "school": SCHOOL, "parked": PARKED, "zebra": ZEBRA, "signs": SIGNS, "decals": DECALS,
-    "start": [-243, -55.3, -2.2],
+    "start": [-254.5, -44.9, -2.38],
     "districts": [
-        {"n": "Dohr/Torfbend", "b": [-505, -140, 62, 125], "hint": "Werkhof mit gelbem Tor"},
+        {"n": "Dohr/Torfbend", "b": [-505, -152, 62, 125], "hint": "GHS Dohr mit Fachwerkgiebel"},
         {"n": "Rheydt", "b": [0, 190, 310, 470], "hint": "Rathausturm und Hauptkirche am Markt"},
         {"n": "Gladbacher Innenstadt", "b": [-5, -470, 505, -296], "hint": "Münsterturm am Alten Markt"},
         {"n": "Nordpark", "b": [-505, -470, -190, -180], "hint": "Stadion"},
@@ -262,10 +271,10 @@ data = {
         "markt": {"giver": [104, 294], "zone": [110, 300, 122, 309], "stalls": [[96, 268], [110, 268], [124, 268], [138, 268], [96, 340], [110, 340]],
                   "fixed": [[130, 372], [144, 372]]},
         "soon": [[100, -390, "Alter Markt", "Wie weit von der Wand?"], [-270, -322, "Nordpark", "Abspannung vor dem Spiel"], [362, 142, "Schloss Rheydt", "Bonus-Auftrag"]],
-        "closed": [-420, -151.2, "Verbindung zum Nordpark: öffnet mit einem späteren Auftrag"],
+        "closed": [-420, -163.2, "Verbindung zum Nordpark: öffnet mit einem späteren Auftrag"],
     },
     "talk": [
-        {"x": -322, "y": -56.2, "name": "Mats", "role": "wartet auf den Bus", "say": ["Neu hier? Am Werkhof gleich um die Ecke sucht Frau Yıldız jemanden, der rechnen kann.", "Wenn das Tor am Werkhof offen wäre, käme man viel schneller zur Dohrer Straße. So muss man außen herum."]},
+        {"x": -322, "y": -56.2, "name": "Mats", "role": "wartet an der Haltestelle Schule Torfbend", "say": ["Neu hier? Am Werkhof gleich um die Ecke sucht Frau Yıldız jemanden, der rechnen kann.", "Wenn das Tor am Werkhof offen wäre, käme man viel schneller zur Dohrer Straße. So muss man außen herum."]},
         {"x": -160, "y": 8, "name": "Elif", "role": "auf dem Spielplatz", "say": ["Quer über die Wiese ist kürzer als außen herum. Warum eigentlich? Frag mal den Park-Kurier.", "Zum Rheydter Markt? Immer die Dohrer Straße runter und dann rechts in die Gartenstraße."]},
         {"x": 136, "y": 350, "name": "Herr Brands", "role": "Markthändler", "say": ["Frische Äpfel vom Niederrhein! Wenn der Marktmeister endlich die neuen Stände aufbauen lässt, wird es hier richtig voll.", "Vom Rathaus bis zur Hauptkirche sind es nur ein paar Schritte. Aber diagonal über den Platz ist noch kürzer."]},
         {"x": 92, "y": -372, "name": "Frau Okafor", "role": "Stadtführerin", "say": ["Der Turm da drüben gehört zum Münster St. Vitus. Den sieht man von fast überall in der Innenstadt.", "Die Hindenburgstraße führt vom Alten Markt hinunter zum Hauptbahnhof."]},
