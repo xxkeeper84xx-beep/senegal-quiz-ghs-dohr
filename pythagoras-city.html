@@ -210,7 +210,7 @@ body.touch #prompt{bottom:calc(98px + env(safe-area-inset-bottom,0px))}
   <div class="card">
     <span class="tag">3D-Open-World · Mönchengladbach · Mathe Klasse 9</span>
     <h1 style="margin-top:12px">Pythagoras City</h1>
-    <p style="font-size:17px;margin-top:12px">Du startest in <b>Dohr</b> auf dem Gehweg vor der <b>GHS Dohr</b> am Torfbend. Du entscheidest selbst: die Gegend erkunden oder zum <b>Werkhof</b> um die Ecke gehen, wo Frau Yıldız deine Hilfe braucht. Für Aufträge nimmst du Maße an den 📏-Punkten auf und rechnest mit Pythagoras. Gelöste Aufträge verändern die Stadt. Mit verdientem Geld kaufst du im <b>Autohaus 🚘</b> Fahrzeuge, vom E-Scooter bis zum Hubschrauber.</p>
+    <p style="font-size:17px;margin-top:12px">Du startest in <b>Dohr</b> auf dem Gehweg vor der <b>GHS Dohr</b> am Torfbend. Du entscheidest selbst: die Gegend erkunden oder zum <b>Werkhof</b> um die Ecke gehen, wo Herr Maaß von der Technik-AG deine Hilfe braucht. Für Aufträge nimmst du Maße an den 📏-Punkten auf und rechnest mit Pythagoras. Gelöste Aufträge verändern die Stadt. Mit verdientem Geld kaufst du im <b>Autohaus 🚘</b> Fahrzeuge, vom E-Scooter bis zum Hubschrauber.</p>
     <div class="formula">a² + b² = c²</div>
     <div class="cols" style="margin-top:10px">
       <div>
@@ -1355,8 +1355,8 @@ save.q=save.q||{};
 const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,done:false,pick:null,tries:0});
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
-  giver:{x:w.giver[0],y:w.giver[1],name:"Frau Yıldız",role:"Hausmeisterin am Werkhof Dohr",shirt:"#e07a2f"},
-  intro:"„Gut, dass du da bist! Am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Lehrer an der GHS Dohr, leitet die Technik-AG im Werkhof",shirt:"#e07a2f"},
+  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, meine Technik-AG arbeitet hier im Werkhof. Am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
@@ -1365,8 +1365,8 @@ if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfb
     fb:v=>v<10?"Zu kurz: 9 m < 10 m. Dieses Kabel reicht nicht bis zum Anschluss.":v>10?"Das Kabel reicht zwar, aber 2 m bleiben übrig. Es gibt ein kürzeres, das passt.":"Passt genau: 10 m reichen und nichts bleibt übrig."},
   doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit der Dohrer Straße.",xp:40,money:120})}
 if(QD.markt){const m=QD.markt,z=m.zone;QUESTS.push({id:"markt",district:"Rheydt",title:"Quer über den Markt",
-  giver:{x:m.giver[0],y:m.giver[1],name:"Herr Lenßen",role:"Marktmeister in Rheydt",shirt:"#2f8f5b"},
-  intro:"„Wir bauen neue Marktstände auf. Das Material liegt an der einen Ecke der weiß markierten Zone und muss zur gegenüberliegenden Ecke. Die Zone ist frei, du darfst also auch quer hindurch. Miss Breite und Länge und rechne aus, wie viel kürzer der direkte Weg ist.“",
+  giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Lehrerin an der GHS Dohr, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
+  intro:"„Hallo, ich bin Frau Krahe! Unsere Schule baut heute neue Marktstände auf. Das Material liegt an der einen Ecke der weiß markierten Zone und muss zur gegenüberliegenden Ecke. Die Zone ist frei, du darfst also auch quer hindurch. Miss Breite und Länge und rechne aus, wie viel kürzer der direkte Weg ist.“",
   measures:[{id:"a",label:"Breite der Zone",short:"Breite",val:9,x:z[0]-1.2,y:z[3],where:"am Eckpfosten unten links der weißen Zone",line:[z[0],.35,z[1],z[0],.35,z[3]]},
             {id:"b",label:"Länge der Zone",short:"Länge",val:12,x:z[2],y:z[1]-1.2,where:"am Eckpfosten oben rechts der weißen Zone",line:[z[0],.35,z[1],z[2],.35,z[1]]}],
   lab:{a:"Breite",b:"Länge",c:"Diagonale"},ans:15,unit:"m",
@@ -2687,7 +2687,7 @@ function refreshHunt(){const f=save.hunt||[];huntMeshes.forEach((h,i)=>{h.m.mate
 
 /* ================= Messaufträge auf dem Schulgelände ================= */
 QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die Außentreppe",
-  giver:{x:-278.5,y:-115.5,name:"Frau Schmitz",role:"Sportlehrerin an der GHS Dohr",shirt:"#c0392b"},
+  giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Lehrerin an der GHS Dohr",shirt:"#c0392b"},
   intro:"„Die Außentreppe am Erweiterungsbau bekommt einen neuen Handlauf. Er soll genau so lang sein wie die Treppe schräg von unten bis zum Podest. Miss bitte die Höhe des Podests und wie weit die Treppe waagerecht reicht.“",
   measures:[{id:"a",label:"Höhe des Podests",short:"Podesthöhe",val:3.9,x:-293.4,y:-112.9,where:"am Podest oben an der Außentreppe",line:[-292.1,0,-111.6,-292.1,3.9,-111.6]},
             {id:"b",label:"Waagerechte Länge der Treppe",short:"Treppenlänge",val:5.5,x:-286.4,y:-112.9,where:"am unteren Ende der Außentreppe",line:[-286.5,.35,-111.9,-292,.35,-111.9]}],
@@ -2695,16 +2695,16 @@ QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die A
   ask:"Wie lang ist die Treppe schräg gemessen?",
   choice:{q:"Handläufe gibt es in 6 m, 7 m und 8 m. Welchen bestellst du?",opts:[{v:6,t:"6 m"},{v:7,t:"7 m"},{v:8,t:"8 m"}],ok:7,
     fb:v=>v<7?"Zu kurz: 6 m < 6,7 m. Der Handlauf würde nicht bis zum Podest reichen.":v>7?"Das geht, aber ein ganzer Meter wäre übrig. Es gibt einen kürzeren, der reicht.":"Richtig: 7 m ist der kürzeste Handlauf, der reicht."},
-  doneText:"Der neue Handlauf ist bestellt. Frau Schmitz bedankt sich.",xp:40,money:110});
+  doneText:"Der neue Handlauf ist bestellt. Frau Ziemer bedankt sich.",xp:40,money:110});
 QUESTS.push({id:"schulhof",district:"Dohr/Torfbend",title:"Quer über den Schulhof",
-  giver:{x:-312,y:-100,name:"Herr Kaya",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
+  giver:{x:-312,y:-100,name:"Herr Ballhorn",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
   intro:"„Für den Sponsorenlauf brauchen wir die längste gerade Strecke auf dem Schulhof: von der Ecke am Gartenhaus quer bis zur Ecke an der Einfahrt. Miss die Breite und die Länge des Hofs entlang der Zäune.“",
   measures:[{id:"a",label:"Länge des Hofs (Nord–Süd)",short:"Hoflänge",val:86,x:-263.5,y:-120,where:"an der weißen Hofmauer zur Feuerwehrzufahrt",line:[-262.2,.35,-149.6,-262.2,.35,-63.6]},
             {id:"b",label:"Breite des Hofs (Ost–West)",short:"Hofbreite",val:72,x:-300,y:-148.3,where:"am hinteren Zaun beim Basketballkorb",line:[-334,.35,-149.4,-262,.35,-149.4]}],
   lab:{a:"Länge",b:"Breite",c:"Diagonale"},ans:Math.hypot(86,72),unit:"m",
   ask:"Wie lang ist die Strecke quer über den Hof (die Diagonale)?",
   extra:{q:"Am Zaun entlang wären es 86 m + 72 m = 158 m. Wie viele Meter ist die Diagonale kürzer?",ans:158-Math.hypot(86,72),unit:"m",steps:`Unterschied: 158 m − 112,2 m ≈ <span class="hl">45,8 m</span>`,tip:"Ziehe die Diagonale vom Weg am Zaun ab: 158 m − 112,2 m."},
-  choice:{q:"Welche Strecke nimmt Herr Kaya für den Sprint?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
+  choice:{q:"Welche Strecke nimmt Herr Ballhorn für den Sprint?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
     fb:v=>v==="diag"?"Die Diagonale ist die längste gerade Strecke auf dem Hof.":"Am Zaun ist es länger, aber nicht gerade: Es gibt eine Ecke."},
   doneText:"Die Laufstrecke ist abgesteckt. Beim Sponsorenlauf rennen alle quer über den Hof.",xp:40,money:110});
 
