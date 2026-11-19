@@ -70,7 +70,7 @@ jobs:
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath "$RUNNER_TEMP/ui.xcresult" \
             NOTFALL_SERVER_URL=http://localhost:3000 \
-            CODE_SIGNING_ALLOWED=NO | tail -n 60
+            CODE_SIGNING_ALLOWED=NO 2>&1 | grep -vE "^(CompileSwift|SwiftCompile|Ld |CodeSign|ProcessInfoPlistFile|CopySwiftLibs|    cd |    export |    /Applications)" | tail -n 250
       - name: Bildschirmfotos exportieren
         if: always()
         run: |
@@ -81,6 +81,8 @@ jobs:
           manifest = json.load(open("shots/manifest.json")) if os.path.exists("shots/manifest.json") else []
           for test in manifest:
               for a in test.get("attachments", []):
+                  if not a["exportedFileName"].lower().endswith(".png"):
+                      continue
                   src = os.path.join("shots", a["exportedFileName"])
                   name = a.get("suggestedHumanReadableName", a["exportedFileName"]).split("_0_")[0].replace(" ", "_")
                   dst = os.path.join("small", name + ".jpg")

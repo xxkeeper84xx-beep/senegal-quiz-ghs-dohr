@@ -25,7 +25,7 @@ final class NotfallUITests: XCTestCase {
         let web = app.webViews.firstMatch
         XCTAssertTrue(web.waitForExistence(timeout: 30))
         let nameField = web.textFields.element(boundBy: 0)
-        XCTAssertTrue(nameField.waitForExistence(timeout: 30), "Anmeldeseite nicht geladen")
+        require(nameField, 30, "Anmeldeseite nicht geladen", app)
         shot("01 Anmeldung", app)
         enter(nameField, "Iris Phone")
         enter(web.textFields.element(boundBy: 1), "IPH")
@@ -34,7 +34,7 @@ final class NotfallUITests: XCTestCase {
 
         // Standort wählen
         let chip = web.buttons["Lehrerzimmer"]
-        XCTAssertTrue(chip.waitForExistence(timeout: 20), "Standort-Dialog fehlt")
+        require(chip, 20, "Standort-Dialog fehlt", app)
         chip.tap()
         web.buttons["Speichern"].tap()
         sleep(2)
@@ -45,24 +45,29 @@ final class NotfallUITests: XCTestCase {
         let token = try XCTUnwrap(kai["token"] as? String)
         _ = post("/api/alarms", ["type": "medical", "location": "Turnhalle", "note": "Schüler gestürzt, nicht ansprechbar"], token: token)
 
-        let title = web.staticTexts["Medizinischer Notfall"]
-        XCTAssertTrue(title.waitForExistence(timeout: 20), "Alarm ist in der App nicht angekommen")
+        // Überschrift wird per CSS in Großbuchstaben dargestellt – daher ohne Groß-/Kleinschreibung suchen
+        let title = web.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'medizinischer notfall'")).firstMatch
+        require(title, 20, "Alarm ist in der App nicht angekommen", app)
         sleep(1)
         shot("03 Alarm eingegangen", app)
 
-        web.buttons["Ich komme"].tap()
+        let coming = web.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'ich komme'")).firstMatch
+        require(coming, 10, "Rückmelde-Knopf fehlt", app)
+        coming.tap()
         sleep(2)
         shot("04 Rueckmeldung gegeben", app)
 
         // Native Alarm-Einstellungen öffnen
-        web.buttons["Minimieren"].tap()
+        let minimize = web.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'minimieren'")).firstMatch
+        require(minimize, 10, "Minimieren fehlt", app)
+        minimize.tap()
         let teamTab = web.buttons.matching(NSPredicate(format: "label CONTAINS 'Kollegium'")).firstMatch
-        XCTAssertTrue(teamTab.waitForExistence(timeout: 10))
+        require(teamTab, 10, "Reiter Kollegium fehlt", app)
         teamTab.tap()
         let settingsButton = web.buttons.matching(NSPredicate(format: "label CONTAINS 'Alarm-Einstellungen'")).firstMatch
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 10), "Knopf für native Einstellungen fehlt")
+        require(settingsButton, 10, "Knopf für native Einstellungen fehlt", app)
         settingsButton.tap()
-        XCTAssertTrue(app.navigationBars["Alarm-Einstellungen"].waitForExistence(timeout: 10), "Einstellungen nicht geöffnet")
+        require(app.navigationBars["Alarm-Einstellungen"], 10, "Einstellungen nicht geöffnet", app)
         sleep(1)
         shot("05 Alarm-Einstellungen", app)
 
@@ -74,6 +79,14 @@ final class NotfallUITests: XCTestCase {
     }
 
     // MARK: - Hilfen
+
+    /// Wartet auf ein Element; fehlt es, gibt es ein Foto und den Bildschirminhalt als Text, dann Abbruch.
+    private func require(_ element: XCUIElement, _ timeout: TimeInterval, _ message: String, _ app: XCUIApplication) {
+        if element.waitForExistence(timeout: timeout) { return }
+        shot("FEHLER - \(message)", app)
+        print("UI-BAUM:\n\(app.debugDescription)")
+        XCTFail(message)
+    }
 
     private func enter(_ field: XCUIElement, _ text: String) {
         field.tap()
