@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Push-Mitteilungen (Xcode stellt beim Archivieren automatisch auf "production" um) -->
+	<key>aps-environment</key>
+	<string>development</string>
+	<!-- Dringende Mitteilungen: durchbrechen Fokus / "Nicht stören" -->
+	<key>com.apple.developer.usernotifications.time-sensitive</key>
+	<true/>
+	<!--
+	  Kritische Hinweise: durchbrechen den Stummschalter (wie NINA).
+	  ERST EINKOMMENTIEREN, wenn Apple die Berechtigung erteilt hat – sonst schlägt das Signieren fehl.
+	  Antrag: https://developer.apple.com/contact/request/notifications-critical-alerts-entitlement/
+
+	<key>com.apple.developer.usernotifications.critical-alerts</key>
+	<true/>
+	-->
+</dict>
+</plist>

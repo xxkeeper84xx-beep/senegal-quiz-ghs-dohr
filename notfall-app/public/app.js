@@ -38,7 +38,7 @@ const S = {
   es: null,
 };
 
-// Android-App (NINA-ähnlicher Alarm): übernimmt Ton/Vibration/Vollbild selbst
+// Android-/iPhone-App (NINA-ähnlicher Alarm): übernimmt Ton/Vibration/Vollbild selbst
 const NATIVE = typeof window.NativeAlarm !== 'undefined';
 const native = (fn, ...args) => { try { if (NATIVE) return window.NativeAlarm[fn](...args); } catch {} };
 window.openAlarmFromNative = (id) => openOverlay(id, true);
@@ -558,7 +558,7 @@ function urlB64ToUint8(b64) {
 async function updatePushStatus() {
   const s = $('#push-status');
   if (NATIVE) {
-    s.textContent = 'Alarme kommen über die Android-App – auch bei Stummschaltung. Bitte einmal die Alarm-Einstellungen prüfen.';
+    s.textContent = 'Alarme kommen über die Handy-App – auch bei Stummschaltung. Bitte einmal die Alarm-Einstellungen prüfen.';
     $('#push-enable').textContent = '⚙️ Alarm-Einstellungen des Handys';
     $('#push-test').classList.add('hidden');
     $('#sound-test').classList.add('hidden');

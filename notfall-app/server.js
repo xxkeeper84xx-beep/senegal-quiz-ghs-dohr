@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const webpush = require('./lib/webpush');
+const { Apns, buildPayload } = require('./lib/apns');
 
 const PORT = Number(process.env.PORT) || 3000;
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
@@ -113,8 +114,28 @@ const SCHOOL_CODE = process.env.SCHULCODE || config.schoolCode;
 const ADMIN_CODE = process.env.ADMINCODE || config.adminCode;
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@example.org';
 
+// iPhone-App: Apple Push (optional). Benötigt einen APNs-Schlüssel (.p8) aus dem Apple-Developer-Konto.
+let apns = null;
+if (process.env.APNS_KEY_FILE) {
+  try {
+    apns = new Apns({
+      keyPem: fs.readFileSync(process.env.APNS_KEY_FILE, 'utf8'),
+      keyId: process.env.APNS_KEY_ID,
+      teamId: process.env.APNS_TEAM_ID,
+      bundleId: process.env.APNS_BUNDLE_ID,
+    });
+    if (!process.env.APNS_KEY_ID || !process.env.APNS_TEAM_ID || !process.env.APNS_BUNDLE_ID) {
+      throw new Error('APNS_KEY_ID, APNS_TEAM_ID und APNS_BUNDLE_ID müssen gesetzt sein.');
+    }
+  } catch (e) {
+    console.error('APNs (iPhone-Push) deaktiviert:', e.message);
+    apns = null;
+  }
+}
+function setApns(instance) { apns = instance; } // für Tests
+
 const db = Object.assign(
-  { users: {}, sessions: {}, alarms: [], messages: [], subscriptions: [] },
+  { users: {}, sessions: {}, alarms: [], messages: [], subscriptions: [], apnsDevices: [] },
   readJson(DB_FILE, {}),
 );
 
@@ -231,6 +252,28 @@ async function pushToAll(payload, exceptUserId, opts) {
       changed = true;
     } else if (r.status === 'rejected' || !r.value.ok) {
       console.warn('Push fehlgeschlagen:', r.status === 'rejected' ? r.reason.message : r.value.status);
+    }
+  });
+  if (changed) save();
+  await pushToApple(payload, exceptUserId, opts);
+}
+
+async function pushToApple(payload, exceptUserId, opts = {}) {
+  if (!apns) return;
+  const devices = db.apnsDevices.filter((d) => d.userId !== exceptUserId);
+  const results = await Promise.allSettled(devices.map((d) => apns.send(d.token, buildPayload(payload, { critical: d.critical }), {
+    environment: d.environment,
+    priority: opts.urgency === 'normal' ? 5 : 10,
+    expiration: Math.floor(Date.now() / 1000) + (opts.ttl || 3600),
+    collapseId: payload.kind === 'alarm' && payload.alarmId ? payload.alarmId.slice(0, 64) : undefined,
+  })));
+  let changed = false;
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled' && r.value.gone) {
+      db.apnsDevices = db.apnsDevices.filter((d) => d !== devices[i]);
+      changed = true;
+    } else if (r.status === 'rejected' || !r.value.ok) {
+      console.warn('iPhone-Push fehlgeschlagen:', r.status === 'rejected' ? r.reason.message : `${r.value.status} ${r.value.reason || ''}`);
     }
   });
   if (changed) save();
@@ -409,6 +452,42 @@ async function handleApi(req, res, url) {
     return send(res, 200, { ok: true });
   }
 
+  if (route === 'POST /api/apns/register') {
+    const body = await readBody(req);
+    const token = clean(body.deviceToken, 200).toLowerCase();
+    if (!/^[0-9a-f]{32,200}$/.test(token)) return send(res, 400, { error: 'Ungültiger Geräte-Token.' });
+    db.apnsDevices = db.apnsDevices.filter((d) => d.token !== token);
+    db.apnsDevices.push({
+      userId: user.id,
+      token,
+      critical: body.critical === true,
+      environment: body.environment === 'sandbox' ? 'sandbox' : 'production',
+      updatedAt: now(),
+    });
+    save();
+    return send(res, 200, { ok: true, apnsEnabled: !!apns });
+  }
+
+  if (route === 'POST /api/apns/unregister') {
+    const body = await readBody(req);
+    const token = clean(body.deviceToken, 200).toLowerCase();
+    db.apnsDevices = db.apnsDevices.filter((d) => !(d.token === token && d.userId === user.id));
+    save();
+    return send(res, 200, { ok: true });
+  }
+
+  if (route === 'POST /api/apns/test') {
+    const devices = db.apnsDevices.filter((d) => d.userId === user.id);
+    if (!apns) return send(res, 503, { error: 'iPhone-Push ist auf dem Server nicht eingerichtet (APNS_KEY_FILE fehlt).' });
+    if (!devices.length) return send(res, 400, { error: 'Kein iPhone für dieses Konto registriert.' });
+    const results = await Promise.allSettled(devices.map((d) => apns.send(d.token, buildPayload({
+      kind: 'alarm', title: '🔔 TESTALARM', body: 'Test – kein Notfall. So klingt ein Alarm.', alarmId: 'test',
+    }, { critical: d.critical }), { environment: d.environment })));
+    const ok = results.some((r) => r.status === 'fulfilled' && r.value.ok);
+    return send(res, ok ? 200 : 502, ok ? { ok: true } : { error: 'Apple hat die Mitteilung abgelehnt: ' +
+      results.map((r) => (r.status === 'fulfilled' ? r.value.reason || r.value.status : r.reason.message)).join(', ') });
+  }
+
   if (route === 'POST /api/push/test') {
     const subs = db.subscriptions.filter((s) => s.userId === user.id);
     if (!subs.length) return send(res, 400, { error: 'Kein Push-Abo für dieses Gerät gefunden.' });
@@ -472,4 +551,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { server, ALARM_TYPES };
+module.exports = { server, ALARM_TYPES, setApns };

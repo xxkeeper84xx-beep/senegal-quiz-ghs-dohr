@@ -1,0 +1,29 @@
+name: iPhone-App prüfen
+
+on:
+  push:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v5
+      - name: XcodeGen installieren
+        run: brew install xcodegen
+      - name: Xcode-Projekt erzeugen
+        run: xcodegen generate
+      - name: Für den iPhone-Simulator bauen (ohne Signatur)
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project NotfallKollegium.xcodeproj \
+            -scheme NotfallKollegium \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO | tail -n 80
