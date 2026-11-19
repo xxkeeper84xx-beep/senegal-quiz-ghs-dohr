@@ -311,6 +311,8 @@ async function handleApi(req, res, url) {
     const token = crypto.randomBytes(32).toString('base64url');
     db.sessions[token] = { userId: user.id, createdAt: now() };
     save();
+    broadcast('user', publicUser(user)); // damit alle Geräte den Namen kennen
+
     return send(res, 200, { token, user: publicUser(user) });
   }
 

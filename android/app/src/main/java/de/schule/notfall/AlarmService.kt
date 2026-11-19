@@ -195,6 +195,7 @@ class AlarmService : Service() {
             when (event) {
                 "alarm" -> handleAlarm(json, fromState = false)
                 "message" -> handleMessage(json)
+                "user" -> users.put(json.getString("id"), json)
             }
         } catch (e: Exception) {
             Log.w(TAG, "Ereignis konnte nicht verarbeitet werden", e)

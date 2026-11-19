@@ -84,12 +84,16 @@ enum Keychain {
 
     static func set(_ value: String?, for key: String) {
         SecItemDelete(query(key) as CFDictionary)
+        UserDefaults.standard.removeObject(forKey: "fallback." + key)
         guard let value else { return }
         var item = query(key)
         item[kSecValueData as String] = Data(value.utf8)
         // Auch bei gesperrtem Gerät lesbar (nach dem ersten Entsperren), damit Push-Registrierungen funktionieren
         item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-        SecItemAdd(item as CFDictionary, nil)
+        if SecItemAdd(item as CFDictionary, nil) != errSecSuccess {
+            // Schlüsselbund nicht verfügbar (z. B. unsignierter Test-Build) – im App-Speicher ablegen
+            UserDefaults.standard.set(value, forKey: "fallback." + key)
+        }
     }
 
     static func get(_ key: String) -> String? {
@@ -97,7 +101,9 @@ enum Keychain {
         q[kSecReturnData as String] = true
         q[kSecMatchLimit as String] = kSecMatchLimitOne
         var out: CFTypeRef?
-        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let data = out as? Data else { return nil }
+        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let data = out as? Data else {
+            return UserDefaults.standard.string(forKey: "fallback." + key)
+        }
         return String(data: data, encoding: .utf8)
     }
 }

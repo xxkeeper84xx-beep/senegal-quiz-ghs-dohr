@@ -144,6 +144,7 @@ function connectEvents() {
   es.addEventListener('ping', live);
   es.addEventListener('alarm', (e) => { live(); onAlarm(JSON.parse(e.data)); });
   es.addEventListener('message', (e) => { live(); onMessage(JSON.parse(e.data)); });
+  es.addEventListener('user', (e) => { live(); const u = JSON.parse(e.data); S.users[u.id] = u; renderAll(); });
   es.addEventListener('presence', (e) => { live(); S.online = JSON.parse(e.data); for (const u of S.online) S.users[u.id] = u; renderTeam(); });
 }
 

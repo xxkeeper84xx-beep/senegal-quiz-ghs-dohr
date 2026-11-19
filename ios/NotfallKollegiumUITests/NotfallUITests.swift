@@ -26,6 +26,7 @@ final class NotfallUITests: XCTestCase {
         XCTAssertTrue(web.waitForExistence(timeout: 30))
         let nameField = web.textFields.element(boundBy: 0)
         require(nameField, 30, "Anmeldeseite nicht geladen", app)
+        sleep(2)
         shot("01 Anmeldung", app)
         enter(nameField, "Iris Phone")
         enter(web.textFields.element(boundBy: 1), "IPH")
@@ -48,6 +49,8 @@ final class NotfallUITests: XCTestCase {
         // Überschrift wird per CSS in Großbuchstaben dargestellt – daher ohne Groß-/Kleinschreibung suchen
         let title = web.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'medizinischer notfall'")).firstMatch
         require(title, 20, "Alarm ist in der App nicht angekommen", app)
+        let reporter = web.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Kai Lehrer'")).firstMatch
+        require(reporter, 5, "Name der auslösenden Person fehlt", app)
         sleep(1)
         shot("03 Alarm eingegangen", app)
 
@@ -74,8 +77,15 @@ final class NotfallUITests: XCTestCase {
         // Lokaler Testalarm, dann App in den Hintergrund: Mitteilung auf dem Home-Bildschirm
         app.buttons.matching(NSPredicate(format: "label CONTAINS 'Testalarm in 5 Sekunden'")).firstMatch.tap()
         XCUIDevice.shared.press(.home)
-        sleep(8)
+        sleep(6)
         shot("06 Testalarm als Mitteilung", nil)
+        // Mitteilungszentrale von oben herunterziehen
+        let springboardWindow = springboard.windows.firstMatch
+        let top = springboardWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.01))
+        let middle = springboardWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.6))
+        top.press(forDuration: 0.1, thenDragTo: middle)
+        sleep(2)
+        shot("07 Mitteilungszentrale", nil)
     }
 
     // MARK: - Hilfen
