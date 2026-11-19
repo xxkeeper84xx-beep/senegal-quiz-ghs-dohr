@@ -20,6 +20,8 @@ Web-App (installierbar auf Handy, Tablet und PC) zur schnellen Alarmierung des L
 - **Push-Benachrichtigungen** auch bei geschlossener App (Web Push).
 - **Entwarnung / Fehlalarm:** Einen Amokalarm können nur die Schulleitung oder die auslösende Person beenden,
   die übrigen Alarme alle Lehrkräfte.
+- **Android-App mit NINA-Alarm:** Der Alarm kommt auch bei stummgeschaltetem Handy und bei „Nicht stören“ laut
+  durch, mit Vollbild auf dem Sperrbildschirm. Siehe [`../android`](../android/README.md).
 - Verlauf aller Alarme, Anzeige der Kolleg*innen, die gerade online sind, und Direktwahl 110/112.
 
 ## Starten
@@ -46,6 +48,7 @@ Beim ersten Start werden zwei Zugangscodes erzeugt und in der Konsole angezeigt 
 | `SCHULNAME` | Name, der beim Anmelden angezeigt wird | `Unsere Schule` |
 | `SCHULCODE` / `ADMINCODE` | feste Zugangscodes statt der erzeugten | zufällig |
 | `DATA_DIR` | Speicherort der Daten | `./data` |
+| `AMOK_STUMM` | `0` = Amokalarm auch mit Ton (Standard: stiller Alarm, nur Vibration) | `1` |
 | `VAPID_SUBJECT` | Kontakt für Push-Dienste (`mailto:…`) | `mailto:admin@example.org` |
 
 ## Betrieb im Schulalltag
@@ -76,7 +79,8 @@ Beim ersten Start werden zwei Zugangscodes erzeugt und in der Konsole angezeigt 
 ## Grenzen
 
 - Ohne Internet bzw. WLAN kommen keine Alarme an. Die App ist ein **zusätzlicher** Kanal neben Durchsage, Telefon und Alarmanlage.
-- Wenn ein Handy auf „Nicht stören“ steht oder Benachrichtigungen blockiert, kann es Alarme verzögert oder lautlos anzeigen.
+- Die **Web-App** (iPhone, PC) zeigt Alarme bei „Nicht stören“ oder Stummschaltung nur lautlos an.
+  Laut trotz Stummschaltung klingelt nur die **Android-App**.
 - Der stille Amokalarm vibriert nur. Ob ein Ton kommt, hängt bei Push-Nachrichten zusätzlich vom Betriebssystem ab.
 
 ## Tests

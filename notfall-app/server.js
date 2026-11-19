@@ -12,6 +12,8 @@ const PORT = Number(process.env.PORT) || 3000;
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const SCHOOL_NAME = process.env.SCHULNAME || 'Unsere Schule';
+// Amokalarm standardmäßig ohne Ton (nur Vibration + Bildschirm). AMOK_STUMM=0 macht ihn laut.
+const AMOK_SILENT = process.env.AMOK_STUMM !== '0';
 
 // ---------------------------------------------------------------------------
 // Alarmarten
@@ -21,7 +23,7 @@ const ALARM_TYPES = {
     label: 'Amokalarm',
     icon: '🚨',
     color: '#b00020',
-    silent: true, // kein Ton auf den Geräten – verrät sonst den Standort
+    silent: AMOK_SILENT, // kein Ton auf den Geräten – verrät sonst den Standort
     adminResolveOnly: true,
     instructions: [
       'Tür abschließen bzw. verbarrikadieren, Licht aus.',

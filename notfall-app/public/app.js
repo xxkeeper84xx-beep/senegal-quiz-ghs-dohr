@@ -38,6 +38,11 @@ const S = {
   es: null,
 };
 
+// Android-App (NINA-ähnlicher Alarm): übernimmt Ton/Vibration/Vollbild selbst
+const NATIVE = typeof window.NativeAlarm !== 'undefined';
+const native = (fn, ...args) => { try { if (NATIVE) return window.NativeAlarm[fn](...args); } catch {} };
+window.openAlarmFromNative = (id) => openOverlay(id, true);
+
 const COMMON_LOCATIONS = ['Lehrerzimmer', 'Schulhof', 'Turnhalle', 'Mensa', 'Sekretariat', 'Aula', 'Bibliothek'];
 
 // ---------------------------------------------------------------- API
@@ -98,6 +103,7 @@ async function enterApp() {
   renderAlarmButtons();
   renderAll();
   connectEvents();
+  native('setSession', S.token);
   updatePushStatus();
   if (!S.location) setTimeout(askLocation, 400);
 }
@@ -138,8 +144,8 @@ function onAlarm(a) {
     openOverlay(a.id);
     if (a.createdBy !== S.me.id) {
       vibrate(t.silent ? [400, 200, 400] : [800, 300, 800, 300, 800]);
-      if (!t.silent) startSiren();
-      notifyLocal(`${t.icon} ${t.label.toUpperCase()}`, `Ort: ${a.location}`, a.id, t.silent);
+      if (!t.silent && !NATIVE) startSiren();
+      if (!NATIVE) notifyLocal(`${t.icon} ${t.label.toUpperCase()}`, `Ort: ${a.location}`, a.id, t.silent);
     }
   } else if (prev?.status === 'active' && a.status !== 'active') {
     if (S.overlayId === a.id) closeOverlay();
@@ -300,6 +306,7 @@ function renderOverlay() {
 
 async function respond(alarmId, response) {
   stopSiren();
+  native('stopAlarm');
   try {
     const a = await api(`/api/alarms/${alarmId}/respond`, { response, location: S.location });
     S.alarms.set(a.id, a);
@@ -309,6 +316,7 @@ async function respond(alarmId, response) {
 
 $('#ov-minimize').addEventListener('click', () => {
   stopSiren();
+  native('stopAlarm');
   if (S.overlayId) S.minimized.add(S.overlayId);
   S.overlayId = null;
   $('#overlay').classList.add('hidden');
@@ -549,6 +557,13 @@ function urlB64ToUint8(b64) {
 
 async function updatePushStatus() {
   const s = $('#push-status');
+  if (NATIVE) {
+    s.textContent = 'Alarme kommen über die Android-App – auch bei Stummschaltung. Bitte einmal die Alarm-Einstellungen prüfen.';
+    $('#push-enable').textContent = '⚙️ Alarm-Einstellungen des Handys';
+    $('#push-test').classList.add('hidden');
+    $('#sound-test').classList.add('hidden');
+    return;
+  }
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     s.textContent = '⚠️ Dieses Gerät/dieser Browser unterstützt keine Push-Benachrichtigungen (ggf. App zum Home-Bildschirm hinzufügen oder HTTPS nutzen).';
     return;
@@ -567,6 +582,7 @@ async function updatePushStatus() {
 }
 
 $('#push-enable').addEventListener('click', async () => {
+  if (NATIVE) { native('openSettings'); return; }
   try {
     unlockAudio();
     const perm = await Notification.requestPermission();
@@ -595,6 +611,7 @@ async function logout(silent) {
     }
   } catch {}
   S.es?.close();
+  native('clearSession');
   S.token = null;
   store.del('token');
   showLogin();
