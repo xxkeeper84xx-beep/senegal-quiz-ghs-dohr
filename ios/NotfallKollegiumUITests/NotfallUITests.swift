@@ -75,7 +75,10 @@ final class NotfallUITests: XCTestCase {
         shot("05 Alarm-Einstellungen", app)
 
         // Lokaler Testalarm, dann App in den Hintergrund: Mitteilung auf dem Home-Bildschirm
-        app.buttons.matching(NSPredicate(format: "label CONTAINS 'Testalarm in 5 Sekunden'")).firstMatch.tap()
+        let testButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Testalarm in 5 Sekunden'")).firstMatch
+        for _ in 0..<5 where !testButton.isHittable { app.swipeUp() }
+        require(testButton, 5, "Testalarm-Knopf fehlt", app)
+        testButton.tap()
         XCUIDevice.shared.press(.home)
         sleep(6)
         shot("06 Testalarm als Mitteilung", nil)
