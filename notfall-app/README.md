@@ -22,6 +22,8 @@ Web-App (installierbar auf Handy, Tablet und PC) zur schnellen Alarmierung des L
   die übrigen Alarme alle Lehrkräfte.
 - **Android-App mit NINA-Alarm:** Der Alarm kommt auch bei stummgeschaltetem Handy und bei „Nicht stören“ laut
   durch, mit Vollbild auf dem Sperrbildschirm. Siehe [`../android`](../android/README.md).
+- **iPhone-App:** Alarme kommen per Apple Push, mit Apple-Genehmigung „Critical Alerts“ auch trotz
+  Stummschalter. Siehe [`../ios`](../ios/README.md).
 - Verlauf aller Alarme, Anzeige der Kolleg*innen, die gerade online sind, und Direktwahl 110/112.
 
 ## Starten
@@ -49,6 +51,7 @@ Beim ersten Start werden zwei Zugangscodes erzeugt und in der Konsole angezeigt 
 | `SCHULCODE` / `ADMINCODE` | feste Zugangscodes statt der erzeugten | zufällig |
 | `DATA_DIR` | Speicherort der Daten | `./data` |
 | `AMOK_STUMM` | `0` = Amokalarm auch mit Ton (Standard: stiller Alarm, nur Vibration) | `1` |
+| `APNS_KEY_FILE`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID` | Apple-Push für die iPhone-App (siehe [`../ios`](../ios/README.md)) | aus |
 | `VAPID_SUBJECT` | Kontakt für Push-Dienste (`mailto:…`) | `mailto:admin@example.org` |
 
 ## Betrieb im Schulalltag
@@ -80,7 +83,7 @@ Beim ersten Start werden zwei Zugangscodes erzeugt und in der Konsole angezeigt 
 
 - Ohne Internet bzw. WLAN kommen keine Alarme an. Die App ist ein **zusätzlicher** Kanal neben Durchsage, Telefon und Alarmanlage.
 - Die **Web-App** (iPhone, PC) zeigt Alarme bei „Nicht stören“ oder Stummschaltung nur lautlos an.
-  Laut trotz Stummschaltung klingelt nur die **Android-App**.
+  Laut trotz Stummschaltung klingeln nur die **Android-App** und die **iPhone-App** (iPhone: mit Apple-Genehmigung „Critical Alerts“).
 - Der stille Amokalarm vibriert nur. Ob ein Ton kommt, hängt bei Push-Nachrichten zusätzlich vom Betriebssystem ab.
 
 ## Tests

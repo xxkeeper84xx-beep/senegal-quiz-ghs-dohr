@@ -63,7 +63,4 @@ Die Datei `notfall.jks` sicher aufbewahren und **nicht** ins Repository legen.
 
 - Die App verbindet sich nur über **HTTPS** mit dem Server.
 - Mindestversion: Android 8.1.
-- **iPhone:** Apple erlaubt das Durchbrechen des Stumm-Schalters nur Apps mit der Sondergenehmigung
-  „Critical Alerts“, die man bei Apple beantragen muss (so macht es NINA). Dafür sind ein Apple-Developer-Konto
-  (99 €/Jahr), ein Mac mit Xcode und eine eigene iOS-App nötig. Bis dahin bekommen iPhones Alarme über die
-  installierte Web-App per Push-Nachricht, die aber vom Stumm-Schalter stummgeschaltet wird.
+- **iPhone:** siehe [`../ios`](../ios/README.md).
