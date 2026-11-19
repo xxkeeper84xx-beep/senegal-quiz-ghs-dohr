@@ -28,6 +28,8 @@ Web-App (installierbar auf Handy, Tablet und PC) zur schnellen Alarmierung des L
 
 ## Starten
 
+> **Nur mal ausprobieren?** Siehe [TESTEN.md](TESTEN.md): Test mit dem eigenen iPhone und einem Windows-PC.
+
 Voraussetzung: [Node.js](https://nodejs.org) ab Version 18. Externe Pakete sind nicht nötig.
 
 ```bash

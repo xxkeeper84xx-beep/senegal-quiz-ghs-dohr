@@ -27,3 +27,74 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO | tail -n 80
+
+  simulator:
+    name: Alarm im iPhone-Simulator durchspielen
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Notfall-Server starten
+        working-directory: notfall-app
+        run: |
+          SCHULCODE=TEST123 ADMINCODE=CHEF123 SCHULNAME="Testschule" PORT=3000 nohup node server.js > server.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/api/config > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:3000/api/config > /dev/null
+      - name: XcodeGen installieren und Projekt erzeugen
+        working-directory: ios
+        run: brew install xcodegen && xcodegen generate
+      - name: Simulator auswählen
+        id: sim
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          d = json.load(sys.stdin)["devices"]
+          ios = sorted([k for k in d if "iOS" in k], key=lambda k: [int(x) for x in k.split("iOS-")[-1].split("-")])
+          for rt in reversed(ios):
+              phones = [x for x in d[rt] if x["name"].startswith("iPhone") and "Pro" in x["name"]] or [x for x in d[rt] if x["name"].startswith("iPhone")]
+              if phones:
+                  print(phones[0]["udid"]); break
+          ')
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl list devices | grep "$UDID"
+      - name: Oberflächentest im Simulator
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project NotfallKollegium.xcodeproj \
+            -scheme NotfallKollegium \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -resultBundlePath "$RUNNER_TEMP/ui.xcresult" \
+            NOTFALL_SERVER_URL=http://localhost:3000 \
+            CODE_SIGNING_ALLOWED=NO | tail -n 60
+      - name: Bildschirmfotos exportieren
+        if: always()
+        run: |
+          mkdir -p shots small
+          xcrun xcresulttool export attachments --path "$RUNNER_TEMP/ui.xcresult" --output-path shots || true
+          python3 - <<'PY'
+          import json, os, subprocess, base64
+          manifest = json.load(open("shots/manifest.json")) if os.path.exists("shots/manifest.json") else []
+          for test in manifest:
+              for a in test.get("attachments", []):
+                  src = os.path.join("shots", a["exportedFileName"])
+                  name = a.get("suggestedHumanReadableName", a["exportedFileName"]).split("_0_")[0].replace(" ", "_")
+                  dst = os.path.join("small", name + ".jpg")
+                  subprocess.run(["sips", "-s", "format", "jpeg", "-s", "formatOptions", "55", "-Z", "760", src, "--out", dst], check=True, capture_output=True)
+                  data = base64.b64encode(open(dst, "rb").read()).decode()
+                  chunks = [data[i:i + 3000] for i in range(0, len(data), 3000)]
+                  for i, c in enumerate(chunks):
+                      print(f"SHOT|{name}|{i}|{len(chunks)}|{c}")
+          PY
+      - name: Server-Protokoll
+        if: always()
+        run: cat notfall-app/server.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iphone-simulator-bildschirmfotos
+          path: small/

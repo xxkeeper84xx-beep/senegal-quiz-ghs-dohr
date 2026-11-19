@@ -234,8 +234,10 @@ function broadcastPresence() {
 }
 
 setInterval(() => {
-  for (const c of clients) c.res.write(': ping\n\n');
-}, 25000).unref();
+  // Lebenszeichen als echtes Ereignis: Clients erkennen so, ob die Live-Verbindung durchkommt
+  // (manche Proxys/Tunnel puffern Server-Sent Events – dann weichen die Clients auf Abfragen aus)
+  for (const c of clients) c.res.write('event: ping\ndata: {}\n\n');
+}, 10000).unref();
 
 // ---------------------------------------------------------------------------
 // Push
@@ -322,7 +324,7 @@ async function handleApi(req, res, url) {
       Connection: 'keep-alive',
       'X-Accel-Buffering': 'no',
     });
-    res.write('retry: 3000\n\n');
+    res.write('retry: 3000\nevent: hello\ndata: {}\n\n');
     const client = { res, userId: user.id };
     clients.add(client);
     broadcastPresence();

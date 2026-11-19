@@ -50,3 +50,31 @@ targets:
         UIUserInterfaceStyle: Dark
         ITSAppUsesNonExemptEncryption: false
         NotfallServerURL: $(NOTFALL_SERVER_URL)
+        # Nur für Tests: http zu localhost/lokalen Namen erlauben (Internet weiterhin nur https)
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+  NotfallKollegiumUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: NotfallKollegiumUITests
+    dependencies:
+      - target: NotfallKollegium
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).uitests
+        TEST_TARGET_NAME: NotfallKollegium
+    info:
+      path: Config/UITests-Info.plist
+      properties:
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+schemes:
+  NotfallKollegium:
+    build:
+      targets:
+        NotfallKollegium: all
+        NotfallKollegiumUITests: [test]
+    test:
+      targets:
+        - NotfallKollegiumUITests

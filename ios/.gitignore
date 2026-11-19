@@ -3,3 +3,4 @@ Config/Info.plist
 DerivedData/
 build/
 *.xcuserstate
+Config/UITests-Info.plist

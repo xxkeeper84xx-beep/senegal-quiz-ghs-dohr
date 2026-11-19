@@ -117,20 +117,62 @@ async function loadState() {
   S.messages = st.messages;
 }
 
+// Live-Verbindung (Server-Sent Events) mit automatischer Ausweichlösung:
+// Kommt über die Live-Verbindung nichts an (z. B. weil ein Proxy oder Tunnel sie puffert),
+// fragt die App alle 3 Sekunden den Stand beim Server ab.
+let lastLive = 0;
+let connectedAt = 0;
+let pollTimer = null;
+
 function connectEvents() {
   if (S.es) S.es.close();
   const es = new EventSource('/api/events?token=' + encodeURIComponent(S.token));
   S.es = es;
+  connectedAt = Date.now();
   let first = true;
   es.onopen = async () => {
-    $('#conn').className = 'dot on';
     if (!first) { await loadState().catch(() => {}); renderAll(); }
     first = false;
   };
-  es.onerror = () => { $('#conn').className = 'dot off'; };
-  es.addEventListener('alarm', (e) => onAlarm(JSON.parse(e.data)));
-  es.addEventListener('message', (e) => onMessage(JSON.parse(e.data)));
-  es.addEventListener('presence', (e) => { S.online = JSON.parse(e.data); for (const u of S.online) S.users[u.id] = u; renderTeam(); });
+  es.onerror = () => { if (!pollTimer) $('#conn').className = 'dot off'; };
+  const live = () => {
+    lastLive = Date.now();
+    $('#conn').className = 'dot on';
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  };
+  es.addEventListener('hello', live);
+  es.addEventListener('ping', live);
+  es.addEventListener('alarm', (e) => { live(); onAlarm(JSON.parse(e.data)); });
+  es.addEventListener('message', (e) => { live(); onMessage(JSON.parse(e.data)); });
+  es.addEventListener('presence', (e) => { live(); S.online = JSON.parse(e.data); for (const u of S.online) S.users[u.id] = u; renderTeam(); });
+}
+
+setInterval(() => {
+  if (!S.token || !S.me || pollTimer) return;
+  const silentFor = Date.now() - Math.max(lastLive, connectedAt);
+  // Noch nie ein Ereignis erhalten: nach 6 s ausweichen; sonst nach 25 s ohne Lebenszeichen
+  if (silentFor > (lastLive ? 25000 : 6000)) {
+    pollTimer = setInterval(pollState, 3000);
+    pollState();
+  }
+}, 2000);
+
+async function pollState() {
+  try {
+    const st = await api('/api/state');
+    Object.assign(S.users, st.users);
+    S.online = st.online;
+    for (const a of st.alarms) {
+      const cur = S.alarms.get(a.id);
+      if (!cur || JSON.stringify(cur) !== JSON.stringify(a)) onAlarm(a);
+    }
+    const known = new Set(S.messages.map((m) => m.id));
+    for (const m of st.messages) if (!known.has(m.id)) onMessage(m);
+    renderTeam();
+    $('#conn').className = 'dot on';
+  } catch {
+    $('#conn').className = 'dot off';
+  }
 }
 
 // ---------------------------------------------------------------- Ereignisse
