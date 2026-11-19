@@ -123,7 +123,7 @@ function buildSchool(){
   function skin(F,H,ops=[],bk="brick",gable=0){const s=new THREE.Shape();s.moveTo(0,0);s.lineTo(F.len,0);s.lineTo(F.len,H);if(gable)s.lineTo(F.len/2,H+gable);s.lineTo(0,H);s.lineTo(0,0);
     for(const o of ops){const p=new THREE.Path();openPath(o,p);s.holes.push(p)}
     put(bk,new THREE.ExtrudeGeometry(s,{depth:F.d,bevelEnabled:false,curveSegments:10}),F.m)}
-  function windows(F,list,st={}){for(const o of list){const rz=F.d-(st.recess??.18);
+  function windows(F,list,st={}){for(const o of list){const rz=F.d-(st.recess??.25);
       const fs=new THREE.Shape();openPath(o,fs);for(const h of paneHoles(o,st.panes||(o.t==="rect"?"grid":"arch")))fs.holes.push(h);
       const fg=new THREE.ExtrudeGeometry(fs,{depth:.07,bevelEnabled:false,curveSegments:10});fg.translate(0,0,rz-.07);put(st.frame||"frame",fg,F.m);
       const gs=new THREE.Shape();openPath(o,gs);const gg=new THREE.ShapeGeometry(gs,10);gg.translate(0,0,rz-.04);put("glass",gg,F.m);
