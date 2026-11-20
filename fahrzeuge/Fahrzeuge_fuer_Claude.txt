@@ -1,0 +1,33 @@
+FAHRZEUGE FÜR DIE PYTHAGORAS-OPEN-WORLD
+
+Das Paket enthält sechs eigenständige glTF-2.0-Binärmodelle (.glb).
+Entpacke die ZIP und füge die GLB-Dateien in Claudes Projekt ein. Die
+Modelle enthalten ihre Materialien und benötigen keine Texturdateien.
+
+Datei          Fahrzeug
+E-Scooter.glb  Petrolfarbener E-Scooter
+Auto.glb       Schieferblauer Kompaktwagen
+Fahrrad.glb    Sandgelbes Cityrad
+Motorrad.glb   Bordeauxfarbenes Straßenmotorrad
+Helikopter.glb Ziviler Helikopter mit Kufen
+Flugzeug.glb   Kleines ziviles Propellerflugzeug
+
+Für die Integration:
+- Einheiten: Meter. In den GLB-Dateien zeigt +Y nach oben und +Z nach vorne.
+- Der Modellursprung liegt auf Bodenhöhe. Platziere die Modelle zunächst
+  mit Skalierung 1 und passe ihre Ausrichtung an die Konvention des Spiels an.
+- Straßenfahrzeuge haben separate Radknoten (Rad_Vorn und Rad_Hinten,
+  beim Auto zusätzlich mit _L bzw. _R). Die Radachse liegt lokal auf X.
+- Helikopter: Hauptrotor dreht um die lokale Y-Achse, Heckrotor um X.
+- Flugzeug: Propeller dreht um die lokale Z-Achse. Bugrad und beide
+  Haupträder sind separat gruppiert.
+- Zuständigkeit des Spiels: Steuerung, Fahr- und Flugphysik, Animation,
+  Kollisionen, Sitzpositionen und Ein-/Ausstieg.
+
+Prompt für Claude:
+Importiere die sechs GLB-Modelle in das bestehende Pythagoras-Spiel.
+Verwende dieselbe Asset-Ladepipeline wie für Noah. Berücksichtige beim
+Import die Modellachsen und Metermaße. Stelle jedes Modell separat im
+Spiel bereit und prüfe Standhöhe und Ausrichtung. Nutze anschließend
+die separaten Drehknoten für Räder, Rotoren und Propeller. Verwende für
+die Kollisionen einfache Körper passend zu den Fahrzeugabmessungen.

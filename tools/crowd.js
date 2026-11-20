@@ -317,9 +317,9 @@ function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue
    Bei allen Figuren kippt eine Drehung um die X-Achse des Knochens nach vorn (Oberschenkel heben, Oberkörper vorbeugen,
    Arme nach vorn); das Knie beugt mit negativem Winkel. Maße in Metern, Fahrzeug-Gruppen sind 0,1-fach skaliert, vorn = +x. */
 const RIDE_POS={  // Sitz bzw. Trittbrett (x nach vorn, y Höhe), Pedal-/Fußpunkt und Haltung
-  bike: {seat:[-.2,1.5], lean:.42, arm:[1.05,-.35], kind:"pedal"},
-  moped:{seat:[-.55,1.42],lean:.32, arm:[1.2,-.25], kind:"sit"},
-  scoot:{deck:[-.18,.36], lean:.14, arm:[.78,-.3], kind:"stand"}};
+  bike: {seat:[-.36,.99], lean:.38, arm:[.95,-.35], kind:"pedal"},     /* Maße der Fahrzeugmodelle aus fahrzeuge/*.json */
+  moped:{seat:[-.42,.9],  lean:.34, arm:[1.1,-.3],  kind:"sit"},
+  scoot:{deck:[-.06,.2],  lean:.1,  arm:[.55,-.95], kind:"stand"}};
 const RIDE={};
 const _q=new THREE.Quaternion(),_ax=new THREE.Vector3(1,0,0),_az=new THREE.Vector3(0,0,1);
 function riderBuild(id,g,name,look){
@@ -335,8 +335,8 @@ function riderPose(R,phi){const P=RIDE_POS[R.id];for(const k in R.base)R.B[k].qu
   rot(R,"Spine",_ax,P.lean*.5);rot(R,"Spine1",_ax,P.lean*.3);rot(R,"Spine2",_ax,P.lean*.2);rot(R,"Neck",_ax,-P.lean*.6);rot(R,"Head",_ax,-P.lean*.3);
   for(const s of ["Left","Right"]){rot(R,s+"Arm",_ax,P.arm[0]);rot(R,s+"ForeArm",_ax,-P.arm[1]);rot(R,s+"Arm",_az,(s==="Left"?-1:1)*.12);rot(R,s+"Hand",_ax,-.2)}
   if(P.kind==="pedal")for(const [s,o] of [["Left",0],["Right",Math.PI]]){const c=Math.sin(phi+o);
-    rot(R,s+"UpLeg",_ax,1.0+.42*c);rot(R,s+"Leg",_ax,-(1.15+.55*c));rot(R,s+"Foot",_ax,.25)}
-  else if(P.kind==="sit")for(const s of ["Left","Right"]){rot(R,s+"UpLeg",_ax,1.35);rot(R,s+"Leg",_ax,-1.25);rot(R,s+"Foot",_ax,.1);rot(R,s+"UpLeg",_az,(s==="Left"?1:-1)*.08)}
+    rot(R,s+"UpLeg",_ax,.55+.42*c);rot(R,s+"Leg",_ax,-(.7+.6*c));rot(R,s+"Foot",_ax,.2)}
+  else if(P.kind==="sit")for(const s of ["Left","Right"]){rot(R,s+"UpLeg",_ax,.95);rot(R,s+"Leg",_ax,-1.55);rot(R,s+"Foot",_ax,.35);rot(R,s+"UpLeg",_az,(s==="Left"?1:-1)*.08)}
   else {rot(R,"LeftUpLeg",_ax,.18);rot(R,"LeftLeg",_ax,-.25);rot(R,"RightUpLeg",_ax,-.12);rot(R,"RightLeg",_ax,-.08)}
   // Figur so verschieben, dass die Hüfte auf dem Sattel bzw. die Füße auf dem Trittbrett stehen
   R.box.position.set(0,0,0);R.box.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(R.box.parent.matrixWorld).invert();

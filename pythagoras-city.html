@@ -4261,9 +4261,9 @@ function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue
    Bei allen Figuren kippt eine Drehung um die X-Achse des Knochens nach vorn (Oberschenkel heben, Oberkörper vorbeugen,
    Arme nach vorn); das Knie beugt mit negativem Winkel. Maße in Metern, Fahrzeug-Gruppen sind 0,1-fach skaliert, vorn = +x. */
 const RIDE_POS={  // Sitz bzw. Trittbrett (x nach vorn, y Höhe), Pedal-/Fußpunkt und Haltung
-  bike: {seat:[-.2,1.5], lean:.42, arm:[1.05,-.35], kind:"pedal"},
-  moped:{seat:[-.55,1.42],lean:.32, arm:[1.2,-.25], kind:"sit"},
-  scoot:{deck:[-.18,.36], lean:.14, arm:[.78,-.3], kind:"stand"}};
+  bike: {seat:[-.36,.99], lean:.38, arm:[.95,-.35], kind:"pedal"},     /* Maße der Fahrzeugmodelle aus fahrzeuge/*.json */
+  moped:{seat:[-.42,.9],  lean:.34, arm:[1.1,-.3],  kind:"sit"},
+  scoot:{deck:[-.06,.2],  lean:.1,  arm:[.55,-.95], kind:"stand"}};
 const RIDE={};
 const _q=new THREE.Quaternion(),_ax=new THREE.Vector3(1,0,0),_az=new THREE.Vector3(0,0,1);
 function riderBuild(id,g,name,look){
@@ -4279,8 +4279,8 @@ function riderPose(R,phi){const P=RIDE_POS[R.id];for(const k in R.base)R.B[k].qu
   rot(R,"Spine",_ax,P.lean*.5);rot(R,"Spine1",_ax,P.lean*.3);rot(R,"Spine2",_ax,P.lean*.2);rot(R,"Neck",_ax,-P.lean*.6);rot(R,"Head",_ax,-P.lean*.3);
   for(const s of ["Left","Right"]){rot(R,s+"Arm",_ax,P.arm[0]);rot(R,s+"ForeArm",_ax,-P.arm[1]);rot(R,s+"Arm",_az,(s==="Left"?-1:1)*.12);rot(R,s+"Hand",_ax,-.2)}
   if(P.kind==="pedal")for(const [s,o] of [["Left",0],["Right",Math.PI]]){const c=Math.sin(phi+o);
-    rot(R,s+"UpLeg",_ax,1.0+.42*c);rot(R,s+"Leg",_ax,-(1.15+.55*c));rot(R,s+"Foot",_ax,.25)}
-  else if(P.kind==="sit")for(const s of ["Left","Right"]){rot(R,s+"UpLeg",_ax,1.35);rot(R,s+"Leg",_ax,-1.25);rot(R,s+"Foot",_ax,.1);rot(R,s+"UpLeg",_az,(s==="Left"?1:-1)*.08)}
+    rot(R,s+"UpLeg",_ax,.55+.42*c);rot(R,s+"Leg",_ax,-(.7+.6*c));rot(R,s+"Foot",_ax,.2)}
+  else if(P.kind==="sit")for(const s of ["Left","Right"]){rot(R,s+"UpLeg",_ax,.95);rot(R,s+"Leg",_ax,-1.55);rot(R,s+"Foot",_ax,.35);rot(R,s+"UpLeg",_az,(s==="Left"?1:-1)*.08)}
   else {rot(R,"LeftUpLeg",_ax,.18);rot(R,"LeftLeg",_ax,-.25);rot(R,"RightUpLeg",_ax,-.12);rot(R,"RightLeg",_ax,-.08)}
   // Figur so verschieben, dass die Hüfte auf dem Sattel bzw. die Füße auf dem Trittbrett stehen
   R.box.position.set(0,0,0);R.box.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(R.box.parent.matrixWorld).invert();
@@ -4359,6 +4359,72 @@ function trVisual(){if(!TR.on)return;const l=TR.l,[lx,ly]=lateral(l.a),inA=l.a-T
   walker.visible=u<.97;walkerAt(x,y,inA+(TR.side>0?1:-1)*u*Math.PI/2*.9,-.35*u);crouch(Math.min(1,u*1.6))}
 {const base=updateCamera;updateCamera=function(dt,VH){trVisual();base(dt,VH)}}
 {const base=interactables;interactables=function(VH){return TR.on?[]:base(VH)}}   /* kein „Einsteigen“-Hinweis während des Übergangs */
+
+/* ================= Fahrzeugmodelle aus fahrzeuge/*.json =================
+   E-Scooter, Fahrrad, Motorrad, Kompaktwagen, Helikopter und Flugzeug (glTF, Meter, +Y oben, +Z vorn, Ursprung auf dem Boden).
+   Geladen wie die Figuren (GLTFLoader, eingebettete Daten). Im Spiel zeigt die Fahrtrichtung nach +x: Modell um 90° drehen.
+   Zweiräder bleiben in der 0,1-fach skalierten Hülle, damit Sitzhaltung und Auf-/Absteigen weiter passen.
+   Räder drehen um ihre lokale X-Achse, Vorderräder des Autos lenken mit; Hauptrotor um Y, Heckrotor um X, Propeller um Z. */
+{const i=VEHICLES.findIndex(v=>v.id==="smart");
+ VEHICLES.splice(i,0,{id:"auto",name:"Kompaktwagen",icon:"🚘",price:900,req:2,max:20,acc:7,rev:-4,r:1.0,grassF:.45,turn:2.6,cam:.9,lights:true,nitro:true,
+   desc:"Schieferblauer Kompaktwagen: bequem, sparsam und mit Platz für die ganze Lerngruppe."});
+ VEHICLES.push({id:"plane",name:"Flugzeug",icon:"🛩️",price:9000,req:5,max:60,acc:6,rev:-2,r:3.2,grassF:.8,turn:1.3,cam:3.2,lights:true,fly:true,plane:true,
+   desc:"Kleines Propellerflugzeug. Auf einer langen, geraden Straße Anlauf nehmen: ab 18 m/s hebt es mit R ab. In der Luft bleibt es immer in Bewegung."});
+ VEH.auto=VEHICLES.find(v=>v.id==="auto");VEH.plane=VEHICLES.find(v=>v.id==="plane");
+ Object.assign(VEH.moped,{name:"Motorrad",icon:"🏍️",desc:"Bordeauxrotes Straßenmotorrad: flott durch die Stadt, mit Licht für die Nacht."});
+ DEF_PAINT.auto="#4a5d73";DEF_PAINT.plane="#f2efe6"}
+const VMOD={scoot:"E-Scooter",bike:"Fahrrad",moped:"Motorrad",auto:"Auto",heli:"Helikopter",plane:"Flugzeug"};
+const VPAINT={scoot:"Petrol",bike:"Sandgelb",moped:"Bordeaux",auto:"Schieferblau",heli:"Petrol",plane:"Cremeweiss"};
+const VG={done:{},size:{}};
+/* Platzhalter, bis die Modelle geladen sind */
+{const base=buildVehicles;buildVehicles=function(){base();vehMeshes.auto=makeCar(pc("auto"),true,{type:"hatch"});vehMeshes.plane=makeHeli(pc("plane"));vehMeshes.plane.visible=false}}
+function vehFromGlb(id,gltf){
+  const two=TWO.has(id),g=new THREE.Group(),body=new THREE.Group(),model=gltf.scene;g.add(body);body.add(model);
+  model.rotation.y=Math.PI/2;if(two){model.scale.setScalar(10);g.scale.setScalar(.1)}
+  let paint=null;const mats=new Map();
+  model.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=true;
+    const src=o.material;let m=mats.get(src);if(!m){m=src.clone();if(ENV){m.envMap=ENV;m.envMapIntensity=.7}mats.set(src,m);if(m.name===VPAINT[id])paint=m;
+      if(/Glas/i.test(m.name)){m.transparent=true;m.opacity=Math.min(m.opacity,.55);m.depthWrite=false}}
+    o.material=m});
+  if(paint)paint.userData.orig=paint.color.clone();
+  const wheels=[];model.traverse(o=>{if(/^(Rad_(Vorn|Hinten)(_[LR])?|Bugrad|Hauptrad_[LR])$/.test(o.name)){const b=new THREE.Box3().setFromObject(o),s=b.getSize(new THREE.Vector3());
+    o.rotation.order="YXZ";wheels.push({n:o,r:Math.max(.05,s.y/2/(two?10:1)),front:/Vorn|Bugrad/.test(o.name)})}});
+  const dummy=()=>{const d=new THREE.Object3D();d.material={opacity:0};return d};
+  const rotor=model.getObjectByName("Hauptrotor")||dummy();
+  g.userData={body,paint,wheels:[],carWheels:[],wr:1,glb:true,glbWheels:wheels,rotor,tail:dummy(),disc:dummy(),tailReal:model.getObjectByName("Heckrotor"),prop:model.getObjectByName("Propeller")};
+  // Abmessungen in Metern (für Kollision und Sitzposition)
+  g.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(model),sz=bb.getSize(new THREE.Vector3());
+  VG.size[id]={len:+sz.x.toFixed(2),wid:+sz.z.toFixed(2),hgt:+sz.y.toFixed(2)};
+  return g}
+/* einfache Kollisionskörper: Kreis mit halber Breite (Zweiräder und Autos), Rotor- bzw. Spannweite bei Helikopter/Flugzeug etwas kleiner */
+function vehRadius(id){const s=VG.size[id];if(!s)return;const r=id==="heli"?Math.max(s.wid,s.len)*.38:id==="plane"?s.wid*.36:TWO.has(id)?Math.max(.45,s.wid/2+.15):s.wid/2+.12;VEH[id].r=+r.toFixed(2);if(V().id===id)car.r=VEH[id].r}
+function vehSwap(id,gltf){const old=vehMeshes[id],g=vehFromGlb(id,gltf);
+  if(old){g.position.copy(old.position);g.rotation.copy(old.rotation);g.visible=old.visible;if(old.userData.rider){g.add(old.userData.rider);g.userData.rider=old.userData.rider}scene.remove(old)}
+  scene.add(g);vehMeshes[id]=g;VG.done[id]=true;vehRadius(id);applyPaint(id)}
+async function loadVehicles(){for(let k=0;k<200&&!THREE.GLTFLoader;k++)await new Promise(r=>setTimeout(r,100));if(!THREE.GLTFLoader)return;
+  const loader=new THREE.GLTFLoader();
+  const order=[V().id,...Object.keys(VMOD)].filter((v,i,a)=>VMOD[v]&&a.indexOf(v)===i);
+  for(const id of order){try{const g=await loader.loadAsync("fahrzeuge/"+VMOD[id]+".json");vehSwap(id,g)}catch(e){console.info("Fahrzeugmodell nicht geladen:",id)}}}
+{const base=initGlbCrowd;initGlbCrowd=function(){loadVehicles();return base()}}
+/* Lack: ohne eigene Farbe aus der Garage bleibt die Originalfarbe des Modells */
+{const base=applyPaint;applyPaint=function(id){const m=vehMeshes[id];if(m&&m.userData.glb&&m.userData.paint){const p=m.userData.paint;
+  if(save.paint&&save.paint[id]){p.color.set(save.paint[id]);p.color.convertSRGBToLinear()}else p.color.copy(p.userData.orig);return}base(id)}}
+/* Räder, Lenkung, Rotoren und Propeller */
+function vehAnim(dt){const VH=V();
+  for(const id in VG.done){const g=vehMeshes[id];if(!g||!g.visible)continue;const U=g.userData,act=VH.id===id,v=act?car.v:0;
+    for(const w of U.glbWheels){w.n.rotation.x+=v*dt/w.r;if(w.front&&!TWO.has(id)&&id!=="plane")w.n.rotation.y=act?car.steer*.45:0}
+    if(U.tailReal)U.tailReal.rotation.x+=(act?(.25+.75*(car.rotor||0)):0)*dt*64;
+    if(U.prop)U.prop.rotation.z+=(act?(VH.fly||Math.abs(car.v)>.5||keys.w||keys.arrowup?1:.25):0)*dt*55;
+    if(id==="plane"&&act){U.body.rotation.z=clamp((car.vy||0)/12,-.3,.35);U.body.rotation.x=-car.steer*.55*clamp(Math.abs(car.v)/20,0,1)}}}
+{const base=updateCamera;updateCamera=function(dt,VH){vehAnim(dt);base(dt,VH)}}
+/* Flugphysik Flugzeug: Startlauf auf dem Boden, Abheben ab 18 m/s mit R, in der Luft Mindesttempo, zu langsam = sinken */
+{const base=update;update=function(dt){const VH=V();if(VH.id!=="plane")return base(dt);
+  const gnd=heightAt(car.x,car.y),air=car.alt-gnd>.4,climb=keys.r||keys.pageup;
+  VEH.plane.fly=air||(climb&&car.v>=18);
+  if(!air&&climb&&car.v<18&&!state.planeHint){state.planeHint=true;toast("Mehr Anlauf!","Erst ab 18 m/s hebt das Flugzeug ab","#ffc933");setTimeout(()=>state.planeHint=false,4000)}
+  if(air){const low=car.alt-gnd<3;if(!low&&car.v<17)car.v=17;if(car.v<15)car.vy=(car.vy||0)-6*dt}   // in der Luft nie stehen bleiben
+  if(VEH.plane.fly&&!air&&climb){car.vy=Math.max(car.vy||0,6);car.alt=gnd+.45}                       // abheben
+  base(dt)}}
 
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){
