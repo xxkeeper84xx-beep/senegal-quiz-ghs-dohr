@@ -6,6 +6,7 @@ R('$("loading").hidden=true; $("start").hidden=false; state.mode="start";', '$("
 R('<div class="hud" id="toast"></div>', '<div class="hud" id="toast"></div>\n<div class="hud" id="warn" hidden></div>\n<div id="banner" hidden></div>\n<div id="title" hidden></div>')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'story.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'extras.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
+R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'more.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('  let maxF=VH.max, acc=VH.acc;','  let maxF=VH.max*(VH.id!=="walk"&&xOn("turbo")?1.12:1), acc=VH.acc;')
 R('maxF=(boost||car.hold>1.4)?6.2:3.3}','maxF=((boost||car.hold>1.4)?6.2:3.3)*(xOn("shoes")?1.2:1)}')
 R("</style>", """
@@ -70,4 +71,71 @@ body.title-on .hud,body.title-on #btnMore,body.title-on #topbtns,body.title-on #
 .xcard .row button{padding:7px 12px;font-size:13.5px}
 .nsw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;box-shadow:0 0 0 1.5px #1a2147}
 #talkLater{margin-left:8px}
+/* --- Smartphone --- */
+#btnPhone{position:fixed;z-index:7;left:calc(115px + env(safe-area-inset-left,0px));top:calc(58px + env(safe-area-inset-top,0px));width:48px;height:44px;padding:0;font-size:22px;background:var(--panel);border-radius:12px}
+#pBadge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font:700 11px var(--body);min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;box-sizing:border-box}
+@media (max-width:760px){#btnPhone{left:calc(12px + env(safe-area-inset-left,0px));top:calc(108px + env(safe-area-inset-top,0px))}}
+body.title-on #btnPhone,body.title-on #pnote{visibility:hidden}
+#pnote{position:fixed;z-index:16;top:calc(12px + env(safe-area-inset-top,0px));right:calc(160px + env(safe-area-inset-right,0px));background:rgba(10,13,28,.94);color:#fff;padding:10px 14px;border-radius:14px;font-weight:700;font-size:14px;box-shadow:0 0 0 1.5px var(--cyan);transition:opacity .4s;pointer-events:none}
+@media (max-width:760px){#pnote{right:12px;left:12px;top:calc(160px + env(safe-area-inset-top,0px));text-align:center}}
+#fadeBlk{position:fixed;inset:0;background:#000;z-index:40;transition:opacity .45s;opacity:0;pointer-events:none}
+#phone{align-items:center}
+.phonebox{width:min(360px,94vw);height:min(720px,calc(var(--vvh,100vh) - 36px));background:#0b0e1c;border-radius:38px;box-shadow:0 0 0 9px #1c2033,0 0 0 11px #3a4060,0 30px 80px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;color:#fff;position:relative;flex:none}
+.pstat{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 6px;font:700 13px var(--body)}
+.pnotch{width:90px;height:22px;background:#000;border-radius:12px}
+#phScreen{flex:1;overflow:auto;display:flex;flex-direction:column;-webkit-user-select:text;user-select:text}
+.phome{padding:4px 0 8px;display:flex;justify-content:center}
+.phome button{width:160px;height:30px;padding:0;background:transparent;box-shadow:none;min-height:0}
+.phome button::after{content:"";display:block;margin:0 auto;width:130px;height:6px;border-radius:3px;background:#e8eaf5}
+.pwall{padding:28px 20px 16px;text-align:center}
+.pclock{font:400 58px var(--display);line-height:1}
+.pdate{font-size:13px;color:#b4bad6;margin-top:6px}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 6px;padding:14px}
+.pgrid button{background:none;box-shadow:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:#e8eaf5;min-height:0}
+.pgrid i{position:relative;width:58px;height:58px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:28px;font-style:normal;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2)}
+.pgrid i b{position:absolute;top:-5px;right:-5px;background:var(--bad);font:700 11px var(--body);min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff}
+.pgrid span{text-align:center;line-height:1.2}
+.ptitle{display:flex;align-items:center;gap:6px;padding:4px 12px 8px;font:400 18px var(--display);color:var(--accent);border-bottom:1px solid #222846}
+.ptitle button{background:none;box-shadow:none;font-size:30px;line-height:1;padding:0 10px;color:#fff;min-height:40px}
+.pbody{padding:12px 14px;flex:1}
+.plist{display:flex;flex-direction:column;gap:6px}
+.plist button{display:flex;align-items:center;gap:12px;text-align:left;background:#161b33;box-shadow:none;padding:10px 12px;border-radius:14px;color:#fff;font-size:15px}
+.plist button.on{box-shadow:0 0 0 2px var(--accent)}
+.plist button:disabled{opacity:.65;cursor:default}
+.plist i{width:42px;height:42px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:22px;font-style:normal}
+.plist span{flex:1;display:flex;flex-direction:column;min-width:0}
+.plist small{font-weight:500;font-size:12px;color:#aab0cc;margin-top:2px;line-height:1.3}
+.plist em{font-style:normal}
+.psmall{font-size:12.5px;color:#aab0cc;margin:12px 2px}
+.pcall{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:18px;gap:4px}
+.pcall>i{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px;font-style:normal}
+.pcall h4{margin:10px 0 0;font:400 22px var(--display)}
+.pstate{color:#aab0cc;font-size:13px}
+.pbubble{background:#1d2444;border-radius:16px 16px 16px 4px;padding:12px 14px;margin:14px 0 4px;text-align:left;font-size:15px;line-height:1.45;align-self:stretch}
+.pdots{display:flex;gap:7px;margin:26px}.pdots span{width:10px;height:10px;border-radius:50%;background:#3ddc84;animation:tblink 1s infinite}.pdots span:nth-child(2){animation-delay:.2s}.pdots span:nth-child(3){animation-delay:.4s}
+.phang{background:#d8343f;color:#fff;box-shadow:none;border-radius:999px;padding:12px 24px;margin:14px 0 6px}
+.pacts{display:flex;flex-direction:column;gap:6px;align-self:stretch;margin-top:6px}
+.pacts button{text-align:left;background:#161b33;color:#fff;box-shadow:none;padding:9px 12px;border-radius:12px;display:flex;flex-direction:column;font-size:14.5px}
+.pacts small{font-weight:500;font-size:11.5px;color:#aab0cc;margin-top:3px;font-family:var(--mono)}
+.pacts small b{color:var(--accent)}
+.pmsgs{display:flex;flex-direction:column;gap:8px}
+.pm{background:#161b33;border-radius:14px;padding:10px 12px}
+.pm.new{box-shadow:inset 3px 0 0 var(--cyan)}
+.pm b{font-size:14px}.pm small{float:right;color:#aab0cc;font-size:11px}.pm p{margin:5px 0 0;font-size:14px;line-height:1.4;color:#e8eaf5}
+.pcalc{display:flex;flex-direction:column;gap:10px}
+.pcalc label{display:flex;flex-direction:column;font-size:12px;font-weight:700;color:#aab0cc;gap:4px}
+.pcalc input{font:700 20px var(--mono);padding:8px 10px;border-radius:10px;border:0;background:#fff;color:var(--ink)}
+.pseg{display:flex;background:#161b33;border-radius:12px;padding:3px}
+.pseg button{flex:1;background:none;box-shadow:none;color:#aab0cc;padding:8px;font-size:13px}
+.pseg button.on{background:var(--accent);color:var(--ink)}
+.pcout{font:500 13.5px var(--mono);line-height:1.7;background:#161b33;border-radius:12px;padding:10px 12px;min-height:20px}
+.pcout b{color:var(--accent);font-size:18px}
+.pbody h5{margin:14px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#aab0cc}
+.pguest{display:flex;gap:6px;margin-top:10px}.pguest input{flex:1;min-width:0;font:700 16px var(--body);padding:8px 10px;border-radius:10px;border:0}
+.perr{color:var(--bad);font-size:13px;font-weight:700;margin:6px 0}
+.pduo{display:flex;align-items:center;justify-content:space-around;background:#161b33;border-radius:14px;padding:12px;margin-bottom:10px;font-weight:700}
+.pduo div{display:flex;flex-direction:column;align-items:center;gap:4px}.pduo i{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal}
+.pduo span{font-size:24px}
+.pwide{width:100%;margin-top:10px;background:#161b33;color:#fff;box-shadow:none}
+
 </style>""")
