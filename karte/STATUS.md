@@ -8,7 +8,7 @@ Passanten, Gruppen, Lehrkräfte, Ladenbesitzer und Auftraggeber nutzen die 3D-St
 umgefärbte Kleidung). Die einfachen Figuren erscheinen nur noch, solange die 3D-Figuren laden. Auf Tablets höchstens 18 Passanten
 im Umkreis von 70 m (Computer 40 im Umkreis von 110 m); weiter entfernte Figuren werden seltener animiert.
 Test (Software-Rendering, Tablet-Einstellung): ca. 1,3–1,5 Mio. Dreiecke und 780–1240 Zeichenaufrufe pro Bild – deutlich mehr als vorher,
-deshalb unbedingt auf dem Schul-iPad prüfen. Noch einfache Figuren: Fahrer auf Roller, Fahrrad und Moped.
+deshalb unbedingt auf dem Schul-iPad prüfen. Auf Roller, Fahrrad und Moped fährt die eigene Spielfigur (z. B. Noah) mit Haltung aus dem Skelett: auf dem Fahrrad tretend, auf dem Moped sitzend, auf dem Roller stehend, Hände am Lenker.
 
 ## Umzug der Spielinhalte (`tools/spielinhalte.js`, `tools/fx_build.js`, `tools/fx_pass.js`)
 | Inhalt | neuer Ort |
@@ -73,14 +73,13 @@ Ladezeit der Welt im Test: ca. 2 s. Ohne Begrenzung der Bäume waren es über 3 
 **Nicht getestet:** echtes Schul-iPad (Bildrate, Speicher, Touch). Das muss vor dem Einsatz im Unterricht passieren.
 
 ## Noch offen (nächste Schritte)
-1. **Spielfigur auf Fahrzeugen**: Auf Roller, Fahrrad und Moped sitzt noch die einfache Figur, nicht Noah (Noah hat keine Sitz-Animation).
-2. **Gelände**: Höhenraster (bis 26 m Unterschied im Ausschnitt) ist noch nicht eingebaut; die Welt ist flach.
+1. **Gelände**: Höhenraster (bis 26 m Unterschied im Ausschnitt) ist noch nicht eingebaut; die Welt ist flach.
    Die Engine braucht dafür Bodenhöhen für Straßen, Kollision, Fahrzeuge und Gebäudesockel.
-3. **LoD2-Meshes** als Gebäudeform statt extrudierter Grundrisse (aktuell nur ihre Höhen genutzt), mit Detailstufen.
-4. **Drei Startmissionen laut Kartenauftrag** (Schulhof-Diagonale, Markt mit zwei rechtwinkligen Strecken, Modellaufgabe am Bahnhof)
+2. **LoD2-Meshes** als Gebäudeform statt extrudierter Grundrisse (aktuell nur ihre Höhen genutzt), mit Detailstufen.
+3. **Drei Startmissionen laut Kartenauftrag** (Schulhof-Diagonale, Markt mit zwei rechtwinkligen Strecken, Modellaufgabe am Bahnhof)
    mit getrennten Werten für „vor Ort gemessen“ und „vereinfachte Aufgabenwerte“. Die umgezogenen Missionen nutzen noch die Werte des Spielmodells.
-5. **Freischalten** der Phasen 2–5 mit Punkt-in-Polygon auf `grenzen/freischaltgebiete.geojson`, Sperren am Übergang,
+4. **Freischalten** der Phasen 2–5 mit Punkt-in-Polygon auf `grenzen/freischaltgebiete.geojson`, Sperren am Übergang,
    Speicherung im Spielstand, keine doppelten Belohnungen.
-6. **Kacheln nachladen** statt eines festen Ausschnitts; weiter entfernte Geometrie vereinfachen.
-7. **Fassaden der Schule**: Für den Standort Torfbend liegen Fotos vor. Für das **Haupthaus Altenbroicher Straße 50–52** fehlen
+5. **Kacheln nachladen** statt eines festen Ausschnitts; weiter entfernte Geometrie vereinfachen.
+6. **Fassaden der Schule**: Für den Standort Torfbend liegen Fotos vor. Für das **Haupthaus Altenbroicher Straße 50–52** fehlen
    Referenzfotos (Fenster, Eingänge, Schilder, Hof).

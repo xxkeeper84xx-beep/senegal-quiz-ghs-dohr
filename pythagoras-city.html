@@ -4256,6 +4256,47 @@ function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue
     const d=Math.hypot(S.x-car.x,S.y-car.y);I.obj.visible=d<CR.radius;if(!I.obj.visible)continue;
     const every=d>50?3:d>25?2:1;I.acc=(I.acc||0)+dt;I.k=(I.k||0)+1;if(I.k%every===0){I.mixer.update(I.acc);I.acc=0}}}}
 
+/* ================= Spielfigur auf Roller, Fahrrad und Moped (Sitz- und Stehhaltung aus dem Skelett) =================
+   Die Figuren haben nur Idle, Walk und Run. Die Haltung entsteht aus der Idle-Pose, deren Knochen gedreht werden.
+   Bei allen Figuren kippt eine Drehung um die X-Achse des Knochens nach vorn (Oberschenkel heben, Oberkörper vorbeugen,
+   Arme nach vorn); das Knie beugt mit negativem Winkel. Maße in Metern, Fahrzeug-Gruppen sind 0,1-fach skaliert, vorn = +x. */
+const RIDE_POS={  // Sitz bzw. Trittbrett (x nach vorn, y Höhe), Pedal-/Fußpunkt und Haltung
+  bike: {seat:[-.2,1.5], lean:.42, arm:[1.05,-.35], kind:"pedal"},
+  moped:{seat:[-.55,1.42],lean:.32, arm:[1.2,-.25], kind:"sit"},
+  scoot:{deck:[-.18,.36], lean:.14, arm:[.78,-.3], kind:"stand"}};
+const RIDE={};
+const _q=new THREE.Quaternion(),_ax=new THREE.Vector3(1,0,0),_az=new THREE.Vector3(0,0,1);
+function riderBuild(id,g,name,look){
+  const M=GLB.models[name],obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);
+  const I={obj,mixer,act,M};tintGlb(I,{shirt:look.jacket,pants:look.jeans,bag:look.bagCol,hair:look.hair,skin:skinMul(look.skin||"#d6a07a")});
+  if(act.idle){act.idle.play();mixer.update(0)}           // Grundhaltung: erstes Bild der Idle-Animation, danach keine Animation mehr
+  const B={};obj.traverse(o=>{if(o.isBone)B[o.name]=o});const base={};for(const k in B)base[k]=B[k].quaternion.clone();
+  mixer.stopAllAction();
+  const box=new THREE.Group();box.add(obj);box.rotation.y=Math.PI/2;box.scale.setScalar(10);footShadow(box,.9);g.add(box);
+  return {I,B,base,box,id,name,key:""}}
+function rot(R,n,ax,a){const b=R.B[n];if(!b)return;b.quaternion.multiply(_q.setFromAxisAngle(ax,a))}
+function riderPose(R,phi){const P=RIDE_POS[R.id];for(const k in R.base)R.B[k].quaternion.copy(R.base[k]);
+  rot(R,"Spine",_ax,P.lean*.5);rot(R,"Spine1",_ax,P.lean*.3);rot(R,"Spine2",_ax,P.lean*.2);rot(R,"Neck",_ax,-P.lean*.6);rot(R,"Head",_ax,-P.lean*.3);
+  for(const s of ["Left","Right"]){rot(R,s+"Arm",_ax,P.arm[0]);rot(R,s+"ForeArm",_ax,-P.arm[1]);rot(R,s+"Arm",_az,(s==="Left"?-1:1)*.12);rot(R,s+"Hand",_ax,-.2)}
+  if(P.kind==="pedal")for(const [s,o] of [["Left",0],["Right",Math.PI]]){const c=Math.sin(phi+o);
+    rot(R,s+"UpLeg",_ax,1.0+.42*c);rot(R,s+"Leg",_ax,-(1.15+.55*c));rot(R,s+"Foot",_ax,.25)}
+  else if(P.kind==="sit")for(const s of ["Left","Right"]){rot(R,s+"UpLeg",_ax,1.35);rot(R,s+"Leg",_ax,-1.25);rot(R,s+"Foot",_ax,.1);rot(R,s+"UpLeg",_az,(s==="Left"?1:-1)*.08)}
+  else {rot(R,"LeftUpLeg",_ax,.18);rot(R,"LeftLeg",_ax,-.25);rot(R,"RightUpLeg",_ax,-.12);rot(R,"RightLeg",_ax,-.08)}
+  // Figur so verschieben, dass die Hüfte auf dem Sattel bzw. die Füße auf dem Trittbrett stehen
+  R.box.position.set(0,0,0);R.box.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(R.box.parent.matrixWorld).invert();
+  const hp=R.B.Hips.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv).multiplyScalar(.1);
+  if(P.seat)R.box.position.set((P.seat[0]-hp.x)*10,(P.seat[1]-hp.y+.06)*10,(-hp.z)*10);
+  else{let lo=1e9;for(const s of ["LeftToeBase","RightToeBase","LeftFoot","RightFoot"]){const b=R.B[s];if(b){const v=b.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);lo=Math.min(lo,v.y*.1)}}
+    R.box.position.set((P.deck[0]-hp.x)*10,(P.deck[1]-lo+.03)*10,(-hp.z)*10)}}
+function riderUpdate(){if(typeof vehMeshes==="undefined"||!PG.model||!GLB.models[PG.model])return;const VH=V();
+  let look={};try{look=JSON.parse(walker.userData.lookKey||"{}")}catch(e){}
+  for(const id of ["scoot","bike","moped"]){const g=vehMeshes[id];if(!g||!g.userData.rider)continue;
+    const key=PG.model+"|"+walker.userData.lookKey;let R=RIDE[id];
+    if(!R||R.key!==key||R.box.parent!==g){if(R&&R.box.parent)R.box.parent.remove(R.box);R=RIDE[id]=riderBuild(id,g,PG.model,look);R.key=key}
+    const active=VH.id===id;g.userData.rider.scale.setScalar(1e-4);R.box.visible=active;   /* alte Figur verkleinern: das Spiel blendet sie sonst wieder ein */
+    if(active)riderPose(R,id==="bike"?(car.ph||0):0)}}
+{const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);riderUpdate()}}
+
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){
   const FX=MG.FX,P=o=>{const p=FX(o.x,o.y);o.x=p[0];o.y=p[1]};
