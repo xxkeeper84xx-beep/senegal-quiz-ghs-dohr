@@ -116,7 +116,7 @@ function goalText(){
   if(save.introDone===undefined||!save.introDone){const d=DITT?Math.round(Math.hypot(DITT.x-car.x,DITT.y-car.y)):0;return `⭐ Hauptmission: Sprich mit Herrn Dittmann vor der GHS Dohr${d>6?` · ${d} m`:""}`}
   for(const q of QUESTS){const s=qs(q);if(!s.acc||s.done)continue;
     const m=q.measures.find(m=>!s.m[m.id]),st=isMain(q)?"⭐":"❗";
-    return m?`${st} ${q.title}: ${m.short} messen (${m.where})`:`${st} ${q.title}: Sprich mit ${q.giver.name} und rechne`}
+    return m?`${st} ${q.title}: ${m.short} messen (${m.where})`:`${st} ${q.title}: Sprich mit ${q.giver.name.replace(/^Herr /,"Herrn ")} und rechne`}
   const n=mainQuest();
   if(n){const d=Math.round(Math.hypot(n.giver.x-car.x,n.giver.y-car.y));return `⭐ Hauptmission: ${n.title} · ${n.giver.name}${d>6?`, ${d} m`:""}`}
   return "⭐ Alle Hauptmissionen geschafft · Nebenmissionen im 📒 Auftragsheft";

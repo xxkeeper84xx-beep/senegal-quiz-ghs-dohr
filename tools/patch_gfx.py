@@ -158,6 +158,7 @@ import os
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'aufgaben.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('buildQuestWorld()}]','buildQuestWorld();buildHunt()}]')
 exec(open(os.path.join(os.path.dirname(gfx),'story_patch.py'),encoding='utf-8').read())
+exec(open(os.path.join(os.path.dirname(gfx),'theme_patch.py'),encoding='utf-8').read())
 open(out, "w", encoding="utf-8").write(s)
 print("FAILS", len(fails))
 for f in fails: print(f)

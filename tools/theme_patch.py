@@ -1,0 +1,5 @@
+# ------------------------------------------------------------ Vice-City-Design (Schriften, CSS-Schicht, Lucide-Icons)
+R('family=Bungee&family=Rubik:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap', 'family=Montserrat:ital,wght@0,600;0,800;0,900;1,800;1,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap')
+R('</style>', open(os.path.join(os.path.dirname(gfx),'theme.css'), encoding="utf-8").read() + open(os.path.join(os.path.dirname(gfx),'theme2.css'), encoding="utf-8").read() + '\n</style>')
+R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'icons.js'), encoding="utf-8").read() + open(os.path.join(os.path.dirname(gfx),'theme.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
+R('s.userData.set=(txt,col,bg="rgba(10,14,32,.85)")', 's.userData.set=(txt,col,bg="rgba(22,11,40,.85)")')
