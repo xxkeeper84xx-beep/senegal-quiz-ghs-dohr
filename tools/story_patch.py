@@ -2,7 +2,7 @@
 R('const persist=()=>{try{localStorage.setItem("pyCity",JSON.stringify(save))}catch(e){}};', 'let SAVE_KEY="pyCity";const persist=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify(save))}catch(e){}};')
 R('desc:"Leise und wendig, ideal für die Fußgängerzone."', 'desc:"Leise und wendig. Aber Achtung: Der E-Scooter gehört auf die Straße, nicht auf den Gehweg!"')
 R('for(const q of QUESTS){const s=qs(q);L.push({x:q.giver.x', 'for(const q of QUESTS){const s=qs(q);if(questLocked(q)){L.push({x:q.giver.x,y:q.giver.y,r:3.4,label:`💬 ${q.giver.name} ansprechen`,act:()=>lockedTalk(q)});continue}L.push({x:q.giver.x')
-R('$("loading").hidden=true; $("start").hidden=false; state.mode="start";', '$("loading").hidden=true; applyLook(); renameQuests(); buildIntroMark(); buildEggs(); refreshQuestWorld(); showTitle("press");')
+R('$("loading").hidden=true; $("start").hidden=false; state.mode="start";', '$("loading").hidden=true; applyLook(); renameQuests(); buildIntroMark(); buildEggs(); refreshQuestWorld(); showTitle("press"); setTimeout(initGlbCrowd,1500);')
 R('<div class="hud" id="toast"></div>', '<div class="hud" id="toast"></div>\n<div class="hud" id="warn" hidden></div>\n<div id="banner" hidden></div>\n<div id="title" hidden></div>')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'story.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'extras.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')

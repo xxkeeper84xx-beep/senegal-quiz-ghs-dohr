@@ -126,11 +126,16 @@ function updateCrowd(dt,now){
   const cx=car.x,cy=car.y;
   CR.t-=dt;if(CR.t<=0){CR.t=.3;
     const list=[];for(const p of peds){if(p.x===undefined)continue;const d=Math.hypot(p.x-cx,p.y-cy);if(d<CR.radius)list.push([d,p])}
-    list.sort((a,b)=>a[0]-b[0]);const keep=new Set(list.slice(0,CR.near).map(e=>e[1]));
-    for(const p of peds){const on=keep.has(p);if(on&&!p.mesh){p.mesh=makeCitizen(p.look);crowdGroup.add(p.mesh);if(p.look.dog)p.dogM=makeDog()}
-      p.det=on;if(p.mesh)p.mesh.visible=on;if(p.dogM)p.dogM.visible=on}}
+    list.sort((a,b)=>a[0]-b[0]);const ranked=list.slice(0,CR.near).map(e=>e[1]),keep=new Set(ranked);
+    // die nächsten Personen bekommen – wo vorhanden – das echte 3D-Modell ihrer Rolle
+    const useGlb=new Set();if(GLB.ready){let n=0;for(const q of ranked){if(n>=GLB.near)break;const mn=GLB.files[q.look.role];if(mn&&GLB.models[mn]&&(!q.static||GLB_ACTS.has(q.act))){useGlb.add(q);n++}}}
+    for(const p of peds){const on=keep.has(p),g=useGlb.has(p);
+      if(g&&!p.glb)p.glb=glbTake(GLB.files[p.look.role],p);if(!g&&p.glb){glbGive(p.glb);p.glb=null}
+      const proc=on&&!g;if(proc&&!p.mesh){p.mesh=makeCitizen(p.look);crowdGroup.add(p.mesh)}
+      if(on&&p.look.dog&&!p.dogM)p.dogM=makeDog();
+      p.det=on;if(p.mesh)p.mesh.visible=proc;if(p.dogM)p.dogM.visible=on}}
   const t=now/1000;
-  for(const p of peds){if(!p.det||!p.mesh)continue;const m=p.mesh,h=m.userData.h,L=p.look,gy=groundY(p.x,p.y);
+  for(const p of peds){if(!p.det)continue;if(p.glb){glbPose(p,dt,now);continue}if(!p.mesh)continue;const m=p.mesh,h=m.userData.h,L=p.look,gy=groundY(p.x,p.y);
     m.position.set(p.x,gy,p.y);m.rotation.y=-p.a;
     if(!p.static){const sp=p.sp,rn=L.run?1:0,stl=strideLen(sp,rn);p.cph=(p.cph||Math.random()*6)+dt*sp*2*Math.PI/stl;   // Standfuß bewegt sich genau mit dem Körpertempo: kein Rutschen
       poseHuman(m.userData.root,p.cph,1,rn,t,stl/L.scale);if(L.stoop)h.torso.rotation.z-=L.stoop;}
@@ -147,3 +152,55 @@ function updateCrowd(dt,now){
       D.position.set(bx,groundY(bx,by),by);D.rotation.y=-p.a;const ph=(p.cph||0)*2;U.legs.forEach((l,i)=>l.rotation.z=p.static?0:Math.sin(ph+(i%2?0:Math.PI)+(i>1?Math.PI/2:0))*.6);U.tail.rotation.x=Math.sin(now/90)*.6}}
 }
 {const base=animQuestWorld;animQuestWorld=function(dt,now){base(dt,now);if(window.__lin)updateCrowd(dt,now)}}
+
+/* ================= Echte 3D-Stadtfiguren (GLB-Dateien mit Idle, Walk, Run) ================= */
+const GLB={base:"figuren/",ready:false,near:isTouch?6:12,models:{},pools:{},
+  files:{schuelerin:"01_Schuelerin",fan:"02_Fussballfan",seniorin:"03_Seniorin",senior:"04_Senior",bauarbeiter:"05_Strassenbauer",joggerin:"06_Joggerin",businesswoman:"07_Geschaeftsfrau",passant:"08_Passant",hund:"08_Passant"}};
+const GLB_ACTS=new Set(["wait","chat","phone"]);      // Stehende, für die die Idle-Animation passt
+const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function initGlbCrowd(){
+  try{if(!THREE.GLTFLoader)await loadScript("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js");
+      if(!THREE.SkeletonUtils)await loadScript("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js")}
+  catch(e){console.info("3D-Figuren: Lader nicht erreichbar, es bleiben die einfachen Figuren");return}
+  const loader=new THREE.GLTFLoader();
+  for(const name of [...new Set(Object.values(GLB.files))]){         // nacheinander im Hintergrund laden
+    try{const g=await loader.loadAsync(GLB.base+name+".glb");GLB.models[name]=prepGlb(g);GLB.ready=true}
+    catch(e){console.info("3D-Figur nicht geladen:",name)}}
+}
+/** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
+function prepGlb(gltf){
+  const scene=gltf.scene,clips={};
+  for(const c of gltf.animations){
+    for(const tr of c.tracks)if(/Hips\.position$/.test(tr.name)){const v=tr.values;for(let i=0;i<v.length;i+=3){v[i]=v[0];v[i+2]=v[2]}}   // nur Auf-und-Ab bleibt
+    clips[c.name.toLowerCase()]=c}
+  scene.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=false;o.frustumCulled=false;
+    const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(ENV){m.envMap=ENV;m.envMapIntensity=.55}if(m.metalness>.3&&!m.metalnessMap)m.metalness=.1;m.needsUpdate=true}});
+  const M={scene,clips,offY:0,speed:{walk:1.3,run:3.2}};
+  // Messung an einer Kopie: Füße bei Idle auf den Boden, Standfuß-Tempo von Walk und Run
+  const probe=THREE.SkeletonUtils.clone(scene),mx=new THREE.AnimationMixer(probe),feet=[];probe.updateMatrixWorld(true);
+  probe.traverse(o=>{if(o.isBone&&/(Left|Right)ToeBase$/.test(o.name))feet.push(o)});
+  const v=new THREE.Vector3(),sample=(clip,t)=>{mx.stopAllAction();const a=mx.clipAction(clip);a.play();a.time=t;mx.update(0);probe.updateMatrixWorld(true);return feet.map(f=>f.getWorldPosition(v).clone())};
+  if(clips.idle){sample(clips.idle,0);let lo=1e9;const w=new THREE.Vector3();          // tiefster Punkt der Schuhsohle in der Idle-Pose
+    probe.traverse(o=>{if(!o.isSkinnedMesh)return;o.skeleton.update();const n=o.geometry.attributes.position.count;
+      for(let i=0;i<n;i+=3){o.boneTransform(i,w);w.applyMatrix4(o.matrixWorld);if(w.y<lo)lo=w.y}});
+    if(lo<1e8)M.offY=-lo}
+  for(const k of ["walk","run"]){const c=clips[k];if(!c||!feet.length)continue;const N=90,pts=[];for(let i=0;i<=N;i++)pts.push(sample(c,c.duration*i/N));
+    let dist=0,time=0;for(let fi=0;fi<feet.length;fi++){const ys=pts.map(q=>q[fi].y),lo=Math.min(...ys);
+      for(let i=1;i<=N;i++)if(pts[i][fi].y<lo+.02&&pts[i-1][fi].y<lo+.02){dist+=Math.abs(pts[i][fi].z-pts[i-1][fi].z);time+=c.duration/N}}
+    if(time>0)M.speed[k]=dist/time}
+  mx.stopAllAction();
+  return M}
+function glbTake(name,p){const M=GLB.models[name],pool=GLB.pools[name]||(GLB.pools[name]=[]);let I=pool.pop();
+  if(!I){const obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);I={obj,mixer,act,M,cur:null};scene.add(obj)}
+  I.obj.visible=true;I.obj.scale.setScalar(rng(.97,1.03));I.cur=null;I.mixer.stopAllAction();glbState(I,p,0);
+  if(I.cur)I.cur.time=Math.random()*I.cur.getClip().duration;return I}
+function glbGive(I){I.obj.visible=false;I.mixer.stopAllAction();I.cur=null;(GLB.pools[Object.keys(GLB.models).find(k=>GLB.models[k]===I.M)]||[]).push(I)}
+/** Passende Animation wählen und weich überblenden; Abspieltempo so, dass die Füße nicht rutschen. */
+function glbState(I,p,fade){const moving=!p.static&&!p.hold,k=moving?(p.look.run&&I.act.run?"run":"walk"):"idle",a=I.act[k]||I.act.idle;if(!a)return;
+  if(moving){const s=I.obj.scale.x;a.timeScale=p.sp/(I.M.speed[k]*s)}else a.timeScale=1;
+  if(I.cur===a)return;a.enabled=true;a.setEffectiveWeight(1);a.reset().play();
+  if(I.cur&&fade>0)I.cur.crossFadeTo(a,fade,false);else if(I.cur)I.cur.stop();I.cur=a}
+function glbPose(p,dt,now){const I=p.glb;glbState(I,p,.35);I.mixer.update(dt);
+  I.obj.position.set(p.x,groundY(p.x,p.y)+I.M.offY*I.obj.scale.x,p.y);I.obj.rotation.y=Math.PI/2-p.a;   // Modelle schauen nach +Z
+  if(p.dogM){const D=p.dogM,U=D.userData,bx=p.x-Math.cos(p.a)*1.1+Math.sin(p.a)*.5,by=p.y-Math.sin(p.a)*1.1-Math.cos(p.a)*.5;p.cph=(p.cph||0)+dt*p.sp*3;
+    D.position.set(bx,groundY(bx,by),by);D.rotation.y=-p.a;U.legs.forEach((l,i)=>l.rotation.z=p.static?0:Math.sin(p.cph+(i%2?0:Math.PI)+(i>1?Math.PI/2:0))*.6);U.tail.rotation.x=Math.sin(now/90)*.6}}
