@@ -4052,7 +4052,7 @@ async function initGlbCrowd(){
   catch(e){console.info("3D-Figuren: Lader nicht erreichbar, es bleiben die einfachen Figuren");return}
   const loader=new THREE.GLTFLoader();
   for(const name of [...new Set(Object.values(GLB.files))]){         // nacheinander im Hintergrund laden
-    try{const g=await loader.loadAsync(GLB.base+name+".glb");GLB.models[name]=prepGlb(g);GLB.ready=true}
+    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g);GLB.ready=true}
     catch(e){console.info("3D-Figur nicht geladen:",name)}}
 }
 /** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
