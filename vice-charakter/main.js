@@ -24,6 +24,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { enhanceCharacter, addRimLight } from './characterMaterials.js';
 
 /* ------------------------------------------------------------------ 1. CONFIG */
 const isMobile = matchMedia('(pointer: coarse)').matches;
@@ -198,58 +199,8 @@ function setupStage() {
 }
 
 /* ------------------------------------------------------------------ 6. Charakter */
-const SKIN = /skin|body|face|head|arm|leg|hand|neck|torso/i;
-const HAIR = /hair|brow|lash|beard/i;
-const EYE = /eye|cornea|iris/i;
-const CLOTH = /cloth|shirt|jacket|hoodie|pants|jeans|trouser|fabric|dress|cap|shoe|sneaker/i;
-
-/** Wandelt Materialien in realistischere PBR-Varianten um (Haut, Haare, Augen, Stoff). */
-function upgradeMaterial(mat, meshName) {
-  if (!mat || !mat.isMeshStandardMaterial) return mat;
-  const name = `${mat.name} ${meshName}`;
-  mat.envMapIntensity = 1.0;
-
-  if (SKIN.test(name) && !CLOTH.test(name)) {
-    // Haut: dielektrisch, mittlere Rauheit, leichter Sheen als Pfirsichhaut-/Streuungs-Ersatz
-    const skin = new THREE.MeshPhysicalMaterial({
-      name: mat.name, map: mat.map, normalMap: mat.normalMap, normalScale: mat.normalScale,
-      roughnessMap: mat.roughnessMap, aoMap: mat.aoMap, color: mat.color,
-      metalness: 0, roughness: THREE.MathUtils.clamp(mat.roughness, 0.42, 0.65),
-      sheen: 0.35, sheenColor: new THREE.Color(0xff9e80), sheenRoughness: 0.55,
-      clearcoat: 0.08, clearcoatRoughness: 0.45, specularIntensity: 0.6,
-    });
-    mat.dispose();
-    return skin;
-  }
-  if (HAIR.test(name)) {
-    mat.alphaTest = mat.map ? 0.5 : 0; mat.side = THREE.DoubleSide;
-    mat.roughness = THREE.MathUtils.clamp(mat.roughness, 0.35, 0.6); mat.metalness = 0;
-    return mat;
-  }
-  if (EYE.test(name)) {
-    const eye = new THREE.MeshPhysicalMaterial({ name: mat.name, map: mat.map, color: mat.color, roughness: 0.05, clearcoat: 1, clearcoatRoughness: 0.02, metalness: 0 });
-    mat.dispose();
-    return eye;
-  }
-  if (CLOTH.test(name)) {
-    const cloth = new THREE.MeshPhysicalMaterial({
-      name: mat.name, map: mat.map, normalMap: mat.normalMap, roughnessMap: mat.roughnessMap, aoMap: mat.aoMap, color: mat.color,
-      metalness: 0, roughness: Math.max(mat.roughness, 0.7), sheen: 0.6, sheenRoughness: 0.8, sheenColor: new THREE.Color(0xffffff),
-    });
-    mat.dispose();
-    return cloth;
-  }
-  return mat;
-}
-
 function prepareCharacter(root) {
-  root.traverse((o) => {
-    if (!o.isMesh) return;
-    o.castShadow = true;
-    o.receiveShadow = true;
-    if (o.isSkinnedMesh) o.frustumCulled = false;     // Animationen verlassen sonst manchmal die Bounding-Box
-    o.material = Array.isArray(o.material) ? o.material.map((m) => upgradeMaterial(m, o.name)) : upgradeMaterial(o.material, o.name);
-  });
+  enhanceCharacter(root, { renderer });              // Haut, Augen, Haare, Stoff veredeln + Schatten an jedem Teil-Mesh
 
   // Auf Zielgröße normieren (FBX-Exporte sind oft in Zentimetern) und auf den Boden stellen
   const box = new THREE.Box3().setFromObject(root);
@@ -266,9 +217,9 @@ function prepareCharacter(root) {
 /** Platzhalter-Figur, bis ein echtes Modell vorhanden ist (nutzt dieselben PBR-Materialien). */
 function createPlaceholder() {
   const g = new THREE.Group();
-  const skin = upgradeMaterial(new THREE.MeshStandardMaterial({ name: 'skin', color: 0xc98a64, roughness: 0.5 }), 'skin');
-  const shirt = upgradeMaterial(new THREE.MeshStandardMaterial({ name: 'shirt', color: 0xf2ece4, roughness: 0.8 }), 'shirt');
-  const pants = upgradeMaterial(new THREE.MeshStandardMaterial({ name: 'jeans', color: 0x2c3e66, roughness: 0.85 }), 'jeans');
+  const skin = new THREE.MeshStandardMaterial({ name: 'skin', color: 0xc98a64, roughness: 0.5 });
+  const shirt = new THREE.MeshStandardMaterial({ name: 'shirt', color: 0xf2ece4, roughness: 0.8 });
+  const pants = new THREE.MeshStandardMaterial({ name: 'jeans', color: 0x2c3e66, roughness: 0.85 });
   const hair = new THREE.MeshStandardMaterial({ name: 'hair', color: 0x1b120c, roughness: 0.45 });
   const add = (geo, mat, x, y, z, parent = g) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
 
@@ -283,7 +234,9 @@ function createPlaceholder() {
     add(new THREE.CapsuleGeometry(0.075, 0.78, 8, 16), pants, s * 0.1, 0.5, 0);
     add(new THREE.BoxGeometry(0.11, 0.07, 0.26), new THREE.MeshStandardMaterial({ color: 0xf4f4f4, roughness: 0.6 }), s * 0.1, 0.035, 0.04);
   }
+  for (const s of [-1, 1]) add(new THREE.SphereGeometry(0.016, 16, 12), new THREE.MeshStandardMaterial({ name: 'eye', color: 0x2a1a10 }), 0.035 * s, 0.775, 0.114, chest);
   g.userData.chest = chest;   // für die Atem-Animation
+  enhanceCharacter(g, { renderer });
   return g;
 }
 
@@ -303,6 +256,7 @@ async function loadCharacter(manager) {
     const root = gltf.scene;
     const height = prepareCharacter(root);
     scene.add(root);
+    addRimLight(scene, root);
 
     if (gltf.animations.length) {
       mixer = new THREE.AnimationMixer(root);
@@ -314,8 +268,8 @@ async function loadCharacter(manager) {
     console.info(`Kein Modell unter ${CONFIG.modelUrl} gefunden (${err.message}) – Platzhalter wird gezeigt.`);
     ui.showNote(`Platzhalter-Figur · Lege dein Modell als ${CONFIG.modelUrl.replace('./', '')} neben index.html`);
     placeholder = createPlaceholder();
-    placeholder.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(placeholder);
+    addRimLight(scene, placeholder);
     return 1.8;
   } finally {
     draco.dispose();

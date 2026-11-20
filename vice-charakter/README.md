@@ -20,7 +20,7 @@ python3 -m http.server 8080      # oder: npx serve .
 | `sunset.hdr` | nein (sonst prozeduraler Sonnenuntergang) | Eigene HDRI für Reflexionen und Hintergrund |
 
 Pfade und alle Stellschrauben (Licht, Bloom, Unschärfe, Kamera) stehen oben in `main.js` im `CONFIG`-Objekt.
-Materialien werden anhand ihrer Namen erkannt (`skin`, `hair`, `eye`, `shirt`, `jeans` …) und automatisch verbessert.
+Materialien veredelt `characterMaterials.js` (Haut mit Streuungs-Shader, Augen, Haare, Stoff, Denim, Leder, Metall) anhand der Material- oder Mesh-Namen (`skin`, `eye`, `hair`, `jeans`, `leather` …). Die Werte stehen dort im `LOOK`-Objekt, die Namensmuster in `MATCH`.
 
 ## Abhängigkeiten
 Keine Installation nötig: Three.js 0.160.0 kommt per Import-Map vom CDN (jsDelivr).
