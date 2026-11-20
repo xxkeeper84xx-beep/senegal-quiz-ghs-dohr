@@ -15,7 +15,7 @@ const ITEMS={
   cap:{icon:"🧢",name:"Basecap",eq:true,desc:"Eine rote Kappe von der Backstube.",hint:"Eine Bäckerei in der Innenstadt."},
   shoes:{icon:"👟",name:"Turbo-Turnschuhe",eq:true,desc:"Zu Fuß 20 % schneller.",hint:"Herr Maaß hat nach dem Werkhof eine sportliche Herausforderung."},
   balloon:{icon:"🎈",name:"Luftballon",eq:true,desc:"Schwebt immer über dir.",hint:"Ein Kind auf dem Spielplatz hat ein Problem mit einem Drachen."},
-  fanfare:{icon:"📯",name:"Stadion-Fanfare",eq:"horn",desc:"Neue Hupe (Taste Q oder 📯).",hint:"Der Platzwart im Nordpark vermisst etwas."},
+  fanfare:{icon:"📯",name:"Stadion-Fanfare",eq:"horn",desc:"Neue Hupe (Taste Q oder 📯).",hint:"Der Platzwart im Mülforter Bruch vermisst etwas."},
   dog:{icon:"🐕",name:"Hund Krümel",eq:true,desc:"Läuft überall mit dir mit.",hint:"Manche Passanten mit ❓ brauchen Hilfe beim Gassigehen."},
   confetti:{icon:"🎉",name:"Konfetti-Spur",eq:true,desc:"Beim Laufen und mit Nitro fliegt Konfetti.",hint:"Hilf 5 Passanten mit ❓."},
   quack:{icon:"🦆",name:"Enten-Hupe",eq:"horn",desc:"Quak! Die lustigste Hupe der Stadt.",hint:"Finde alle 6 versteckten Quietscheentchen."},
@@ -38,11 +38,11 @@ function xMarker(col){const m=new THREE.Mesh(new THREE.OctahedronGeometry(.36,0)
 
 /* ---- Auftraggeber: Läden und bekannte Leute ---- */
 const XG=[
-  {id:"yilmaz",name:"Herr Yilmaz",role:"Büdchen am Torfbend",at:[-214,-47],shirt:"#2e8b57",booth:["#2e8b57","🥤 Büdchen"],jobs:["kiosk"]},
+  {id:"yilmaz",name:"Herr Yilmaz",role:"Büdchen am Torfbend",at:[918,258],shirt:"#2e8b57",booth:["#2e8b57","🥤 Büdchen"],jobs:["kiosk"]},
   {id:"jana",name:"Jana",role:"Fahrradladen „Speiche & Kette“",at:[95,300],shirt:"#17a2b8",booth:["#17a2b8","🚲 Speiche & Kette"],jobs:["bike"]},
-  {id:"kalle",name:"Kalle",role:"Kalles Schrauberbude",at:[152,82],shirt:"#55606e",booth:["#e8742a","🔧 Kalles Schrauberbude"],jobs:["ramp","trial"]},
+  {id:"kalle",name:"Kalle",role:"Kalles Schrauberbude",at:[-362,-960],shirt:"#55606e",booth:["#e8742a","🔧 Kalles Schrauberbude"],jobs:["ramp","trial"]},
   {id:"rossi",name:"Frau Rossi",role:"Eiscafé „Dolce Vita“",at:[180,368],shirt:"#e05a8c",booth:["#f2b8c6","🍦 Dolce Vita"],jobs:["ice"]},
-  {id:"hennes",name:"Bäcker Hennes",role:"Backstube Hennes",at:[60,-350],shirt:"#f2f2f2",booth:["#b5793a","🥨 Backstube Hennes"],jobs:["bread"]},
+  {id:"hennes",name:"Bäcker Hennes",role:"Backstube Hennes",at:[-430,-935],shirt:"#f2f2f2",booth:["#b5793a","🥨 Backstube Hennes"],jobs:["bread"]},
   {id:"elif",talk:"Elif",jobs:["kite"]},
   {id:"tarik",talk:"Tarik",jobs:["ball"]},
   {id:"maass",quest:"werkhof",jobs:["sprint"]},
@@ -218,7 +218,7 @@ function applyEquip(){xs();if(xHas("gold")&&!PAINTS.includes("#d4af37"))PAINTS.p
   $("game").style.filter=xOn("film")?"grayscale(1) contrast(1.12) sepia(.18)":"";dressAll()}
 
 /* ---- Easter Eggs: Quietscheentchen ---- */
-const DUCKS=[[-331,-146,"im Schulgarten der GHS Dohr"],[-238,24,"im Werkhof"],[-168,14,"am Spielplatz"],[-292,-345,"im Nordpark"],[150,374,"am Markt in Rheydt"],[345,150,"am Wassergraben von Schloss Rheydt"],[112,-396,"am Alten Markt"]].slice(0,6);
+const DUCKS=[[-331,-146,"im Schulgarten der GHS Dohr"],[-238,24,"im Werkhof"],[606,632,"am Spielplatz in der Grünanlage"],[382,410,"im Mülforter Bruch"],[150,374,"am Markt in Rheydt"],[600,628,"in der Grünanlage in Mülfort"],[-458,-800,"an der Hauptkirche Rheydt"]].slice(0,6);
 let duckMeshes=[];
 function makeDuck(){const g=new THREE.Group(),y=xmat("#ffd21f",{emissive:"#4a3a00"}),o=xmat("#ff7a1a");
   const b=new THREE.Mesh(new THREE.SphereGeometry(.16,14,10),y);b.scale.set(1.25,.85,1);b.position.y=.13;g.add(b);
@@ -227,19 +227,19 @@ function makeDuck(){const g=new THREE.Group(),y=xmat("#ffd21f",{emissive:"#4a3a0
   for(const s of [1,-1]){const e=new THREE.Mesh(new THREE.SphereGeometry(.018,6,5),xmat("#111"));e.position.set(.19,.35,s*.05);g.add(e)}
   const t=new THREE.Mesh(new THREE.ConeGeometry(.06,.12,8),y);t.rotation.z=Math.PI/2.6;t.position.set(-.2,.2,0);g.add(t);
   g.traverse(o=>{if(o.isMesh)o.castShadow=true});g.scale.setScalar(1.3);scene.add(g);return g}
-function buildEggs(){if(MG.real){SEIL.x=SEIL.y=NaN;if(!XJ.beacon){XJ.beacon=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,40,16,1,true),new THREE.MeshBasicMaterial({color:0x3ddc84,transparent:true,opacity:.28,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false}));XJ.beacon.visible=false;scene.add(XJ.beacon)}for(const G of XG)G.mark=xMarker("#3ddc84");PED.mark=xMarker("#3fd8ff");PED.mark.visible=false;sanitizeJobs();applyEquip();return}
+function buildEggs(){
   duckMeshes=DUCKS.map(([x,y,w],i)=>{const p=freeSpot(x,y,false),m=makeDuck();m.position.set(p.x,groundY(p.x,p.y),p.y);m.userData={x:p.x,y:p.y,w,i};m.visible=!xs().ducks.includes(i);return m});
-  // Das ägyptische Knotenseil 3-4-5 im Nordpark
-  const sp=freeSpot(-246,-300,false);SEIL.x=sp.x;SEIL.y=sp.y;const gy=groundY(sp.x,sp.y)+.05,rope=xmat("#c9a46a"),knot=xmat("#7a5a2e");
+  // Das ägyptische Knotenseil 3-4-5 im Mülforter Bruch
+  const sp=freeSpot(372,440,false);SEIL.x=sp.x;SEIL.y=sp.y;const gy=groundY(sp.x,sp.y)+.05,rope=xmat("#c9a46a"),knot=xmat("#7a5a2e");
   const P=[[0,0],[4,0],[0,3]].map(([a,b])=>[sp.x-1.3+a,sp.y-1+b]);
   for(let k=0;k<3;k++){const A=P[k],B=P[(k+1)%3],L=Math.hypot(B[0]-A[0],B[1]-A[1]),n=Math.round(L);const m=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,L,6),rope);m.rotation.z=Math.PI/2;m.rotation.y=-Math.atan2(B[1]-A[1],B[0]-A[0]);m.position.set((A[0]+B[0])/2,gy,(A[1]+B[1])/2);scene.add(m);
     for(let j=0;j<n;j++){const kk=new THREE.Mesh(new THREE.SphereGeometry(.08,8,6),knot);kk.position.set(A[0]+(B[0]-A[0])*j/n,gy+.02,A[1]+(B[1]-A[1])*j/n);scene.add(kk)}}
   for(const [x,y] of P){const pg=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.5,6),xmat("#6b4a2a"));pg.position.set(x,gy+.2,y);scene.add(pg)}
-  // UFO hoch über dem Nordpark – nur aus dem Hubschrauber zu entdecken
+  // UFO hoch über dem Mülforter Bruch – nur aus dem Hubschrauber zu entdecken
   const u=new THREE.Group(),met=xmat("#b8c2cc",{emissive:"#202830"});const d=new THREE.Mesh(new THREE.SphereGeometry(6,24,10),met);d.scale.y=.22;u.add(d);
   const dome=new THREE.Mesh(new THREE.SphereGeometry(2.4,18,10,0,Math.PI*2,0,Math.PI/2),new THREE.MeshLambertMaterial({color:0x7ff7ff,transparent:true,opacity:.7,emissive:0x1a5a5a}));dome.position.y=.9;u.add(dome);
   for(let i=0;i<8;i++){const l=new THREE.Mesh(new THREE.SphereGeometry(.35,8,6),xbasic(i%2?"#39ff6a":"#ff2bd6",{fog:false}));const a=i/8*Math.PI*2;l.position.set(Math.cos(a)*5.4,-.1,Math.sin(a)*5.4);u.add(l)}
-  u.position.set(-360,130,-395);scene.add(u);UFO.m=u;
+  u.position.set(382,130,420);scene.add(u);UFO.m=u;
   if(!XJ.beacon){XJ.beacon=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,40,16,1,true),new THREE.MeshBasicMaterial({color:0x3ddc84,transparent:true,opacity:.28,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false}));XJ.beacon.visible=false;scene.add(XJ.beacon)}
   for(const G of XG)if(G.at)buildBooth(G);
   for(const G of XG){G.mark=xMarker("#3ddc84")}
@@ -259,7 +259,7 @@ function tickEggs(dt,now){const VH=V();
       if(n>=DUCKS.length){save.money+=100;persist();updateHud();setTimeout(()=>{giveItem("quack");missionBanner("ok","Alle Enten gefunden!","🦆 Neue Hupe: Enten-Hupe","+$100 · Drück Q oder die Hupe")},2600)}}}
   if(state.mode==="play"&&!VH.fly&&Math.hypot(SEIL.x-car.x,SEIL.y-car.y)<2.6&&!save.secrets.includes("seil")){findSecret("seil","Mit 12 Knoten und den Seitenlängen 3, 4 und 5 bauten schon die alten Ägypter rechte Winkel");}
   if(UFO.m){UFO.m.rotation.y+=dt*.8;UFO.m.position.y=130+Math.sin(now/900)*3;UFO.m.visible=VH.fly;
-    if(state.mode==="play"&&VH.fly&&car.alt>70&&Math.hypot(UFO.m.position.x-car.x,UFO.m.position.z-car.y)<70)findSecret("ufo","Über dem Nordpark schwebt ein UFO. Die Außerirdischen kennen Pythagoras auch!")}}
+    if(state.mode==="play"&&VH.fly&&car.alt>70&&Math.hypot(UFO.m.position.x-car.x,UFO.m.position.z-car.y)<70)findSecret("ufo","Über dem Mülforter Bruch schwebt ein UFO. Die Außerirdischen kennen Pythagoras auch!")}}
 
 /* ---- Konfetti ---- */
 const CONF={pts:null,n:240,i:0,pos:null,vel:null,life:null,acc:0};

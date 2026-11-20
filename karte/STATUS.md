@@ -1,11 +1,32 @@
 # Stand: echte Karte Mönchengladbach (Auftrag aus `CLAUDE_AUFTRAG.md`)
 
-Stand 20.11.2026. Die echte Karte ist als **Vorschau** spielbar (`echt.html`, Startmenü → „Echte Karte Rheydt“).
-Die bisherige verdichtete Spielkarte bleibt das Hauptspiel, bis alle Missionen umgezogen sind.
+Stand 20.11.2026. **Das Spiel nutzt nur noch die echte Karte** (`pythagoras-city.html` lädt `mg-echt.js`).
+Die Auswahl zwischen Spielkarte und echter Karte ist entfernt; `echt.html` leitet auf das Spiel weiter.
+
+## Umzug der Spielinhalte (`tools/spielinhalte.js`, `tools/fx_build.js`, `tools/fx_pass.js`)
+| Inhalt | neuer Ort |
+|---|---|
+| Schulmodell GHS Dohr, Schulhof, Aufträge „Außentreppe“ und „Quer über den Schulhof“, Dreiecksjagd | Grundstück Am Torfbend, um 11° gedreht wie die Straße |
+| Werkhof mit Halle, Tor und Licht („Licht für den Werkhof“), Herr Maaß | freie Fläche südwestlich der Schule zwischen Am Torfbend und den Kleingärten |
+| „Quer über den Markt“, Marktstände, Frau Krahe, Jana, Frau Rossi | Rheydter Markt (Stände enger gestellt, Messzone weiter 12 m × 9 m) |
+| Rathaus-Auftrag | Rathaus Rheydt |
+| Taxistand | Rheydt Hauptbahnhof |
+| Einsatzleitung, Stadtführerin | Evangelische Hauptkirche Rheydt |
+| Elektromarkt, Bäcker Hennes | Hauptstraße |
+| Autohaus, Kalles Schrauberbude | Gartenstraße |
+| Kran- und Hubschrauber-Aufträge, Platzwart, Knotenseil, UFO (früher Nordpark) | Mülforter Bruch |
+| Grünanlage, Spielplatz, Elif | Grünanlage in Mülfort |
+| Herr Yilmaz (Büdchen) | Am Torfbend östlich der Schule |
+
+Für Schule und Werkhof wurden 6 OSM-Gebäude entfernt, die unter den Modellen lagen (u. a. Teile der Orthodoxen Gemeinde
+westlich des Schulgrundstücks): Das Schulmodell nach den Fotos ist 72 m breit, das OSM-Grundstück nur etwa 50 m.
+Alter Markt, Nordpark und Schloss Rheydt liegen außerhalb von Phase 1 und stehen im Auftragsheft als „folgt“.
+Nicht übernommen: geparkte Autos, Schilder und Zebrastreifen der alten Spielkarte (lagen auf deren Straßen).
 
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
   Idle/Walk/Run mit Überblendung, Blick in Laufrichtung, Füße am Boden (Standfuß beim Gehen 0 cm, beim Laufen 0,2–0,4 cm pro Bild).
+  Zu Fuß: Gehen 1,8 m/s mit „Walk“, Sprinten (Shift oder nach 2 s Gedrückthalten) 4,8 m/s mit „Run“; vorher lief Noah schon beim normalen Gehen mit „Run“.
 - **Konverter** `tools/realkarte.py` (pyproj, shapely) erzeugt `mg-echt.js` für den Phase-1-Ausschnitt
   X −1350…1250, Z −950…1350 (beide Schulen, Rheydt Markt, Rheydt Hbf). Projektion EPSG:4326 → EPSG:25832,
   Ursprung Ost 322000 / Nord 5671000; geprüft: Marker Torfbend ergibt X 832,98 / Z 412,56 wie in `orte.geojson`.
@@ -45,13 +66,12 @@ Ladezeit der Welt im Test: ca. 2 s. Ohne Begrenzung der Bäume waren es über 3 
 **Nicht getestet:** echtes Schul-iPad (Bildrate, Speicher, Touch). Das muss vor dem Einsatz im Unterricht passieren.
 
 ## Noch offen (nächste Schritte)
-1. **Gelände**: Höhenraster (bis 26 m Unterschied im Ausschnitt) ist noch nicht eingebaut; die Welt ist flach.
+1. **Spielfigur auf Fahrzeugen**: Auf Roller, Fahrrad und Moped sitzt noch die einfache Figur, nicht Noah (Noah hat keine Sitz-Animation).
+2. **Gelände**: Höhenraster (bis 26 m Unterschied im Ausschnitt) ist noch nicht eingebaut; die Welt ist flach.
    Die Engine braucht dafür Bodenhöhen für Straßen, Kollision, Fahrzeuge und Gebäudesockel.
-2. **LoD2-Meshes** als Gebäudeform statt extrudierter Grundrisse (aktuell nur ihre Höhen genutzt), mit Detailstufen.
-3. **Inhalte umziehen**: Schulmodell (aus den Fotos) auf das echte Grundstück Am Torfbend setzen und ausrichten,
-   Hauptmissionen, Läden, Dreiecksjagd, Enten und Geheimnisse an echte Orte verlegen; Werkhof-Mission ist fiktiv und braucht einen Ersatz.
-4. **Drei Startmissionen** (Schulhof-Diagonale, Markt mit zwei rechtwinkligen Strecken, Modellaufgabe am Bahnhof) mit getrennten
-   Werten für „vor Ort gemessen“ und „vereinfachte Aufgabenwerte“.
+3. **LoD2-Meshes** als Gebäudeform statt extrudierter Grundrisse (aktuell nur ihre Höhen genutzt), mit Detailstufen.
+4. **Drei Startmissionen laut Kartenauftrag** (Schulhof-Diagonale, Markt mit zwei rechtwinkligen Strecken, Modellaufgabe am Bahnhof)
+   mit getrennten Werten für „vor Ort gemessen“ und „vereinfachte Aufgabenwerte“. Die umgezogenen Missionen nutzen noch die Werte des Spielmodells.
 5. **Freischalten** der Phasen 2–5 mit Punkt-in-Polygon auf `grenzen/freischaltgebiete.geojson`, Sperren am Übergang,
    Speicherung im Spielstand, keine doppelten Belohnungen.
 6. **Kacheln nachladen** statt eines festen Ausschnitts; weiter entfernte Geometrie vereinfachen.

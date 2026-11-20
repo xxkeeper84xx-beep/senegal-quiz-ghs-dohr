@@ -46,11 +46,12 @@ const GROUPS=[
   GV.tv&&{at:[GV.tv[0]-5,GV.tv[1]+4],members:[["passant","phone"],["passant","chat"],["businesswoman","chat"]],spread:1.0},
   GV.taxi&&{at:[GV.taxi[0]-6,GV.taxi[1]+3],members:[["business","wait"],["passant","wait"],["seniorin","wait"]],spread:1.4},
 ].filter(Boolean);
-if(MG.real){GROUPS.length=0;const O=MG.real.orte,near=(o,dx,dy)=>[o.x+dx,o.y+dy];
-  if(O.rheydt_marktplatz)GROUPS.push({at:near(O.rheydt_marktplatz,8,10),members:[["passant","chat"],["seniorin","chat"],["passant","phone"],["businesswoman","chat"]],spread:1.4},{at:near(O.rheydt_marktplatz,-12,18),members:[["fan","cheer"],["fan","cheer"],["fan","chat"]],spread:1.3});
+if(MG.FX){   /* Gruppen der früheren Spielkarte an ihre neuen Orte, dazu echte Treffpunkte */
+  for(let k=GROUPS.length-1;k>=0;k--){const G=GROUPS[k];if(G.at[0]===-164&&G.at[1]===12)G.at=[600,618];G.at=MG.FX(...G.at)}
+  const O=MG.real.orte,near=(o,dx,dy)=>[o.x+dx,o.y+dy];
+  if(O.rheydt_marktplatz)GROUPS.push({at:near(O.rheydt_marktplatz,8,10),members:[["passant","chat"],["seniorin","chat"],["passant","phone"],["businesswoman","chat"]],spread:1.4});
   if(O.rheydt_hbf)GROUPS.push({at:near(O.rheydt_hbf,6,6),members:[["business","wait"],["passant","wait"],["seniorin","wait"],["schuelerin","phone"]],spread:1.6});
-  for(const q of (MG.pois||[]).filter(q=>/bus_stop|platform/.test(q.k)&&Math.hypot(q.x-MG.start[0],q.y-MG.start[1])<450).slice(0,4))GROUPS.push({at:[q.x+1.5,q.y+1.5],members:[["passant","wait"],["schueler","wait"]],spread:1.2});
-  GROUPS.push({at:[MG.start[0]+14,MG.start[1]+3],members:[["schueler","chat"],["schuelerin","chat"],["schuelerin","phone"]],spread:1.1})}
+  for(const q of (MG.pois||[]).filter(q=>/bus_stop|platform/.test(q.k)&&Math.hypot(q.x-MG.start[0],q.y-MG.start[1])<450).slice(0,3))GROUPS.push({at:[q.x+1.5,q.y+1.5],members:[["passant","wait"],["schuelerin","wait"]],spread:1.2})}
 for(const G of GROUPS){const n=G.members.length;G.members.forEach(([role,act],k)=>{
   const a=k/n*Math.PI*2,x=G.at[0]+Math.cos(a)*G.spread,y=G.at[1]+Math.sin(a)*G.spread;
   const kid=role==="kind",look=makeLook(kid?pick(["schueler","schuelerin"]):role);if(kid){look.scale=rng(.68,.76);look.acc=look.acc.filter(x=>x!=="backpack")}
@@ -275,10 +276,10 @@ function playerGlbApply(){
   hu.userData={h:{head:anchor,torso:anchor},acc:[]};walker.userData.hu=hu;walker.userData.glbDone=true;walker.userData.glbBox=box;
   dressAll()}
 function playerGlbPose(dt){const I=PG.inst;if(!I)return;const v=Math.abs(car.v);
-  // Clip nach Tempo: Gehen bis ca. 2,3 m/s, darüber Laufen (mit Hysterese, damit es nicht flackert)
-  let want=v<.2?"idle":(I.act.run&&(v>2.4||(PG.state==="run"&&v>2.0))?"run":"walk");PG.state=want;
+  // Idle im Stand, Walk beim Gehen (1,8 m/s), Run beim Sprinten (4,8 m/s); Umschalten mit Hysterese, damit nichts flackert
+  let want=v<.15?"idle":(I.act.run&&(v>2.7||(PG.state==="run"&&v>2.3))?"run":"walk");PG.state=want;
   const a=I.act[want]||I.act.idle;
-  if(want!=="idle"){const sp=I.M.speed[want]||1.3;a.timeScale=clamp(v/sp,.35,3.2)*(car.v<0?-1:1)}else a.timeScale=1;
+  if(want!=="idle"){const sp=I.M.speed[want]||1.3;a.timeScale=(want==="run"?clamp(v/sp,.75,1.9):clamp(v/sp,.4,1.6))*(car.v<0?-1:1)}else a.timeScale=1;
   if(PG.cur!==a){a.enabled=true;a.setEffectiveWeight(1);a.reset().play();if(PG.cur)PG.cur.crossFadeTo(a,.25,false);PG.cur=a}
   I.mixer.update(dt)}
 {const base=applyLook;applyLook=function(l){base(l);playerGlbApply()}}

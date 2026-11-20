@@ -710,7 +710,7 @@ button:disabled{opacity:.5}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="mg-data.js"></script>
+<script src="mg-echt.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
@@ -1209,7 +1209,7 @@ function update(dt){
   const ground=VH.fly?heightAt(car.x,car.y):0, landed=VH.fly&&car.alt-ground<.4;
   let maxF=VH.max*(VH.id!=="walk"&&xOn("turbo")?1.12:1), acc=VH.acc;
   if(!VH.fly&&isGrass(car.x,car.y))maxF*=VH.grassF;
-  if(VH.id==="walk"){car.hold=up?(car.hold||0)+dt:0;maxF=((boost||car.hold>1.4)?6.2:3.3)*(xOn("shoes")?1.2:1)}
+  if(VH.id==="walk"){car.hold=up?(car.hold||0)+dt:0;maxF=((boost||car.hold>2.0)?4.8:1.8)*(xOn("shoes")?1.15:1)}
   if(VH.nitro&&boost&&car.nitro>0&&up){maxF*=1.35;acc*=1.8;car.nitro=Math.max(0,car.nitro-dt*.35)}else car.nitro=Math.min(1,car.nitro+dt*.07);
   if(VH.fly&&landed)maxF=3;
   if(up)car.v+=(car.v<0?acc*2.5:acc)*dt; else if(dn)car.v-=(car.v>0?(VH.agile?acc*3:acc*2.2):acc*.8)*dt; else car.v*=Math.pow(VH.agile?.03:VH.fly?.4:.45,dt);
@@ -1690,14 +1690,14 @@ const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,d
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
   giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
-  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zur Dohrer Straße, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
   ask:"Wie lang ist die gerade Strecke von der Kabeltrommel bis zum Anschluss?",
   choice:{q:"Im Lager liegen drei Kabel. Nimm das kürzeste, das reicht.",opts:[{v:9,t:"9 m"},{v:10,t:"10 m"},{v:12,t:"12 m"}],ok:10,
     fb:v=>v<10?"Zu kurz: 9 m < 10 m. Dieses Kabel reicht nicht bis zum Anschluss.":v>10?"Das Kabel reicht zwar, aber 2 m bleiben übrig. Es gibt ein kürzeres, das passt.":"Passt genau: 10 m reichen und nichts bleibt übrig."},
-  doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit der Dohrer Straße.",xp:40,money:120})}
+  doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit den Kleingärten.",xp:40,money:120})}
 if(QD.markt){const m=QD.markt,z=m.zone;QUESTS.push({id:"markt",district:"Rheydt",title:"Quer über den Markt",
   giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Lehrerin an der GHS Dohr, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
   intro:"„Hallo, ich bin Frau Krahe! Unsere Schule baut heute neue Marktstände auf. Das Material liegt an der einen Ecke der weiß markierten Zone und muss zur gegenüberliegenden Ecke. Die Zone ist frei, du darfst also auch quer hindurch. Miss Breite und Länge und rechne aus, wie viel kürzer der direkte Weg ist.“",
@@ -2257,7 +2257,7 @@ function buildSchool(){
   /* ---------- Gelände: Gehweg vor der Schule, Rinne, Hof, Vorgärten ---------- */
   {const flatG=(bk,x0,z0,x1,z1,y)=>{const g=new THREE.PlaneGeometry(x1-x0,z1-z0);g.rotateX(-Math.PI/2);g.translate((x0+x1)/2,y,(z0+z1)/2);put(bk,g)};
     flatG("paver",-345,-63.4,-198,-56.05,SIDE_Y+.003);
-    for(let x=-345;x<=-198;x+=.5)for(let z=-63.4;z<=-56;z+=.5){const i=gi(x,z);if(i>=0&&!(surf[i]&4))surf[i]|=8}
+    if(!MG.XF)for(let x=-345;x<=-198;x+=.5)for(let z=-63.4;z<=-56;z+=.5){const i=gi(x,z);if(i>=0&&!(surf[i]&4))surf[i]|=8}
     flatG("cobble",-345,-53.66,-198,-53.2,ROAD_Y+.004);flatG("cobble",-345,-46.8,-198,-46.34,ROAD_Y+.004);
     flatG("yard",-334,-149.8,-261.5,-63.4,B0+.012);
     flatG("grass",-334,-66,-318,-63.8,B0+.03);flatG("grass",-318,-70,-293,-63.8,B0+.03);flatG("grass",-293,-67,-279,-63.8,B0+.03);flatG("grass",-334,-84,-332,-66,B0+.03);
@@ -2990,7 +2990,7 @@ const HUNT=[
   {x:-326.1,y:-144.6,where:"am weißen Gartenhaus im Hof",post:[-326.9,-145.4],kind:"tapLegs"},
   {x:-279.6,y:-123.6,where:"am Eingang der Turnhalle",post:[-280.4,-124.6],kind:"eq"},
   {x:-284.8,y:-112.8,where:"unter der Außentreppe",post:[-285.8,-113.7],kind:"num"},
-  {x:-236,y:25,where:"im Werkhof an der Dohrer Straße",post:[-235,26.2],kind:"name"},
+  {x:-236,y:25,where:"im Werkhof bei den Kleingärten",post:[-235,26.2],kind:"name"},
 ];
 function huntTask(i){const H=HUNT[i],k=H.kind;let t;
   if(k==="tapHyp")t=AUFG.find(v=>v.id==="r_tap_hyp").make(1);
@@ -3004,7 +3004,7 @@ function huntFound(i){save.hunt=save.hunt||[];if(!save.hunt.includes(i))save.hun
   const n=save.hunt.length;if(n>=HUNT.length&&!save.huntDone){save.huntDone=true;save.money+=150;save.xp+=40;persist();updateHud();jingle();toast("Alle Schilder gefunden!","Dreiecksjagd geschafft · +40 XP · +$150","#3ddc84")}
   else toast(`Schild ${n} von ${HUNT.length}`,n<HUNT.length?"Such weiter rund um die GHS Dohr":"","#ffc933")}
 let huntMeshes=[];
-function buildHunt(){if(MG.real)return;const yellow=new THREE.MeshLambertMaterial({color:0xf2c230,side:THREE.DoubleSide}),green=new THREE.MeshLambertMaterial({color:0x3ddc84,side:THREE.DoubleSide}),pole=new THREE.MeshLambertMaterial({color:0x6b7178}),edge=new THREE.MeshLambertMaterial({color:0x1a2147,side:THREE.DoubleSide});
+function buildHunt(){const yellow=new THREE.MeshLambertMaterial({color:0xf2c230,side:THREE.DoubleSide}),green=new THREE.MeshLambertMaterial({color:0x3ddc84,side:THREE.DoubleSide}),pole=new THREE.MeshLambertMaterial({color:0x6b7178}),edge=new THREE.MeshLambertMaterial({color:0x1a2147,side:THREE.DoubleSide});
   const tri=s=>{const sh=new THREE.Shape([new THREE.Vector2(0,0),new THREE.Vector2(.55*s,0),new THREE.Vector2(0,.42*s)]);return new THREE.ShapeGeometry(sh)};
   HUNT.forEach((H,i)=>{const g=new THREE.Group(),[px,pz]=H.post,gy=groundY(px,pz);
     const p=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.5,8),pole);p.position.y=.75;g.add(p);
@@ -3020,7 +3020,7 @@ function refreshHunt(){const f=save.hunt||[];huntMeshes.forEach((h,i)=>{h.m.mate
   <ul class="chk">${HUNT.map((H,i)=>`<li class="${f.includes(i)?"ok":""}">${f.includes(i)?"✓":"○"} Schild ${i+1}: ${f.includes(i)||i<2?H.where:"<small>noch unbekannt – such weiter</small>"}</li>`).join("")}</ul></div>`)}}
 
 /* ================= Messaufträge auf dem Schulgelände ================= */
-if(!MG.real){
+{
 QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die Außentreppe",
   giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Lehrerin an der GHS Dohr",shirt:"#c0392b"},
   intro:"„Die Außentreppe am Erweiterungsbau bekommt einen neuen Handlauf. Er soll genau so lang sein wie die Treppe schräg von unten bis zum Podest. Miss bitte die Höhe des Podests und wie weit die Treppe waagerecht reicht.“",
@@ -3042,7 +3042,7 @@ QUESTS.push({id:"schulhof",district:"Dohr/Torfbend",title:"Quer über den Schulh
   choice:{q:"Welche Strecke nimmt Herr Ballhorn für den Sprint?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
     fb:v=>v==="diag"?"Die Diagonale ist die längste gerade Strecke auf dem Hof.":"Am Zaun ist es länger, aber nicht gerade: Es gibt eine Ecke."},
   doneText:"Die Laufstrecke ist abgesteckt. Beim Sponsorenlauf rennen alle quer über den Hof.",xp:40,money:110});
-}   /* Ende: nur auf der Spielkarte */
+}
 
 /* ================= Spieler, Startbildschirm, Haupt- und Nebenmissionen, Verkehrsregeln ================= */
 /* ---- Spielerprofile: jeder Spieler hat einen eigenen Namen, eine eigene Figur und einen eigenen Spielstand ---- */
@@ -3170,7 +3170,6 @@ function missionBanner(kind,big,mid,small){const el=$("banner");el.className=kin
   clearTimeout(bannerT);bannerT=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>{if(el.style.opacity==="0")el.hidden=true},500)},4000)}
 
 function goalText(){
-  if(REAL&&save.introDone)return "🗺️ Echte Karte Rheydt (Vorschau) · Missionen ziehen gerade um – erkunde die Stadt";
   if(save.introDone===undefined||!save.introDone){const d=DITT?Math.round(Math.hypot(DITT.x-car.x,DITT.y-car.y)):0;return `⭐ Hauptmission: Sprich mit Herrn Dittmann vor der GHS Dohr${d>6?` · ${d} m`:""}`}
   for(const q of QUESTS){const s=qs(q);if(!s.acc||s.done)continue;
     const m=q.measures.find(m=>!s.m[m.id]),st=isMain(q)?"⭐":"❗";
@@ -3266,8 +3265,7 @@ function titleHTML(){
     if(multi)menu+=`<button data-t="list" type="button">Spieler wechseln<small>${PROFS.list.length} ${PROFS.list.length===1?"Spieler":"Spieler"} auf diesem Gerät</small></button>`;
     if(PROF)menu+=`<button data-t="new" type="button">Neuer Spieler</button><button data-t="look" type="button">Figur ändern</button>`;
     {const fs=PROF?save:{},n=FIG_CHOICES.filter(f=>figUnlocked(f[0],fs)).length;menu+=`<button data-t="figs" type="button">Figuren<small>${n} von ${FIG_CHOICES.length} freigespielt</small></button>`}
-    menu+=`<button data-t="theory" type="button">Theorie</button><button data-t="info" type="button">Steuerung und Orte</button>`;
-    menu+=REAL?`<button data-t="karte" type="button">Zur Spielkarte<small>verdichtete Karte mit allen Missionen</small></button>`:`<button data-t="karte" type="button">Echte Karte Rheydt<small>Vorschau: echte Straßen und Gebäude</small></button>`}
+    menu+=`<button data-t="theory" type="button">Theorie</button><button data-t="info" type="button">Steuerung und Orte</button>`}
   if(V2==="list"){menu=`<div class="tpanel"><h3>Wer spielt?</h3>${PROFS.list.map(p=>{const d=readSave(p.id)||{};const xp=d.xp||0;let L=0;RANKS.forEach((r,i)=>{if(xp>=r[0])L=i});
       return `<div class="prow"><button data-t="pick" data-id="${p.id}" type="button"><i style="background:${p.look&&p.look.jacket||LOOK_DEF.jacket}"></i>${esc(p.name)}<small>${RANKS[L][1]} · $${(d.money||0).toLocaleString("de-DE")}</small></button><button class="del" data-t="del" data-id="${p.id}" type="button" aria-label="${esc(p.name)} löschen">${TITLE.del===p.id?"Wirklich löschen?":"✕"}</button></div>`}).join("")}
       <div class="row"><button data-t="new" type="button" class="primary">+ Neuer Spieler</button><button data-t="back" type="button">Zurück</button></div></div>`}
@@ -3322,7 +3320,7 @@ $("title").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(t==="sw"){TITLE.draft.name=$("pName").value;TITLE.draft.look[b.dataset.k]=b.dataset.c;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="cancel"){const D=TITLE.draft;TITLE.draft=null;applyLook();if(TITLE.restoreVeh&&save.owned.includes(TITLE.restoreVeh)){setVehicle(TITLE.restoreVeh)}TITLE.restoreVeh=null;TITLE.view=PROF?"menu":"list";renderTitle()}
   if(t==="ok")submitCreate();
-  if(t==="karte"){if(REAL&&history.length>1)history.back();else location.href=REAL?"./":"echt.html"}});
+});
 $("title").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="pName"){e.preventDefault();submitCreate()}});
 $("title").addEventListener("input",e=>{if(e.target.id==="pName"&&TITLE.draft){TITLE.draft.name=e.target.value;$("pErr").textContent=""}});
 function submitCreate(){const D=TITLE.draft,n=($("pName").value||"").trim().replace(/\s+/g," ");
@@ -3371,7 +3369,7 @@ const ITEMS={
   cap:{icon:"🧢",name:"Basecap",eq:true,desc:"Eine rote Kappe von der Backstube.",hint:"Eine Bäckerei in der Innenstadt."},
   shoes:{icon:"👟",name:"Turbo-Turnschuhe",eq:true,desc:"Zu Fuß 20 % schneller.",hint:"Herr Maaß hat nach dem Werkhof eine sportliche Herausforderung."},
   balloon:{icon:"🎈",name:"Luftballon",eq:true,desc:"Schwebt immer über dir.",hint:"Ein Kind auf dem Spielplatz hat ein Problem mit einem Drachen."},
-  fanfare:{icon:"📯",name:"Stadion-Fanfare",eq:"horn",desc:"Neue Hupe (Taste Q oder 📯).",hint:"Der Platzwart im Nordpark vermisst etwas."},
+  fanfare:{icon:"📯",name:"Stadion-Fanfare",eq:"horn",desc:"Neue Hupe (Taste Q oder 📯).",hint:"Der Platzwart im Mülforter Bruch vermisst etwas."},
   dog:{icon:"🐕",name:"Hund Krümel",eq:true,desc:"Läuft überall mit dir mit.",hint:"Manche Passanten mit ❓ brauchen Hilfe beim Gassigehen."},
   confetti:{icon:"🎉",name:"Konfetti-Spur",eq:true,desc:"Beim Laufen und mit Nitro fliegt Konfetti.",hint:"Hilf 5 Passanten mit ❓."},
   quack:{icon:"🦆",name:"Enten-Hupe",eq:"horn",desc:"Quak! Die lustigste Hupe der Stadt.",hint:"Finde alle 6 versteckten Quietscheentchen."},
@@ -3394,11 +3392,11 @@ function xMarker(col){const m=new THREE.Mesh(new THREE.OctahedronGeometry(.36,0)
 
 /* ---- Auftraggeber: Läden und bekannte Leute ---- */
 const XG=[
-  {id:"yilmaz",name:"Herr Yilmaz",role:"Büdchen am Torfbend",at:[-214,-47],shirt:"#2e8b57",booth:["#2e8b57","🥤 Büdchen"],jobs:["kiosk"]},
+  {id:"yilmaz",name:"Herr Yilmaz",role:"Büdchen am Torfbend",at:[918,258],shirt:"#2e8b57",booth:["#2e8b57","🥤 Büdchen"],jobs:["kiosk"]},
   {id:"jana",name:"Jana",role:"Fahrradladen „Speiche & Kette“",at:[95,300],shirt:"#17a2b8",booth:["#17a2b8","🚲 Speiche & Kette"],jobs:["bike"]},
-  {id:"kalle",name:"Kalle",role:"Kalles Schrauberbude",at:[152,82],shirt:"#55606e",booth:["#e8742a","🔧 Kalles Schrauberbude"],jobs:["ramp","trial"]},
+  {id:"kalle",name:"Kalle",role:"Kalles Schrauberbude",at:[-362,-960],shirt:"#55606e",booth:["#e8742a","🔧 Kalles Schrauberbude"],jobs:["ramp","trial"]},
   {id:"rossi",name:"Frau Rossi",role:"Eiscafé „Dolce Vita“",at:[180,368],shirt:"#e05a8c",booth:["#f2b8c6","🍦 Dolce Vita"],jobs:["ice"]},
-  {id:"hennes",name:"Bäcker Hennes",role:"Backstube Hennes",at:[60,-350],shirt:"#f2f2f2",booth:["#b5793a","🥨 Backstube Hennes"],jobs:["bread"]},
+  {id:"hennes",name:"Bäcker Hennes",role:"Backstube Hennes",at:[-430,-935],shirt:"#f2f2f2",booth:["#b5793a","🥨 Backstube Hennes"],jobs:["bread"]},
   {id:"elif",talk:"Elif",jobs:["kite"]},
   {id:"tarik",talk:"Tarik",jobs:["ball"]},
   {id:"maass",quest:"werkhof",jobs:["sprint"]},
@@ -3574,7 +3572,7 @@ function applyEquip(){xs();if(xHas("gold")&&!PAINTS.includes("#d4af37"))PAINTS.p
   $("game").style.filter=xOn("film")?"grayscale(1) contrast(1.12) sepia(.18)":"";dressAll()}
 
 /* ---- Easter Eggs: Quietscheentchen ---- */
-const DUCKS=[[-331,-146,"im Schulgarten der GHS Dohr"],[-238,24,"im Werkhof"],[-168,14,"am Spielplatz"],[-292,-345,"im Nordpark"],[150,374,"am Markt in Rheydt"],[345,150,"am Wassergraben von Schloss Rheydt"],[112,-396,"am Alten Markt"]].slice(0,6);
+const DUCKS=[[-331,-146,"im Schulgarten der GHS Dohr"],[-238,24,"im Werkhof"],[606,632,"am Spielplatz in der Grünanlage"],[382,410,"im Mülforter Bruch"],[150,374,"am Markt in Rheydt"],[600,628,"in der Grünanlage in Mülfort"],[-458,-800,"an der Hauptkirche Rheydt"]].slice(0,6);
 let duckMeshes=[];
 function makeDuck(){const g=new THREE.Group(),y=xmat("#ffd21f",{emissive:"#4a3a00"}),o=xmat("#ff7a1a");
   const b=new THREE.Mesh(new THREE.SphereGeometry(.16,14,10),y);b.scale.set(1.25,.85,1);b.position.y=.13;g.add(b);
@@ -3583,19 +3581,19 @@ function makeDuck(){const g=new THREE.Group(),y=xmat("#ffd21f",{emissive:"#4a3a0
   for(const s of [1,-1]){const e=new THREE.Mesh(new THREE.SphereGeometry(.018,6,5),xmat("#111"));e.position.set(.19,.35,s*.05);g.add(e)}
   const t=new THREE.Mesh(new THREE.ConeGeometry(.06,.12,8),y);t.rotation.z=Math.PI/2.6;t.position.set(-.2,.2,0);g.add(t);
   g.traverse(o=>{if(o.isMesh)o.castShadow=true});g.scale.setScalar(1.3);scene.add(g);return g}
-function buildEggs(){if(MG.real){SEIL.x=SEIL.y=NaN;if(!XJ.beacon){XJ.beacon=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,40,16,1,true),new THREE.MeshBasicMaterial({color:0x3ddc84,transparent:true,opacity:.28,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false}));XJ.beacon.visible=false;scene.add(XJ.beacon)}for(const G of XG)G.mark=xMarker("#3ddc84");PED.mark=xMarker("#3fd8ff");PED.mark.visible=false;sanitizeJobs();applyEquip();return}
+function buildEggs(){
   duckMeshes=DUCKS.map(([x,y,w],i)=>{const p=freeSpot(x,y,false),m=makeDuck();m.position.set(p.x,groundY(p.x,p.y),p.y);m.userData={x:p.x,y:p.y,w,i};m.visible=!xs().ducks.includes(i);return m});
-  // Das ägyptische Knotenseil 3-4-5 im Nordpark
-  const sp=freeSpot(-246,-300,false);SEIL.x=sp.x;SEIL.y=sp.y;const gy=groundY(sp.x,sp.y)+.05,rope=xmat("#c9a46a"),knot=xmat("#7a5a2e");
+  // Das ägyptische Knotenseil 3-4-5 im Mülforter Bruch
+  const sp=freeSpot(372,440,false);SEIL.x=sp.x;SEIL.y=sp.y;const gy=groundY(sp.x,sp.y)+.05,rope=xmat("#c9a46a"),knot=xmat("#7a5a2e");
   const P=[[0,0],[4,0],[0,3]].map(([a,b])=>[sp.x-1.3+a,sp.y-1+b]);
   for(let k=0;k<3;k++){const A=P[k],B=P[(k+1)%3],L=Math.hypot(B[0]-A[0],B[1]-A[1]),n=Math.round(L);const m=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,L,6),rope);m.rotation.z=Math.PI/2;m.rotation.y=-Math.atan2(B[1]-A[1],B[0]-A[0]);m.position.set((A[0]+B[0])/2,gy,(A[1]+B[1])/2);scene.add(m);
     for(let j=0;j<n;j++){const kk=new THREE.Mesh(new THREE.SphereGeometry(.08,8,6),knot);kk.position.set(A[0]+(B[0]-A[0])*j/n,gy+.02,A[1]+(B[1]-A[1])*j/n);scene.add(kk)}}
   for(const [x,y] of P){const pg=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.5,6),xmat("#6b4a2a"));pg.position.set(x,gy+.2,y);scene.add(pg)}
-  // UFO hoch über dem Nordpark – nur aus dem Hubschrauber zu entdecken
+  // UFO hoch über dem Mülforter Bruch – nur aus dem Hubschrauber zu entdecken
   const u=new THREE.Group(),met=xmat("#b8c2cc",{emissive:"#202830"});const d=new THREE.Mesh(new THREE.SphereGeometry(6,24,10),met);d.scale.y=.22;u.add(d);
   const dome=new THREE.Mesh(new THREE.SphereGeometry(2.4,18,10,0,Math.PI*2,0,Math.PI/2),new THREE.MeshLambertMaterial({color:0x7ff7ff,transparent:true,opacity:.7,emissive:0x1a5a5a}));dome.position.y=.9;u.add(dome);
   for(let i=0;i<8;i++){const l=new THREE.Mesh(new THREE.SphereGeometry(.35,8,6),xbasic(i%2?"#39ff6a":"#ff2bd6",{fog:false}));const a=i/8*Math.PI*2;l.position.set(Math.cos(a)*5.4,-.1,Math.sin(a)*5.4);u.add(l)}
-  u.position.set(-360,130,-395);scene.add(u);UFO.m=u;
+  u.position.set(382,130,420);scene.add(u);UFO.m=u;
   if(!XJ.beacon){XJ.beacon=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,40,16,1,true),new THREE.MeshBasicMaterial({color:0x3ddc84,transparent:true,opacity:.28,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false}));XJ.beacon.visible=false;scene.add(XJ.beacon)}
   for(const G of XG)if(G.at)buildBooth(G);
   for(const G of XG){G.mark=xMarker("#3ddc84")}
@@ -3615,7 +3613,7 @@ function tickEggs(dt,now){const VH=V();
       if(n>=DUCKS.length){save.money+=100;persist();updateHud();setTimeout(()=>{giveItem("quack");missionBanner("ok","Alle Enten gefunden!","🦆 Neue Hupe: Enten-Hupe","+$100 · Drück Q oder die Hupe")},2600)}}}
   if(state.mode==="play"&&!VH.fly&&Math.hypot(SEIL.x-car.x,SEIL.y-car.y)<2.6&&!save.secrets.includes("seil")){findSecret("seil","Mit 12 Knoten und den Seitenlängen 3, 4 und 5 bauten schon die alten Ägypter rechte Winkel");}
   if(UFO.m){UFO.m.rotation.y+=dt*.8;UFO.m.position.y=130+Math.sin(now/900)*3;UFO.m.visible=VH.fly;
-    if(state.mode==="play"&&VH.fly&&car.alt>70&&Math.hypot(UFO.m.position.x-car.x,UFO.m.position.z-car.y)<70)findSecret("ufo","Über dem Nordpark schwebt ein UFO. Die Außerirdischen kennen Pythagoras auch!")}}
+    if(state.mode==="play"&&VH.fly&&car.alt>70&&Math.hypot(UFO.m.position.x-car.x,UFO.m.position.z-car.y)<70)findSecret("ufo","Über dem Mülforter Bruch schwebt ein UFO. Die Außerirdischen kennen Pythagoras auch!")}}
 
 /* ---- Konfetti ---- */
 const CONF={pts:null,n:240,i:0,pos:null,vel:null,life:null,acc:0};
@@ -3715,7 +3713,7 @@ const CHARS={
   hausm:{icon:"🧰",name:"Hausmeister-Azubi",look:{jacket:"#2b5ea8",jeans:"#2b5ea8",bagCol:"#55606e"},head:"bluecap",need:()=>qsx("schulhof").done,how:"Löse die Hauptmission von Herrn Ballhorn."},
   detektiv:{icon:"🕵️",name:"Detektiv",look:{jacket:"#b8956a",jeans:"#4a3a2a",bagCol:"#6b4226"},head:"hat",need:()=>(save.ducks||[]).length>=3,how:"Finde 3 Quietscheentchen."},
   kapitaen:{icon:"🤝",name:"Teamkapitän",look:{jacket:"#e8742a",jeans:"#1f2633",bagCol:"#1f2633"},head:"band",bandCol:"#1f2633",need:()=>save.duoDone>=1,how:"Schaffe eine Duo-Mission zu zweit."},
-  astro:{icon:"🧑‍🚀",name:"Astronaut",look:{jacket:"#e9ecef",jeans:"#e9ecef",bagCol:"#c0c6cc"},head:"space",need:()=>(save.secrets||[]).includes("ufo"),how:"Finde das Geheimnis über dem Nordpark."},
+  astro:{icon:"🧑‍🚀",name:"Astronaut",look:{jacket:"#e9ecef",jeans:"#e9ecef",bagCol:"#c0c6cc"},head:"space",need:()=>(save.secrets||[]).includes("ufo"),how:"Finde das Geheimnis über dem Mülforter Bruch."},
   pyth:{icon:"🏛️",name:"Pythagoras von Samos",look:{jacket:"#f3efe2",jeans:"#f3efe2",bagCol:"#c9a23a"},head:"laurel",need:()=>mainIdx()>=MAIN.length,how:"Schaffe alle Hauptmissionen."},
 };
 const charOk=id=>id==="self"||ms().chars.includes(id);
@@ -3782,7 +3780,7 @@ const f2=v=>String(Math.round(v*100)/100).replace(".",",");
 function callLines(id){const N=pName(),q=mainQuest(),dq=DUCKS.map((d,i)=>i).find(i=>!(save.ducks||[]).includes(i));
   const tip=pick(["Merk dir: Die Hypotenuse liegt immer gegenüber dem rechten Winkel.","Kathete gesucht? Erst c² − a², dann die Wurzel.","Erst quadrieren, dann addieren, zum Schluss die Wurzel ziehen.","3, 4, 5 – das berühmteste Zahlentripel. Und 6, 8, 10 klappt auch!"]);
   switch(id){
-    case "mats":{const secret=!(save.secrets||[]).includes("ufo")?"Mein Onkel schwört, dass über dem Nordpark manchmal was Komisches fliegt. Aber nur ganz hoch oben …":!(save.secrets||[]).includes("seil")?"Im Nordpark liegt ein altes Seil mit Knoten im Gras. Total seltsam, schau mal hin!":!(save.secrets||[]).includes("film")?"Hast du schon mal ganz oft auf die Uhr getippt? 😏":"Du hast echt alles gefunden. Respekt!";
+    case "mats":{const secret=!(save.secrets||[]).includes("ufo")?"Mein Onkel schwört, dass über dem Mülforter Bruch manchmal was Komisches fliegt. Aber nur ganz hoch oben …":!(save.secrets||[]).includes("seil")?"Im Mülforter Bruch liegt ein altes Seil mit Knoten im Gras. Total seltsam, schau mal hin!":!(save.secrets||[]).includes("film")?"Hast du schon mal ganz oft auf die Uhr getippt? 😏":"Du hast echt alles gefunden. Respekt!";
       return dq!==undefined?`Hey ${N}! Ich hab ein gelbes Quietscheentchen gesehen – ${DUCKS[dq][2]}! Sammelst du die nicht?`:`Hey ${N}! ${secret}`}
     case "ditt":return !save.introDone?`Hallo ${N}, komm doch mal vor dem Haupteingang vorbei, ich warte auf dich!`:q?`Hallo ${N}! Deine nächste Hauptmission: „${q.title}“. ${q.giver.name.replace(/^Herr /,"Herrn ")} findest du in ${q.district}. ${tip}`:`${N}, du hast alle Hauptmissionen geschafft. Ich bin richtig stolz auf dich!`;
     case "maass":return save.jobs&&save.jobs.sprint&&save.jobs.sprint.done?`Na, ${N}, läufst du noch mit den Turbo-Turnschuhen? Bewegung ist das halbe Leben!`:qsx("werkhof").done?`${N}! Komm mal zum Werkhof, ich hab eine sportliche Herausforderung für dich.`:`Hallo ${N}, ich bin am Werkhof um die Ecke und brauche jemanden, der rechnen kann.`;
@@ -3794,7 +3792,7 @@ function callLines(id){const N=pName(),q=mainQuest(),dq=DUCKS.map((d,i)=>i).find
       if(id==="kalle")return `Kalle hier, Schrauberbude und Pannendienst! ${j?`Ich hab noch Arbeit für dich: „${JOBDEF[j].title}“.`:""} Soll ich dir eins deiner Fahrzeuge vorbeibringen? Kostet 10 $.`;
       if(id==="taxi")return `Taxi Mönchengladbach, guten Tag! Wohin soll’s gehen? Wir rechnen ehrlich nach Luftlinie ab: 5 $ Grundgebühr plus 2 $ pro 100 m.`;
       return j?`Hallo ${N}! Komm doch mal vorbei, ich hab Arbeit für dich: „${JOBDEF[j].title}“.`:`Hallo ${N}! Schön, dass du anrufst. Danke nochmal für deine Hilfe!`}}}
-const TAXI_DEST=[["🏫 GHS Dohr",-254.5,-44.9],["🔧 Werkhof",-238,22],["🚘 Autohaus",130,63],["⛪ Alter Markt",100,-372],["🏛️ Rheydter Markt",140,345],["🏰 Schloss Rheydt",330,140],["🌳 Nordpark",-268,-330],["🚉 Hauptbahnhof",402,-372]];
+const TAXI_DEST=[["🏫 GHS Dohr Torfbend",MG.start[0],MG.start[1]],["🔧 Werkhof",-238,22],["🚘 Autohaus Gartenstraße",-392,-965],["⛪ Hauptkirche Rheydt",-452,-822],["🏛️ Rheydter Markt",140,345],["🏫 GHS Dohr Haupthaus",MG.real.orte.haupthaus.x,MG.real.orte.haupthaus.y],["🌳 Mülforter Bruch",382,394],["🚉 Rheydt Hbf",-872,-250]].map(([n,x,y])=>{const p=MG.FX?MG.FX(x,y):[x,y];return [n,p[0],p[1]]});
 function startCall(id){PH.call={id,on:false};renderPhone();let n=0;const ring=()=>{beep(440,.35,"sine",.04);setTimeout(()=>beep(480,.35,"sine",.03),20);n++;if(n<2)PH.ring=setTimeout(ring,900);else PH.ring=setTimeout(answer,900)};ring();
   function answer(){if(!PH.call||PH.call.id!==id)return;PH.call.on=true;PH.call.say=callLines(id);
     if(id==="taxi"){PH.call.actions=`<div class="pacts">${TAXI_DEST.map(([n,x,y],i)=>{const dx=Math.round(Math.abs(x-car.x)/10)*10,dy=Math.round(Math.abs(y-car.y)/10)*10,d=Math.hypot(dx,dy),p=Math.round(5+d/50);return d<30?"":`<button type="button" data-taxi="${i}"><span>${n}</span><small>Δx ${dx} m · Δy ${dy} m → √(${dx}² + ${dy}²) ≈ ${Math.round(d)} m · <b>${p} $</b></small></button>`}).join("")}</div>`}
@@ -3992,11 +3990,12 @@ const GROUPS=[
   GV.tv&&{at:[GV.tv[0]-5,GV.tv[1]+4],members:[["passant","phone"],["passant","chat"],["businesswoman","chat"]],spread:1.0},
   GV.taxi&&{at:[GV.taxi[0]-6,GV.taxi[1]+3],members:[["business","wait"],["passant","wait"],["seniorin","wait"]],spread:1.4},
 ].filter(Boolean);
-if(MG.real){GROUPS.length=0;const O=MG.real.orte,near=(o,dx,dy)=>[o.x+dx,o.y+dy];
-  if(O.rheydt_marktplatz)GROUPS.push({at:near(O.rheydt_marktplatz,8,10),members:[["passant","chat"],["seniorin","chat"],["passant","phone"],["businesswoman","chat"]],spread:1.4},{at:near(O.rheydt_marktplatz,-12,18),members:[["fan","cheer"],["fan","cheer"],["fan","chat"]],spread:1.3});
+if(MG.FX){   /* Gruppen der früheren Spielkarte an ihre neuen Orte, dazu echte Treffpunkte */
+  for(let k=GROUPS.length-1;k>=0;k--){const G=GROUPS[k];if(G.at[0]===-164&&G.at[1]===12)G.at=[600,618];G.at=MG.FX(...G.at)}
+  const O=MG.real.orte,near=(o,dx,dy)=>[o.x+dx,o.y+dy];
+  if(O.rheydt_marktplatz)GROUPS.push({at:near(O.rheydt_marktplatz,8,10),members:[["passant","chat"],["seniorin","chat"],["passant","phone"],["businesswoman","chat"]],spread:1.4});
   if(O.rheydt_hbf)GROUPS.push({at:near(O.rheydt_hbf,6,6),members:[["business","wait"],["passant","wait"],["seniorin","wait"],["schuelerin","phone"]],spread:1.6});
-  for(const q of (MG.pois||[]).filter(q=>/bus_stop|platform/.test(q.k)&&Math.hypot(q.x-MG.start[0],q.y-MG.start[1])<450).slice(0,4))GROUPS.push({at:[q.x+1.5,q.y+1.5],members:[["passant","wait"],["schueler","wait"]],spread:1.2});
-  GROUPS.push({at:[MG.start[0]+14,MG.start[1]+3],members:[["schueler","chat"],["schuelerin","chat"],["schuelerin","phone"]],spread:1.1})}
+  for(const q of (MG.pois||[]).filter(q=>/bus_stop|platform/.test(q.k)&&Math.hypot(q.x-MG.start[0],q.y-MG.start[1])<450).slice(0,3))GROUPS.push({at:[q.x+1.5,q.y+1.5],members:[["passant","wait"],["schuelerin","wait"]],spread:1.2})}
 for(const G of GROUPS){const n=G.members.length;G.members.forEach(([role,act],k)=>{
   const a=k/n*Math.PI*2,x=G.at[0]+Math.cos(a)*G.spread,y=G.at[1]+Math.sin(a)*G.spread;
   const kid=role==="kind",look=makeLook(kid?pick(["schueler","schuelerin"]):role);if(kid){look.scale=rng(.68,.76);look.acc=look.acc.filter(x=>x!=="backpack")}
@@ -4221,16 +4220,30 @@ function playerGlbApply(){
   hu.userData={h:{head:anchor,torso:anchor},acc:[]};walker.userData.hu=hu;walker.userData.glbDone=true;walker.userData.glbBox=box;
   dressAll()}
 function playerGlbPose(dt){const I=PG.inst;if(!I)return;const v=Math.abs(car.v);
-  // Clip nach Tempo: Gehen bis ca. 2,3 m/s, darüber Laufen (mit Hysterese, damit es nicht flackert)
-  let want=v<.2?"idle":(I.act.run&&(v>2.4||(PG.state==="run"&&v>2.0))?"run":"walk");PG.state=want;
+  // Idle im Stand, Walk beim Gehen (1,8 m/s), Run beim Sprinten (4,8 m/s); Umschalten mit Hysterese, damit nichts flackert
+  let want=v<.15?"idle":(I.act.run&&(v>2.7||(PG.state==="run"&&v>2.3))?"run":"walk");PG.state=want;
   const a=I.act[want]||I.act.idle;
-  if(want!=="idle"){const sp=I.M.speed[want]||1.3;a.timeScale=clamp(v/sp,.35,3.2)*(car.v<0?-1:1)}else a.timeScale=1;
+  if(want!=="idle"){const sp=I.M.speed[want]||1.3;a.timeScale=(want==="run"?clamp(v/sp,.75,1.9):clamp(v/sp,.4,1.6))*(car.v<0?-1:1)}else a.timeScale=1;
   if(PG.cur!==a){a.enabled=true;a.setEffectiveWeight(1);a.reset().play();if(PG.cur)PG.cur.crossFadeTo(a,.25,false);PG.cur=a}
   I.mixer.update(dt)}
 {const base=applyLook;applyLook=function(l){base(l);playerGlbApply()}}
 
 /* Quellenangabe der echten Karte in der Kartenansicht (Pflicht laut ODbL) */
 if(MG.real)document.querySelectorAll(".mapnote").forEach(n=>n.insertAdjacentHTML("beforeend",' · Karte: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap-Mitwirkende</a> (ODbL) · Geobasis NRW (dl-de/zero-2-0) · Stadt Mönchengladbach'));
+
+/* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
+if(MG.FX){
+  const FX=MG.FX,P=o=>{const p=FX(o.x,o.y);o.x=p[0];o.y=p[1]};
+  for(const q of QUESTS){if(MG.FXC(q.giver.x,q.giver.y)){P(q.giver);for(const m of q.measures){P(m);const L=m.line,a=FX(L[0],L[2]),b=FX(L[3],L[5]);m.line=[a[0],L[1],a[1],b[0],L[4],b[1]]}}}
+  for(const H of HUNT){P(H);H.post=FX(...H.post)}
+  for(const G of XG)if(G.at)G.at=MG.fxFree(...FX(...G.at));
+  for(let i=0;i<DUCKS.length;i++){const [x,y,w]=DUCKS[i];DUCKS[i]=[...FX(x,y),w]}
+  for(const k in JOBDEF)for(const st of JOBDEF[k].steps||[])if(st.fixed)st.fixed=FX(...st.fixed);
+  /* Schulmodell: wird in Spielkarten-Koordinaten gebaut und als Ganzes auf das echte Grundstück gedreht und verschoben */
+  {const base=buildSchool;buildSchool=function(){const n0=scene.children.length;base();const S=MG.XF.find(c=>c.id==="S"),g=new THREE.Group();
+    const co=Math.cos(S.r),si=Math.sin(S.r);g.rotation.y=-S.r;g.position.set(S.t[0]-(S.f[0]*co-S.f[1]*si),0,S.t[1]-(S.f[0]*si+S.f[1]*co));
+    const add=scene.children.slice(n0);for(const o of add){scene.remove(o);g.add(o)}scene.add(g);g.updateMatrixWorld(true)}}
+}
 
 /* ================= Start ================= */
 let last=performance.now(), hudT=0;

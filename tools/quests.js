@@ -8,14 +8,14 @@ const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,d
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
   giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
-  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zur Dohrer Straße, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
   ask:"Wie lang ist die gerade Strecke von der Kabeltrommel bis zum Anschluss?",
   choice:{q:"Im Lager liegen drei Kabel. Nimm das kürzeste, das reicht.",opts:[{v:9,t:"9 m"},{v:10,t:"10 m"},{v:12,t:"12 m"}],ok:10,
     fb:v=>v<10?"Zu kurz: 9 m < 10 m. Dieses Kabel reicht nicht bis zum Anschluss.":v>10?"Das Kabel reicht zwar, aber 2 m bleiben übrig. Es gibt ein kürzeres, das passt.":"Passt genau: 10 m reichen und nichts bleibt übrig."},
-  doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit der Dohrer Straße.",xp:40,money:120})}
+  doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit den Kleingärten.",xp:40,money:120})}
 if(QD.markt){const m=QD.markt,z=m.zone;QUESTS.push({id:"markt",district:"Rheydt",title:"Quer über den Markt",
   giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Lehrerin an der GHS Dohr, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
   intro:"„Hallo, ich bin Frau Krahe! Unsere Schule baut heute neue Marktstände auf. Das Material liegt an der einen Ecke der weiß markierten Zone und muss zur gegenüberliegenden Ecke. Die Zone ist frei, du darfst also auch quer hindurch. Miss Breite und Länge und rechne aus, wie viel kürzer der direkte Weg ist.“",
@@ -575,7 +575,7 @@ function buildSchool(){
   /* ---------- Gelände: Gehweg vor der Schule, Rinne, Hof, Vorgärten ---------- */
   {const flatG=(bk,x0,z0,x1,z1,y)=>{const g=new THREE.PlaneGeometry(x1-x0,z1-z0);g.rotateX(-Math.PI/2);g.translate((x0+x1)/2,y,(z0+z1)/2);put(bk,g)};
     flatG("paver",-345,-63.4,-198,-56.05,SIDE_Y+.003);
-    for(let x=-345;x<=-198;x+=.5)for(let z=-63.4;z<=-56;z+=.5){const i=gi(x,z);if(i>=0&&!(surf[i]&4))surf[i]|=8}
+    if(!MG.XF)for(let x=-345;x<=-198;x+=.5)for(let z=-63.4;z<=-56;z+=.5){const i=gi(x,z);if(i>=0&&!(surf[i]&4))surf[i]|=8}
     flatG("cobble",-345,-53.66,-198,-53.2,ROAD_Y+.004);flatG("cobble",-345,-46.8,-198,-46.34,ROAD_Y+.004);
     flatG("yard",-334,-149.8,-261.5,-63.4,B0+.012);
     flatG("grass",-334,-66,-318,-63.8,B0+.03);flatG("grass",-318,-70,-293,-63.8,B0+.03);flatG("grass",-293,-67,-279,-63.8,B0+.03);flatG("grass",-334,-84,-332,-66,B0+.03);

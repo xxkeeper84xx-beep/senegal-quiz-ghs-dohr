@@ -124,7 +124,6 @@ function missionBanner(kind,big,mid,small){const el=$("banner");el.className=kin
   clearTimeout(bannerT);bannerT=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>{if(el.style.opacity==="0")el.hidden=true},500)},4000)}
 
 function goalText(){
-  if(REAL&&save.introDone)return "🗺️ Echte Karte Rheydt (Vorschau) · Missionen ziehen gerade um – erkunde die Stadt";
   if(save.introDone===undefined||!save.introDone){const d=DITT?Math.round(Math.hypot(DITT.x-car.x,DITT.y-car.y)):0;return `⭐ Hauptmission: Sprich mit Herrn Dittmann vor der GHS Dohr${d>6?` · ${d} m`:""}`}
   for(const q of QUESTS){const s=qs(q);if(!s.acc||s.done)continue;
     const m=q.measures.find(m=>!s.m[m.id]),st=isMain(q)?"⭐":"❗";
@@ -220,8 +219,7 @@ function titleHTML(){
     if(multi)menu+=`<button data-t="list" type="button">Spieler wechseln<small>${PROFS.list.length} ${PROFS.list.length===1?"Spieler":"Spieler"} auf diesem Gerät</small></button>`;
     if(PROF)menu+=`<button data-t="new" type="button">Neuer Spieler</button><button data-t="look" type="button">Figur ändern</button>`;
     {const fs=PROF?save:{},n=FIG_CHOICES.filter(f=>figUnlocked(f[0],fs)).length;menu+=`<button data-t="figs" type="button">Figuren<small>${n} von ${FIG_CHOICES.length} freigespielt</small></button>`}
-    menu+=`<button data-t="theory" type="button">Theorie</button><button data-t="info" type="button">Steuerung und Orte</button>`;
-    menu+=REAL?`<button data-t="karte" type="button">Zur Spielkarte<small>verdichtete Karte mit allen Missionen</small></button>`:`<button data-t="karte" type="button">Echte Karte Rheydt<small>Vorschau: echte Straßen und Gebäude</small></button>`}
+    menu+=`<button data-t="theory" type="button">Theorie</button><button data-t="info" type="button">Steuerung und Orte</button>`}
   if(V2==="list"){menu=`<div class="tpanel"><h3>Wer spielt?</h3>${PROFS.list.map(p=>{const d=readSave(p.id)||{};const xp=d.xp||0;let L=0;RANKS.forEach((r,i)=>{if(xp>=r[0])L=i});
       return `<div class="prow"><button data-t="pick" data-id="${p.id}" type="button"><i style="background:${p.look&&p.look.jacket||LOOK_DEF.jacket}"></i>${esc(p.name)}<small>${RANKS[L][1]} · $${(d.money||0).toLocaleString("de-DE")}</small></button><button class="del" data-t="del" data-id="${p.id}" type="button" aria-label="${esc(p.name)} löschen">${TITLE.del===p.id?"Wirklich löschen?":"✕"}</button></div>`}).join("")}
       <div class="row"><button data-t="new" type="button" class="primary">+ Neuer Spieler</button><button data-t="back" type="button">Zurück</button></div></div>`}
@@ -276,7 +274,7 @@ $("title").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(t==="sw"){TITLE.draft.name=$("pName").value;TITLE.draft.look[b.dataset.k]=b.dataset.c;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="cancel"){const D=TITLE.draft;TITLE.draft=null;applyLook();if(TITLE.restoreVeh&&save.owned.includes(TITLE.restoreVeh)){setVehicle(TITLE.restoreVeh)}TITLE.restoreVeh=null;TITLE.view=PROF?"menu":"list";renderTitle()}
   if(t==="ok")submitCreate();
-  if(t==="karte"){if(REAL&&history.length>1)history.back();else location.href=REAL?"./":"echt.html"}});
+});
 $("title").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="pName"){e.preventDefault();submitCreate()}});
 $("title").addEventListener("input",e=>{if(e.target.id==="pName"&&TITLE.draft){TITLE.draft.name=e.target.value;$("pErr").textContent=""}});
 function submitCreate(){const D=TITLE.draft,n=($("pName").value||"").trim().replace(/\s+/g," ");

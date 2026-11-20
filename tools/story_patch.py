@@ -8,7 +8,7 @@ R('/* ================= Start ================= */', open(os.path.join(os.path.d
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'extras.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'more.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('  let maxF=VH.max, acc=VH.acc;','  let maxF=VH.max*(VH.id!=="walk"&&xOn("turbo")?1.12:1), acc=VH.acc;')
-R('maxF=(boost||car.hold>1.4)?6.2:3.3}','maxF=((boost||car.hold>1.4)?6.2:3.3)*(xOn("shoes")?1.2:1)}')
+R('maxF=(boost||car.hold>1.4)?6.2:3.3}','maxF=((boost||car.hold>2.0)?4.8:1.8)*(xOn("shoes")?1.15:1)}')   # Tempo passend zu den Walk- und Run-Clips der 3D-Figuren
 R("</style>", """
 /* --- Startbildschirm --- */
 #title{position:fixed;inset:0;z-index:30;display:grid;grid-template-rows:auto 1fr auto;box-sizing:border-box;padding:calc(28px + env(safe-area-inset-top,0px)) calc(32px + env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) calc(36px + env(safe-area-inset-left,0px));
