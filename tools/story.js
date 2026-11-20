@@ -5,7 +5,8 @@ let PROFS=(()=>{try{return JSON.parse(localStorage.getItem(PROF_KEY)||"null")}ca
 if(!Array.isArray(PROFS.list))PROFS={list:[],last:null};
 let PROF=PROFS.list.find(p=>p.id===PROFS.last)||null;
 const saveProfs=()=>{try{localStorage.setItem(PROF_KEY,JSON.stringify(PROFS))}catch(e){}};
-const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c"};
+const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c",model:"01_Schuelerin"};
+const FIG_CHOICES=[["01_Schuelerin","Schülerin"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["07_Geschaeftsfrau","Geschäftsfrau"],["05_Strassenbauer","Straßenbauer"],["03_Seniorin","Seniorin"],["04_Senior","Senior"],["classic","Klassisch"]];
 const LOOKS={
   jacket:["#2f4f7a","#c0392b","#2e8b57","#f2b81f","#7b3fa0","#1b1b1b","#e8742a","#e05a8c"],
   hair:["#1c1410","#33251c","#6b4226","#b5793a","#e3c27a","#8c2f1a","#9aa0a8"],
@@ -208,6 +209,7 @@ function titleHTML(){
     menu=`<div class="tpanel"><h3>${D.edit?"Figur ändern":"Neuer Spieler"}</h3>
       <label class="nm">Dein Name<input id="pName" maxlength="16" autocomplete="off" value="${esc(D.name)}" placeholder="Vorname"></label>
       <p class="err" id="pErr"></p>
+      <div class="figs"><span>Figur</span>${FIG_CHOICES.map(([v,n])=>`<button type="button" data-t="fig" data-v="${v}" class="${(D.look.model||LOOK_DEF.model)===v?"on":""}">${n}</button>`).join("")}</div>
       ${Object.keys(LOOKS).map(k=>`<div class="sw"><span>${LOOK_NAMES[k]}</span>${LOOKS[k].map(c=>`<button type="button" data-t="sw" data-k="${k}" data-c="${c}" class="${D.look[k]===c?"on":""}" style="background:${c}" aria-label="${LOOK_NAMES[k]} ${c}"></button>`).join("")}</div>`).join("")}
       ${!PROFS.list.length&&hasLegacy()?`<p class="note">Dein bisheriger Spielstand wird für diesen Spieler übernommen.</p>`:""}
       <div class="row"><button class="primary" data-t="ok" type="button">${D.edit?"Speichern":"Los geht’s ▶"}</button>${PROFS.list.length||D.edit?`<button data-t="cancel" type="button">Abbrechen</button>`:""}</div></div>`}
@@ -240,6 +242,7 @@ $("title").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(t==="del"){if(TITLE.del===b.dataset.id){deleteProfile(b.dataset.id);TITLE.del=null;TITLE.view=PROFS.list.length?"list":"create";if(!PROFS.list.length)startCreate(false)}else TITLE.del=b.dataset.id;renderTitle()}
   if(t==="theory"){hideTitle();state.mode="start";openHelp()}
   if(t==="info"){$("title").hidden=true;$("start").hidden=false;$("btnStart").textContent="Zurück zum Menü"}
+  if(t==="fig"){TITLE.draft.name=$("pName").value;TITLE.draft.look.model=b.dataset.v;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="sw"){TITLE.draft.name=$("pName").value;TITLE.draft.look[b.dataset.k]=b.dataset.c;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="cancel"){const D=TITLE.draft;TITLE.draft=null;applyLook();if(TITLE.restoreVeh&&save.owned.includes(TITLE.restoreVeh)){setVehicle(TITLE.restoreVeh)}TITLE.restoreVeh=null;TITLE.view=PROF?"menu":"list";renderTitle()}
   if(t==="ok")submitCreate()});

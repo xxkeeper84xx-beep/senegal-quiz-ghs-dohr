@@ -186,6 +186,10 @@ body.touch #prompt{bottom:calc(98px + env(safe-area-inset-bottom,0px))}
 #title .sw span{width:100%;margin-bottom:-2px;font-size:13px;color:var(--muted);font-weight:700}
 #title .sw button{width:34px;height:34px;padding:0;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}
 #title .sw button.on{box-shadow:0 0 0 3px var(--accent),inset 0 0 0 2px #000}
+#title .figs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+#title .figs span{width:100%;font-size:13px;color:var(--muted);font-weight:700}
+#title .figs button{padding:6px 10px;font-size:13px;border-radius:999px}
+#title .figs button.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:var(--glow)}
 #title .note{font-size:13px;color:var(--good);margin:8px 0 0}
 #title .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 #title .prow{display:flex;gap:6px;margin-bottom:6px}
@@ -1578,7 +1582,7 @@ function render3D(dt,now){
   car.pv=car.v;
   const wv=Math.abs(car.v); car.wk=(car.wk||0)+((VH.id==="walk"?clamp(wv/1.1,0,1):0)-(car.wk||0))*Math.min(1,dt*8); car.rn=(car.rn||0)+(clamp((wv-3.4)/2.2,0,1)-(car.rn||0))*Math.min(1,dt*4);
   const stl=strideLen(wv,car.rn); car.ph+=VH.id==="walk"?dt*car.v*2*Math.PI/stl:dt*car.v*1.4;
-  if(VH.id==="walk"){poseHuman(walker.userData.hu,car.ph,car.wk,car.rn,now/1000,stl);walker.position.y=car.alt}
+  if(VH.id==="walk"){if(walker.userData.glbDone)playerGlbPose(dt);else poseHuman(walker.userData.hu,car.ph,car.wk,car.rn,now/1000,stl);walker.position.y=car.alt}
   if(pm.userData.carWheels)for(const w of pm.userData.carWheels)w.rotation.z-=car.v*dt/pm.userData.wr;
   if(pm.userData.rider){sitHuman(pm.userData.rider.userData.hu,VH.id==="scoot"?"stand":VH.id,car.ph);for(const w of pm.userData.wheels)w.rotation.z-=car.v*dt/.5}
   const fx=Math.cos(car.a),fz=Math.sin(car.a);
@@ -3029,7 +3033,8 @@ let PROFS=(()=>{try{return JSON.parse(localStorage.getItem(PROF_KEY)||"null")}ca
 if(!Array.isArray(PROFS.list))PROFS={list:[],last:null};
 let PROF=PROFS.list.find(p=>p.id===PROFS.last)||null;
 const saveProfs=()=>{try{localStorage.setItem(PROF_KEY,JSON.stringify(PROFS))}catch(e){}};
-const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c"};
+const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c",model:"01_Schuelerin"};
+const FIG_CHOICES=[["01_Schuelerin","Schülerin"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["07_Geschaeftsfrau","Geschäftsfrau"],["05_Strassenbauer","Straßenbauer"],["03_Seniorin","Seniorin"],["04_Senior","Senior"],["classic","Klassisch"]];
 const LOOKS={
   jacket:["#2f4f7a","#c0392b","#2e8b57","#f2b81f","#7b3fa0","#1b1b1b","#e8742a","#e05a8c"],
   hair:["#1c1410","#33251c","#6b4226","#b5793a","#e3c27a","#8c2f1a","#9aa0a8"],
@@ -3232,6 +3237,7 @@ function titleHTML(){
     menu=`<div class="tpanel"><h3>${D.edit?"Figur ändern":"Neuer Spieler"}</h3>
       <label class="nm">Dein Name<input id="pName" maxlength="16" autocomplete="off" value="${esc(D.name)}" placeholder="Vorname"></label>
       <p class="err" id="pErr"></p>
+      <div class="figs"><span>Figur</span>${FIG_CHOICES.map(([v,n])=>`<button type="button" data-t="fig" data-v="${v}" class="${(D.look.model||LOOK_DEF.model)===v?"on":""}">${n}</button>`).join("")}</div>
       ${Object.keys(LOOKS).map(k=>`<div class="sw"><span>${LOOK_NAMES[k]}</span>${LOOKS[k].map(c=>`<button type="button" data-t="sw" data-k="${k}" data-c="${c}" class="${D.look[k]===c?"on":""}" style="background:${c}" aria-label="${LOOK_NAMES[k]} ${c}"></button>`).join("")}</div>`).join("")}
       ${!PROFS.list.length&&hasLegacy()?`<p class="note">Dein bisheriger Spielstand wird für diesen Spieler übernommen.</p>`:""}
       <div class="row"><button class="primary" data-t="ok" type="button">${D.edit?"Speichern":"Los geht’s ▶"}</button>${PROFS.list.length||D.edit?`<button data-t="cancel" type="button">Abbrechen</button>`:""}</div></div>`}
@@ -3264,6 +3270,7 @@ $("title").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(t==="del"){if(TITLE.del===b.dataset.id){deleteProfile(b.dataset.id);TITLE.del=null;TITLE.view=PROFS.list.length?"list":"create";if(!PROFS.list.length)startCreate(false)}else TITLE.del=b.dataset.id;renderTitle()}
   if(t==="theory"){hideTitle();state.mode="start";openHelp()}
   if(t==="info"){$("title").hidden=true;$("start").hidden=false;$("btnStart").textContent="Zurück zum Menü"}
+  if(t==="fig"){TITLE.draft.name=$("pName").value;TITLE.draft.look.model=b.dataset.v;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="sw"){TITLE.draft.name=$("pName").value;TITLE.draft.look[b.dataset.k]=b.dataset.c;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="cancel"){const D=TITLE.draft;TITLE.draft=null;applyLook();if(TITLE.restoreVeh&&save.owned.includes(TITLE.restoreVeh)){setVehicle(TITLE.restoreVeh)}TITLE.restoreVeh=null;TITLE.view=PROF?"menu":"list";renderTitle()}
   if(t==="ok")submitCreate()});
@@ -3905,7 +3912,7 @@ const ROLES={
   jogger:     {w:1,label:"Jogger",scale:[.98,1.04],sp:[3.0,3.8],run:true,jacket:["#0ea5e9","#ef4444","#f2f2f2","#22c55e"],jeans:["#1b1b1b","#334155"],acc:["headband"],opt:{},short:true},
   business:   {w:2,label:"Geschäftsmann",scale:[.98,1.04],sp:[1.4,1.7],jacket:["#1f2a44","#2b2b2b","#3d4552"],same:true,acc:["briefcase"],opt:{glasses:.3}},
   businesswoman:{w:2,label:"Geschäftsfrau",scale:[.93,.99],sp:[1.35,1.65],jacket:["#1f2a44","#7a2633","#2b2b2b","#e9e4da"],jeans:["#2b2b2b","#1f2a44"],acc:["skirt","handbag","bun"],opt:{glasses:.3}},
-  passant:    {w:7,label:"Passant",scale:[.92,1.04],sp:[1.0,1.5],jacket:["#2f4f7a","#c0392b","#2e8b57","#f2b81f","#7b3fa0","#1b1b1b","#e8742a","#e9e9e9","#e05a8c","#17a2b8","#8b5a2b","#55606e"],jeans:["#3a4f72","#1f2633","#55606e","#6b5a43","#2d3d2a","#c9b38f"],acc:[],opt:{cap:.12,glasses:.2,shopping:.3,ponytail:.25,longhair:.15}},
+  passant:    {w:11,label:"Passant",scale:[.92,1.04],sp:[1.0,1.5],jacket:["#2f4f7a","#c0392b","#2e8b57","#f2b81f","#7b3fa0","#1b1b1b","#e8742a","#e9e9e9","#e05a8c","#17a2b8","#8b5a2b","#55606e"],jeans:["#3a4f72","#1f2633","#55606e","#6b5a43","#2d3d2a","#c9b38f"],acc:[],opt:{cap:.12,glasses:.2,shopping:.3,ponytail:.25,longhair:.15}},
   hund:       {w:1.2,label:"mit Hund",scale:[.94,1.02],sp:[.9,1.2],jacket:["#2e8b57","#55606e","#8b5a2b","#2f4f7a"],jeans:["#3a4f72","#1f2633"],acc:[],opt:{cap:.25},dog:true},
 };
 function makeLook(role){
@@ -4043,7 +4050,7 @@ function updateCrowd(dt,now){
 
 /* ================= Echte 3D-Stadtfiguren (GLB-Dateien mit Idle, Walk, Run) ================= */
 const GLB={base:"figuren/",ready:false,near:isTouch?6:12,models:{},pools:{},
-  files:{schuelerin:"01_Schuelerin",fan:"02_Fussballfan",seniorin:"03_Seniorin",senior:"04_Senior",bauarbeiter:"05_Strassenbauer",joggerin:"06_Joggerin",businesswoman:"07_Geschaeftsfrau",passant:"08_Passant",hund:"08_Passant"}};
+  files:{schuelerin:"01_Schuelerin",schueler:"02_Fussballfan",fan:"02_Fussballfan",seniorin:"03_Seniorin",senior:"04_Senior",bauarbeiter:"05_Strassenbauer",joggerin:"06_Joggerin",businesswoman:"07_Geschaeftsfrau",passant:"08_Passant",hund:"08_Passant"}};
 const GLB_ACTS=new Set(["wait","chat","phone"]);      // Stehende, für die die Idle-Animation passt
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
 async function initGlbCrowd(){
@@ -4051,8 +4058,9 @@ async function initGlbCrowd(){
       if(!THREE.SkeletonUtils)await loadScript("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js")}
   catch(e){console.info("3D-Figuren: Lader nicht erreichbar, es bleiben die einfachen Figuren");return}
   const loader=new THREE.GLTFLoader();
-  for(const name of [...new Set(Object.values(GLB.files))]){         // nacheinander im Hintergrund laden
-    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g);GLB.ready=true}
+  const first=(PROF&&PROF.look&&PROF.look.model)||LOOK_DEF.model,names=[...new Set([first,...Object.values(GLB.files),...FIG_CHOICES.map(f=>f[0]).filter(n=>n!=="classic")])];
+  for(const name of names){         // nacheinander im Hintergrund laden, Spielfigur zuerst
+    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply()}
     catch(e){console.info("3D-Figur nicht geladen:",name)}}
 }
 /** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
@@ -4063,7 +4071,12 @@ function prepGlb(gltf){
     clips[c.name.toLowerCase()]=c}
   scene.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=false;o.frustumCulled=false;
     const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(ENV){m.envMap=ENV;m.envMapIntensity=.55}if(m.metalness>.3&&!m.metalnessMap)m.metalness=.1;m.needsUpdate=true}});
-  const M={scene,clips,offY:0,speed:{walk:1.3,run:3.2}};
+  const M={scene,clips,offY:0,speed:{walk:1.3,run:3.2},slots:new Map()};
+  scene.traverse(o=>{if(!o.isMesh)return;const m=o.material,slot=glbSlot(m.name);if(!slot||M.slots.has(m))return;
+    const info={slot,base:m.color.clone()};
+    if(m.map&&slot!=="skin")info.gray=recolorTex(m.map,slot==="outfit"?null:0);
+    if(m.map&&slot==="outfit")info.hues=[40,80,140,200,260,320].map(h=>recolorTex(m.map,h));
+    M.slots.set(m,info)});
   // Messung an einer Kopie: Füße bei Idle auf den Boden, Standfuß-Tempo von Walk und Run
   const probe=THREE.SkeletonUtils.clone(scene),mx=new THREE.AnimationMixer(probe),feet=[];probe.updateMatrixWorld(true);
   probe.traverse(o=>{if(o.isBone&&/(Left|Right)ToeBase$/.test(o.name))feet.push(o)});
@@ -4072,10 +4085,10 @@ function prepGlb(gltf){
     probe.traverse(o=>{if(!o.isSkinnedMesh)return;o.skeleton.update();const n=o.geometry.attributes.position.count;
       for(let i=0;i<n;i+=3){o.boneTransform(i,w);w.applyMatrix4(o.matrixWorld);if(w.y<lo)lo=w.y}});
     if(lo<1e8)M.offY=-lo}
-  for(const k of ["walk","run"]){const c=clips[k];if(!c||!feet.length)continue;const N=90,pts=[];for(let i=0;i<=N;i++)pts.push(sample(c,c.duration*i/N));
-    let dist=0,time=0;for(let fi=0;fi<feet.length;fi++){const ys=pts.map(q=>q[fi].y),lo=Math.min(...ys);
-      for(let i=1;i<=N;i++)if(pts[i][fi].y<lo+.02&&pts[i-1][fi].y<lo+.02){dist+=Math.abs(pts[i][fi].z-pts[i-1][fi].z);time+=c.duration/N}}
-    if(time>0)M.speed[k]=dist/time}
+  for(const k of ["walk","run"]){const c=clips[k];if(!c||!feet.length)continue;const N=240,pts=[],dt=c.duration/N;for(let i=0;i<=N;i++)pts.push(sample(c,c.duration*i/N));
+    const vs=[];for(let fi=0;fi<feet.length;fi++){const ys=pts.map(q=>q[fi].y),lo=Math.min(...ys);   // nur die Mitte des Bodenkontakts (Fuß ganz unten)
+      for(let i=1;i<=N;i++)if(pts[i][fi].y<lo+.006&&pts[i-1][fi].y<lo+.006)vs.push(-(pts[i][fi].z-pts[i-1][fi].z)/dt)}
+    vs.sort((x,y)=>x-y);if(vs.length)M.speed[k]=Math.max(.3,vs[vs.length>>1])}
   mx.stopAllAction();
   return M}
 function glbTake(name,p){const M=GLB.models[name],pool=GLB.pools[name]||(GLB.pools[name]=[]);let I=pool.pop();
@@ -4092,6 +4105,71 @@ function glbPose(p,dt,now){const I=p.glb;glbState(I,p,.35);I.mixer.update(dt);
   I.obj.position.set(p.x,groundY(p.x,p.y)+I.M.offY*I.obj.scale.x,p.y);I.obj.rotation.y=Math.PI/2-p.a;   // Modelle schauen nach +Z
   if(p.dogM){const D=p.dogM,U=D.userData,bx=p.x-Math.cos(p.a)*1.1+Math.sin(p.a)*.5,by=p.y-Math.sin(p.a)*1.1-Math.cos(p.a)*.5;p.cph=(p.cph||0)+dt*p.sp*3;
     D.position.set(bx,groundY(bx,by),by);D.rotation.y=-p.a;U.legs.forEach((l,i)=>l.rotation.z=p.static?0:Math.sin(p.cph+(i%2?0:Math.PI)+(i>1?Math.PI/2:0))*.6);U.tail.rotation.x=Math.sin(now/90)*.6}}
+
+/* ---- Kleidung umfärben: viele verschiedene Passanten aus einem Modell ---- */
+function glbSlot(n){if(/^skin$/i.test(n))return "skin";if(/^hair$/i.test(n))return "hair";if(/^outfit$/i.test(n))return "outfit";
+  if(/^backpack$/i.test(n))return "bag";if(/sneaker leather|^shoes$/i.test(n))return "shoes";
+  if(/jeans|pants|trousers/i.test(n))return "pants";if(/tee|shirt$|blouse/i.test(n)&&!/collar/i.test(n))return "shirt";return null}
+/** Graue (hue=0) oder farbverschobene (hue in Grad) Kopie einer Textur; Muster und Falten bleiben erhalten. */
+function recolorTex(tex,hue){const img=tex.image;if(!img||!img.width)return null;const c=document.createElement("canvas");c.width=img.width;c.height=img.height;
+  const g=c.getContext("2d",{willReadFrequently:true});g.drawImage(img,0,0);const d=g.getImageData(0,0,c.width,c.height),a=d.data;
+  if(hue===0){let sum=0,n=0;for(let i=0;i<a.length;i+=16){if(a[i+3]>20){sum+=.299*a[i]+.587*a[i+1]+.114*a[i+2];n++}}const k=n?Math.min(4,200/(sum/n)):1;
+    for(let i=0;i<a.length;i+=4){const l=Math.min(255,(.299*a[i]+.587*a[i+1]+.114*a[i+2])*k);a[i]=a[i+1]=a[i+2]=l}}
+  else{const cs=Math.cos(hue*Math.PI/180),sn=Math.sin(hue*Math.PI/180),M=[.213+cs*.787-sn*.213,.715-cs*.715-sn*.715,.072-cs*.072+sn*.928,.213-cs*.213+sn*.143,.715+cs*.285+sn*.14,.072-cs*.072-sn*.283,.213-cs*.213-sn*.787,.715-cs*.715+sn*.715,.072+cs*.928+sn*.072];
+    for(let i=0;i<a.length;i+=4){const r=a[i],gg=a[i+1],b=a[i+2];a[i]=r*M[0]+gg*M[1]+b*M[2];a[i+1]=r*M[3]+gg*M[4]+b*M[5];a[i+2]=r*M[6]+gg*M[7]+b*M[8]}}
+  g.putImageData(d,0,0);const t=new THREE.CanvasTexture(c);t.flipY=tex.flipY;t.encoding=THREE.sRGBEncoding;t.wrapS=tex.wrapS;t.wrapT=tex.wrapT;t.anisotropy=4;return t}
+const PAL={
+  shirt:["#c0392b","#2e8b57","#1f4e8c","#f2b81f","#7b3fa0","#e9e9e9","#1b1b1b","#e8742a","#e05a8c","#17a2b8","#8b5a2b","#55606e","#6b8e23","#c9b38f","#9fc3e6","#b03060"],
+  pants:["#3a4f72","#1f2633","#55606e","#6b5a43","#2d3d2a","#c9b38f","#2b2b2b","#5a6a7a","#7a6a52"],
+  shoes:["#f2f2f2","#1b1b1b","#5a4030","#808890","#c0392b","#1f4e8c"],
+  bag:["#e2a91c","#d81e2c","#1b2f6b","#1b1b1b","#2e8b57","#7b3fa0"]};
+const SKIN_MUL=["#ffffff","#f4e2d4","#e6c7ae","#c99c7a","#a27556","#7a5440","#5a3c2c"];
+function rolePalette(role){const R={...PAL};
+  if(role==="fan")R.shirt=["#1f8a4c","#f2f2f2","#151515","#1f8a4c"];
+  if(role==="businesswoman"){R.shirt=["#f2f2f2","#e9e4da","#cfe0f2","#f2d7d9","#d8d0e8"];R.pants=["#1f2a44","#2b2b2b","#3d4552","#4a3a3a"]}
+  if(role==="bauarbeiter")R.shirt=["#1f4e8c","#2b3a5a","#55606e","#2e5e4e"];
+  return R}
+/** Färbt eine Figuren-Instanz neu. c: {shirt,pants,shoes,bag,hair,skin,outfit} als Farben (Hex) bzw. outfit als Index. */
+function tintGlb(I,c){I.obj.traverse(o=>{if(!o.isMesh)return;const src=o.userData.srcMat||o.material,info=I.M.slots.get(src);if(!info)return;
+    if(!o.userData.srcMat){o.userData.srcMat=src;o.material=src.clone()}const m=o.material,v=c[info.slot];
+    if(info.slot==="skin"){m.color.copy(info.base);if(v)m.color.multiply(new THREE.Color(v).convertSRGBToLinear())}
+    else if(info.slot==="outfit"){m.map=v>=0&&info.hues&&info.hues[v]?info.hues[v]:src.map;m.color.copy(info.base)}
+    else if(v&&info.gray){m.map=info.gray;m.color.set(v).convertSRGBToLinear()}
+    else if(v&&info.slot==="hair"&&!info.gray){m.color.set(v).convertSRGBToLinear()}
+    else{m.map=src.map;m.color.copy(info.base)}
+    m.needsUpdate=true})}
+function randomTint(role){const P=rolePalette(role),keepShirt=role==="bauarbeiter"&&false;
+  return {shirt:pick(P.shirt),pants:pick(P.pants),shoes:pick(P.shoes),bag:pick(P.bag),hair:pick(role==="senior"||role==="seniorin"?GREYS:HAIRS),skin:pick(SKIN_MUL),outfit:Math.random()<.3?-1:Math.floor(Math.random()*6)}}
+{const base=glbTake;glbTake=function(name,p){const I=base(name,p);if(!p.tint)p.tint=randomTint(p.look.role);tintGlb(I,p.tint);return I}}
+
+/* ================= Spielfigur als 3D-Modell (Farben aus dem eigenen Profil) ================= */
+const PG={inst:null,model:null,cur:null,state:"idle"};
+function skinMul(hex){const b=new THREE.Color("#f6d5b8"),c=new THREE.Color(hex);return "#"+new THREE.Color(Math.min(1,c.r/b.r),Math.min(1,c.g/b.g),Math.min(1,c.b/b.b)).getHexString()}
+function playerGlbApply(){
+  if(!walker||walker.userData.glbDone)return;let look={};try{look=JSON.parse(walker.userData.lookKey||"{}")}catch(e){}
+  const name=look.model||LOOK_DEF.model;if(name==="classic"||!GLB.models[name])return;
+  if(!PG.inst||PG.model!==name){if(PG.inst)PG.inst.obj.parent&&PG.inst.obj.parent.remove(PG.inst.obj);
+    const M=GLB.models[name],obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);
+    PG.inst={obj,mixer,act,M};PG.model=name;PG.cur=null}
+  const I=PG.inst;tintGlb(I,{shirt:look.jacket,pants:look.jeans,bag:look.bagCol,hair:look.hair,skin:skinMul(look.skin||"#d6a07a")});
+  // in die Hülle der alten Figur einsetzen (Hülle ist 0,092-fach skaliert, Blick nach +x)
+  const box=new THREE.Group();box.scale.setScalar(1/walker.scale.x);box.rotation.y=Math.PI/2;box.add(I.obj);I.obj.position.y=I.M.offY;
+  footShadow(box,.9);
+  const old=walker.userData.hu;old.visible=false;walker.add(box);
+  // Anker für Zubehör (Kappe, Krone, Brille, Ballon, Charakter-Kopfbedeckungen) am Kopf-Knochen, gleiches Koordinatensystem wie bei der alten Figur
+  let head=null;I.obj.traverse(o=>{if(o.isBone&&o.name==="Head")head=o});
+  const hu=new THREE.Group();hu.rotation.y=-Math.PI/2;box.add(hu);const anchor=new THREE.Group();
+  if(head){anchor.position.set(0,.075,.015);anchor.rotation.y=-Math.PI/2;head.add(anchor)}
+  hu.userData={h:{head:anchor,torso:anchor},acc:[]};walker.userData.hu=hu;walker.userData.glbDone=true;walker.userData.glbBox=box;
+  dressAll()}
+function playerGlbPose(dt){const I=PG.inst;if(!I)return;const v=Math.abs(car.v);
+  // Clip nach Tempo: Gehen bis ca. 2,3 m/s, darüber Laufen (mit Hysterese, damit es nicht flackert)
+  let want=v<.2?"idle":(I.act.run&&(v>2.4||(PG.state==="run"&&v>2.0))?"run":"walk");PG.state=want;
+  const a=I.act[want]||I.act.idle;
+  if(want!=="idle"){const sp=I.M.speed[want]||1.3;a.timeScale=clamp(v/sp,.35,3.2)*(car.v<0?-1:1)}else a.timeScale=1;
+  if(PG.cur!==a){a.enabled=true;a.setEffectiveWeight(1);a.reset().play();if(PG.cur)PG.cur.crossFadeTo(a,.25,false);PG.cur=a}
+  I.mixer.update(dt)}
+{const base=applyLook;applyLook=function(l){base(l);playerGlbApply()}}
 
 /* ================= Start ================= */
 let last=performance.now(), hudT=0;

@@ -32,6 +32,10 @@ R("</style>", """
 #title .sw span{width:100%;margin-bottom:-2px;font-size:13px;color:var(--muted);font-weight:700}
 #title .sw button{width:34px;height:34px;padding:0;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}
 #title .sw button.on{box-shadow:0 0 0 3px var(--accent),inset 0 0 0 2px #000}
+#title .figs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+#title .figs span{width:100%;font-size:13px;color:var(--muted);font-weight:700}
+#title .figs button{padding:6px 10px;font-size:13px;border-radius:999px}
+#title .figs button.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:var(--glow)}
 #title .note{font-size:13px;color:var(--good);margin:8px 0 0}
 #title .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 #title .prow{display:flex;gap:6px;margin-bottom:6px}
