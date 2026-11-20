@@ -1,8 +1,8 @@
 # ------------------------------------------------------------ Stadtbewohner (crowd.js)
-R('PED_N=SK?(isTouch?14:24):(isTouch?50:110)', 'PED_N=SK?(isTouch?34:60):(isTouch?50:110)')
-R('placeAgent(p,walkEdges,car.x,car.y,5,350,false);peds.push(p)', 'placeAgent(p,walkEdges,car.x,car.y,5,170,false);peds.push(p)')
-R('if(d>420)placeAgent(p,walkEdges,car.x,car.y,40,300,false);', 'if(d>190)placeAgent(p,walkEdges,car.x,car.y,60,170,false);')
-R('o3.position.set(p.x,bob,p.y);o3.rotation.set(0,-p.a,0);o3.scale.setScalar(.1);', 'o3.position.set(p.x,bob,p.y);o3.rotation.set(0,-p.a,0);o3.scale.setScalar(p.det?0:.1*(p.look?p.look.scale:1));')
+R('PED_N=SK?(isTouch?14:24):(isTouch?50:110)', 'PED_N=SK?(isTouch?34:60):(isTouch?30:60)')   # alle sichtbaren Personen sind 3D-Figuren: weniger, dafür echte
+R('placeAgent(p,walkEdges,car.x,car.y,5,350,false);peds.push(p)', 'placeAgent(p,walkEdges,car.x,car.y,5,isTouch?75:110,false);peds.push(p)')
+R('if(d>420)placeAgent(p,walkEdges,car.x,car.y,40,300,false);', 'if(d>(isTouch?90:125))placeAgent(p,walkEdges,car.x,car.y,isTouch?45:65,isTouch?75:110,false);')
+R('o3.position.set(p.x,bob,p.y);o3.rotation.set(0,-p.a,0);o3.scale.setScalar(.1);', 'o3.position.set(p.x,bob,p.y);o3.rotation.set(0,-p.a,0);o3.scale.setScalar(p.det||GLB.ready?0:.1*(p.look?p.look.scale:1));')
 R('pH.setColorAt(i,c.set(pick(["#f1c9a5","#c68e63","#8d5a3b","#e0ac7e","#5c3b28"])))', 'pH.setColorAt(i,c.set(p.look?p.look.skin:pick(["#f1c9a5","#c68e63","#8d5a3b","#e0ac7e","#5c3b28"])));pL.setColorAt(i,c.set(p.look?p.look.jeans:"#2a3142"))')
 R('pL=new THREE.InstancedMesh(pedLegs,new THREE.MeshLambertMaterial({color:0x2a3142}),peds.length);', 'pL=new THREE.InstancedMesh(pedLegs,new THREE.MeshLambertMaterial({color:0xffffff}),peds.length);')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'crowd.js'), encoding="utf-8").read() + '\n' + open(os.path.join(os.path.dirname(gfx),'fx_pass.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')

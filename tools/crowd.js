@@ -1,7 +1,8 @@
 /* ================= Stadtbewohner: viele unterschiedliche Personen mit Rollen, Kleidung und Verhalten ================= */
-/* Nahe Personen werden als animierte Figuren gezeigt (Gehen, Laufen, Stehen, Plaudern, Jubeln …),
-   weiter entfernte als einfache Silhouetten. So bleibt die Stadt voll und das iPad flüssig. */
-const CR={near:isTouch?12:24,radius:isTouch?42:55,t:0,fixed:false};
+/* Alle Personen in Sichtweite sind die 3D-Stadtfiguren (figuren/*.json) mit Idle, Walk und Run.
+   Für das iPad: höchstens 18 Figuren gleichzeitig (Computer 40), weiter entfernte Figuren werden seltener animiert.
+   Die einfachen Figuren erscheinen nur, solange die 3D-Figuren noch laden (oder wenn das Laden scheitert). */
+const CR={near:isTouch?18:40,radius:isTouch?70:110,t:0,fixed:false};
 const SKINS=["#f6d5b8","#efc29c","#e0ac7e","#c68e63","#a86f48","#8d5a3b","#5c3b28"];
 const HAIRS=["#1c1410","#2e2018","#4a3020","#6b4226","#9a6a3a","#c89a5a","#e3c27a","#8c2f1a"];
 const GREYS=["#d9d9d9","#bdbdbd","#efeae0","#a7a7a7"];
@@ -134,7 +135,7 @@ function updateCrowd(dt,now){
     const list=[];for(const p of peds){if(p.x===undefined)continue;const d=Math.hypot(p.x-cx,p.y-cy);if(d<CR.radius)list.push([d,p])}
     list.sort((a,b)=>a[0]-b[0]);const ranked=list.slice(0,CR.near).map(e=>e[1]),keep=new Set(ranked);
     // die nächsten Personen bekommen – wo vorhanden – das echte 3D-Modell ihrer Rolle
-    const useGlb=new Set();if(GLB.ready){let n=0;for(const q of ranked){if(n>=GLB.near)break;const mn=GLB.files[q.look.role];if(mn&&GLB.models[mn]&&(!q.static||GLB_ACTS.has(q.act))){useGlb.add(q);n++}}}
+    const useGlb=new Set();if(GLB.ready)for(const q of ranked){const mn=GLB.files[q.look.role];if(mn&&GLB.models[mn])useGlb.add(q)}
     for(const p of peds){const on=keep.has(p),g=useGlb.has(p);
       if(g&&!p.glb)p.glb=glbTake(GLB.files[p.look.role],p);if(!g&&p.glb){glbGive(p.glb);p.glb=null}
       const proc=on&&!g;if(proc&&!p.mesh){p.mesh=makeCitizen(p.look);crowdGroup.add(p.mesh)}
@@ -161,7 +162,7 @@ function updateCrowd(dt,now){
 
 /* ================= Echte 3D-Stadtfiguren (GLB-Dateien mit Idle, Walk, Run) ================= */
 const GLB={base:"figuren/",ready:false,near:isTouch?6:12,models:{},pools:{},
-  files:{schuelerin:"01_Schuelerin",schueler:"02_Fussballfan",fan:"02_Fussballfan",seniorin:"03_Seniorin",senior:"04_Senior",bauarbeiter:"05_Strassenbauer",joggerin:"06_Joggerin",businesswoman:"07_Geschaeftsfrau",passant:"08_Passant",hund:"08_Passant"}};
+  files:{schuelerin:"01_Schuelerin",schueler:"02_Fussballfan",fan:"02_Fussballfan",seniorin:"03_Seniorin",senior:"04_Senior",bauarbeiter:"05_Strassenbauer",joggerin:"06_Joggerin",jogger:"08_Passant",business:"08_Passant",businesswoman:"07_Geschaeftsfrau",passant:"08_Passant",hund:"08_Passant"}};
 const GLB_ACTS=new Set(["wait","chat","phone"]);      // Stehende, für die die Idle-Animation passt
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
 async function initGlbCrowd(){
@@ -171,7 +172,7 @@ async function initGlbCrowd(){
   const loader=new THREE.GLTFLoader();
   const first=(PROF&&PROF.look&&PROF.look.model)||LOOK_DEF.model,names=[...new Set([first,...Object.values(GLB.files),...FIG_CHOICES.map(f=>f[0]).filter(n=>n!=="classic")])];
   for(const name of names){         // nacheinander im Hintergrund laden, Spielfigur zuerst
-    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply()}
+    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
     catch(e){console.info("3D-Figur nicht geladen:",name)}}
 }
 /** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
@@ -204,7 +205,7 @@ function prepGlb(gltf){
   return M}
 function glbTake(name,p){const M=GLB.models[name],pool=GLB.pools[name]||(GLB.pools[name]=[]);let I=pool.pop();
   if(!I){const obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);I={obj,mixer,act,M,cur:null};scene.add(obj)}
-  I.obj.visible=true;I.obj.scale.setScalar(rng(.97,1.03));I.cur=null;I.mixer.stopAllAction();glbState(I,p,0);
+  I.obj.visible=true;I.obj.scale.setScalar(p.look.scale<.8?p.look.scale*1.04:rng(.97,1.03));   /* Kinder kleiner */I.cur=null;I.mixer.stopAllAction();glbState(I,p,0);
   if(I.cur)I.cur.time=Math.random()*I.cur.getClip().duration;return I}
 function glbGive(I){I.obj.visible=false;I.mixer.stopAllAction();I.cur=null;(GLB.pools[Object.keys(GLB.models).find(k=>GLB.models[k]===I.M)]||[]).push(I)}
 /** Passende Animation wählen und weich überblenden; Abspieltempo so, dass die Füße nicht rutschen. */
@@ -212,8 +213,11 @@ function glbState(I,p,fade){const moving=!p.static&&!p.hold,k=moving?(p.look.run
   if(moving){const s=I.obj.scale.x;a.timeScale=p.sp/(I.M.speed[k]*s)}else a.timeScale=1;
   if(I.cur===a)return;a.enabled=true;a.setEffectiveWeight(1);a.reset().play();
   if(I.cur&&fade>0)I.cur.crossFadeTo(a,fade,false);else if(I.cur)I.cur.stop();I.cur=a}
-function glbPose(p,dt,now){const I=p.glb;glbState(I,p,.35);I.mixer.update(dt);
-  I.obj.position.set(p.x,groundY(p.x,p.y)+I.M.offY*I.obj.scale.x,p.y);I.obj.rotation.y=Math.PI/2-p.a;   // Modelle schauen nach +Z
+function glbPose(p,dt,now){const I=p.glb;glbState(I,p,.35);
+  // weiter entfernte Figuren seltener animieren (spart Rechenzeit auf dem iPad)
+  const d=Math.hypot(p.x-car.x,p.y-car.y),every=d>50?3:d>25?2:1;I.acc=(I.acc||0)+dt;I.k=(I.k||0)+1;if(I.k%every===0){I.mixer.update(I.acc);I.acc=0}
+  const hop=p.static&&(p.act==="cheer"||p.act==="play")?Math.max(0,Math.sin(now/1000*(p.act==="play"?2.4:3)+(p.seed||0)))*(p.act==="play"?.22:.1):0;
+  I.obj.position.set(p.x,groundY(p.x,p.y)+I.M.offY*I.obj.scale.x+hop,p.y);I.obj.rotation.y=Math.PI/2-p.a;   // Modelle schauen nach +Z
   if(p.dogM){const D=p.dogM,U=D.userData,bx=p.x-Math.cos(p.a)*1.1+Math.sin(p.a)*.5,by=p.y-Math.sin(p.a)*1.1-Math.cos(p.a)*.5;p.cph=(p.cph||0)+dt*p.sp*3;
     D.position.set(bx,groundY(bx,by),by);D.rotation.y=-p.a;U.legs.forEach((l,i)=>l.rotation.z=p.static?0:Math.sin(p.cph+(i%2?0:Math.PI)+(i>1?Math.PI/2:0))*.6);U.tail.rotation.x=Math.sin(now/90)*.6}}
 
@@ -239,6 +243,8 @@ function rolePalette(role){const R={...PAL};
   if(role==="fan")R.shirt=["#1f8a4c","#f2f2f2","#151515","#1f8a4c"];
   if(role==="businesswoman"){R.shirt=["#f2f2f2","#e9e4da","#cfe0f2","#f2d7d9","#d8d0e8"];R.pants=["#1f2a44","#2b2b2b","#3d4552","#4a3a3a"]}
   if(role==="bauarbeiter")R.shirt=["#1f4e8c","#2b3a5a","#55606e","#2e5e4e"];
+  if(role==="business"){R.shirt=["#1f2a44","#2b2b2b","#3d4552","#e9e9e9","#cfe0f2"];R.pants=["#1f2a44","#2b2b2b","#3d4552"]}
+  if(role==="jogger"){R.shirt=["#0ea5e9","#ef4444","#f2f2f2","#22c55e"];R.pants=["#1b1b1b","#334155"]}
   return R}
 /** Färbt eine Figuren-Instanz neu. c: {shirt,pants,shoes,bag,hair,skin,outfit} als Farben (Hex) bzw. outfit als Index. */
 function tintGlb(I,c){I.obj.traverse(o=>{if(!o.isMesh)return;const src=o.userData.srcMat||o.material,info=I.M.slots.get(src);if(!info)return;
@@ -286,3 +292,22 @@ function playerGlbPose(dt){const I=PG.inst;if(!I)return;const v=Math.abs(car.v);
 
 /* Quellenangabe der echten Karte in der Kartenansicht (Pflicht laut ODbL) */
 if(MG.real)document.querySelectorAll(".mapnote").forEach(n=>n.insertAdjacentHTML("beforeend",' · Karte: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap-Mitwirkende</a> (ODbL) · Geobasis NRW (dl-de/zero-2-0) · Stadt Mönchengladbach'));
+
+/* ================= Ansprechpersonen (Lehrkräfte, Ladenbesitzer, Auftraggeber) als 3D-Figuren ================= */
+const STANDS=[];
+{const base=standPerson;standPerson=function(x,y,a,shirt){const p=base(x,y,a,shirt);STANDS.push({p,x,y,a,shirt,glb:null});return p}}
+const STAND_MODEL={"Mats":"02_Fussballfan","Elif":"01_Schuelerin","Jana":"06_Joggerin","Tarik":"05_Strassenbauer","Kalle":"05_Strassenbauer",
+  "Herr Ballhorn":"05_Strassenbauer","Herr Brands":"04_Senior","Bäcker Hennes":"08_Passant"};
+function standName(S){const p=S.p;for(const q of QUESTS)if(q.person===p)return q.giver.name;for(const t of TALK)if(t.person===p)return t.name;
+  for(const G of XG)if(G.person===p)return G.name||G.talk||"";return ""}
+function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue;const n=standName(S);
+  const mn=STAND_MODEL[n]||(/^Frau /.test(n)?"07_Geschaeftsfrau":"08_Passant");const M=GLB.models[mn];if(!M)continue;
+  const obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);
+  const I={obj,mixer,act,M,cur:null};const role=mn==="07_Geschaeftsfrau"?"businesswoman":mn==="05_Strassenbauer"?"bauarbeiter":mn==="04_Senior"?"senior":"passant";
+  tintGlb(I,Object.assign(randomTint(role),{shirt:S.shirt,outfit:-1}));
+  if(act.idle){act.idle.play();act.idle.time=Math.random()*act.idle.getClip().duration}
+  obj.position.set(S.x,groundY(S.x,S.y)+M.offY,S.y);obj.rotation.y=Math.PI/2-S.a;scene.add(obj);S.p.visible=false;S.glb=I}}
+{const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);
+  for(const S of STANDS){const I=S.glb;if(!I)continue;if(!S.p.parent){scene.remove(I.obj);S.glb=null;continue}S.p.visible=false;
+    const d=Math.hypot(S.x-car.x,S.y-car.y);I.obj.visible=d<CR.radius;if(!I.obj.visible)continue;
+    const every=d>50?3:d>25?2:1;I.acc=(I.acc||0)+dt;I.k=(I.k||0)+1;if(I.k%every===0){I.mixer.update(I.acc);I.acc=0}}}}
