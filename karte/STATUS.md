@@ -10,6 +10,11 @@ im Umkreis von 70 m (Computer 40 im Umkreis von 110 m); weiter entfernte Figuren
 Test (Software-Rendering, Tablet-Einstellung): ca. 1,3–1,5 Mio. Dreiecke und 780–1240 Zeichenaufrufe pro Bild – deutlich mehr als vorher,
 deshalb unbedingt auf dem Schul-iPad prüfen. Auf Roller, Fahrrad und Moped fährt die eigene Spielfigur (z. B. Noah) mit Haltung aus dem Skelett: auf dem Fahrrad tretend, auf dem Moped sitzend, auf dem Roller stehend, Hände am Lenker.
 
+## Auf- und Absteigen, Ein- und Aussteigen
+Zweiräder: zur Seite des Fahrzeugs gehen, Bein über den Sattel schwingen (Roller: auf das Trittbrett steigen); Absteigen rückwärts.
+Autos und Hubschrauber: zur Fahrertür gehen, bücken und hineingleiten; Aussteigen rückwärts. Dauer 0,6–1,7 s, Steuerung währenddessen gesperrt.
+Türen öffnen sich nicht (die Automodelle haben keine beweglichen Türen).
+
 ## Umzug der Spielinhalte (`tools/spielinhalte.js`, `tools/fx_build.js`, `tools/fx_pass.js`)
 | Inhalt | neuer Ort |
 |---|---|

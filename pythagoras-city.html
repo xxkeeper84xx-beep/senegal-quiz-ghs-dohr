@@ -4297,6 +4297,69 @@ function riderUpdate(){if(typeof vehMeshes==="undefined"||!PG.model||!GLB.models
     if(active)riderPose(R,id==="bike"?(car.ph||0):0)}}
 {const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);riderUpdate()}}
 
+/* ================= Auf- und Absteigen (Zweiräder), Ein- und Aussteigen (Autos, Hubschrauber) =================
+   Kurze Übergänge statt Sprung: hingehen, Bein über den Sattel schwingen bzw. bücken und einsteigen; rückwärts beim Verlassen.
+   Während des Übergangs ist die Steuerung gesperrt. Ohne 3D-Figur (Laden gescheitert) bleibt es beim sofortigen Wechsel. */
+const TWO=new Set(["scoot","bike","moped"]);
+const TR={on:false};
+const ease=u=>u<0?0:u>1?1:u*u*(3-2*u);
+function trStart(o){Object.assign(TR,{on:true,t:0},o)}
+function lateral(a){return [-Math.sin(a),Math.cos(a)]}
+{const base=enterVehicle;enterVehicle=function(){const l=save.left;
+  if(TR.on||!l||V().id!=="walk"||!PG.inst||state.mode!=="play")return base();
+  const two=TWO.has(l.id)&&RIDE[l.id],[lx,ly]=lateral(l.a),side=((car.x-l.x)*lx+(car.y-l.y)*ly)>=0?1:-1;
+  const fwd=[Math.cos(l.a),Math.sin(l.a)],door=two?.62:1.25,ahead=two?-.1:.35;
+  const spot=[l.x+lx*side*door+fwd[0]*ahead,l.y+ly*side*door+fwd[1]*ahead];
+  const walk=Math.hypot(spot[0]-car.x,spot[1]-car.y),tw=Math.min(.9,walk/1.8);
+  trStart({kind:two?"mount":"enter",l:{...l},side,from:[car.x,car.y],spot,tw,dur:tw+(two?(l.id==="scoot"?.55:.85):.75),done:base})}}
+{const base=exitVehicle;exitVehicle=function(){const VH=V(),id=VH.id;
+  if(TR.on||id==="walk"||!PG.inst||state.mode!=="play")return base();
+  const l0={id,x:car.x,y:car.y,a:car.a};base();if(V().id!=="walk")return;         // z. B. Hubschrauber in der Luft: nichts passiert
+  const two=TWO.has(id)&&RIDE[id],[lx,ly]=lateral(l0.a),side=((car.x-l0.x)*lx+(car.y-l0.y)*ly)>=0?1:-1;
+  const fwd=[Math.cos(l0.a),Math.sin(l0.a)],door=two?.62:1.25,ahead=two?-.1:.35;
+  const spot=[l0.x+lx*side*door+fwd[0]*ahead,l0.y+ly*side*door+fwd[1]*ahead];
+  const tw=Math.min(.6,Math.hypot(car.x-spot[0],car.y-spot[1])/1.8),tb=two?(id==="scoot"?.5:.8):.75;
+  trStart({kind:two?"dismount":"exit",l:l0,side,spot,to:[car.x,car.y],tb,tw,dur:tb+tw})}}
+/* Steuerung sperren */
+{const base=update;update=function(dt){if(!TR.on)return base(dt);const k={...keys};for(const n in keys)keys[n]=false;car.v=0;base(dt);Object.assign(keys,k);
+  TR.t+=dt;if(TR.t>=TR.dur){TR.on=false;if(TR.done)TR.done();TR.done=null}}}
+/* Gehen zum Fahrzeug bzw. vom Fahrzeug weg mit der Walk-Animation */
+{const base=playerGlbPose;playerGlbPose=function(dt){if(!TR.on)return base(dt);
+  const walking=(TR.kind==="mount"||TR.kind==="enter")?TR.t<TR.tw:TR.t>TR.tb;const v=car.v;car.v=walking?1.8:0;base(dt);car.v=v}}
+function walkerAt(x,y,a,yo=0){walker.position.set(x,groundY(x,y)+yo,y);walker.rotation.set(0,-a,0)}
+function crouch(w){const I=PG.inst;if(!I)return;const B={};I.obj.traverse(o=>{if(o.isBone)B[o.name]=o});const r=(n,a)=>{if(B[n])B[n].quaternion.multiply(_q.setFromAxisAngle(_ax,a))};
+  r("Spine",.45*w);r("Spine1",.25*w);r("Neck",-.3*w);for(const s of ["Left","Right"]){r(s+"UpLeg",.9*w);r(s+"Leg",-1.2*w);r(s+"Foot",.3*w)}}
+function trVisual(){if(!TR.on)return;const l=TR.l,[lx,ly]=lateral(l.a),inA=l.a-TR.side*Math.PI/2;  // Blick zur Fahrzeugmitte
+  const g=vehMeshes[l.id];
+  if(TR.kind==="mount"||TR.kind==="dismount"){const R=RIDE[l.id];const tb=TR.kind==="mount"?TR.tw:0,u=TR.kind==="mount"?ease((TR.t-tb)/(TR.dur-tb)):1-ease(TR.t/TR.tb);
+    const walking=TR.kind==="mount"?TR.t<TR.tw:TR.t>TR.tb;
+    if(walking){R.box.visible=false;walker.visible=true;const k=TR.kind==="mount"?ease(TR.t/TR.tw):ease((TR.t-TR.tb)/TR.tw),A=TR.kind==="mount"?TR.from:TR.spot,Bp=TR.kind==="mount"?TR.spot:TR.to;
+      const x=A[0]+(Bp[0]-A[0])*k,y=A[1]+(Bp[1]-A[1])*k,dir=Math.atan2(Bp[1]-A[1],Bp[0]-A[0]);walkerAt(x,y,Math.hypot(Bp[0]-A[0],Bp[1]-A[1])>.05?dir:l.a);return}
+    walker.visible=false;g.visible=true;g.position.set(l.x,groundY(l.x,l.y),l.y);g.rotation.set(0,-l.a,0);g.userData.rider.scale.setScalar(1e-4);R.box.visible=true;
+    riderPose(R,0);const ride={};for(const k in R.B)ride[k]=R.B[k].quaternion.clone();const rp=R.box.position.clone();
+    for(const k in R.B)R.B[k].quaternion.copy(R.base[k]).slerp(ride[k],u);
+    if(l.id!=="scoot"){const sw=Math.sin(Math.PI*u),leg=TR.side>0?"Left":"Right",out=TR.side>0?1:-1;      // fernes Bein schwingt über den Sattel
+      const b=R.B[leg+"UpLeg"];if(b){b.quaternion.multiply(_q.setFromAxisAngle(_ax,.9*sw));b.quaternion.multiply(_q.setFromAxisAngle(_az,out*1.0*sw))}
+      const k2=R.B[leg+"Leg"];if(k2)k2.quaternion.multiply(_q.setFromAxisAngle(_ax,-.9*sw))}
+    // Lage: neben dem Fahrzeug stehend (u=0) bis auf dem Sitz (u=1)
+    R.box.position.set(0,0,0);R.box.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(g.matrixWorld).invert();
+    let lo=1e9;for(const s of ["LeftToeBase","RightToeBase","LeftFoot","RightFoot"]){const b=R.B[s];if(b)lo=Math.min(lo,b.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv).y)}
+    const hp=R.B.Hips.getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);
+    const stand=new THREE.Vector3(rp.x,-lo,TR.side*6.2-hp.z);       // Gruppen-Einheiten (0,1 m)
+    R.box.position.copy(stand.lerp(rp,u));R.box.position.y+=Math.sin(Math.PI*u)*(l.id==="scoot"?1.2:.6);
+    R.box.rotation.y=Math.PI/2+(1-u)*(TR.side>0?1:-1)*.9;   // beim Stehen halb zum Fahrzeug gedreht
+    return}
+  // Auto/Hubschrauber: an der Tür bücken und hineingleiten bzw. heraus
+  const into=TR.kind==="enter";const walking=into?TR.t<TR.tw:TR.t>TR.tb;
+  if(walking){walker.visible=true;const k=into?ease(TR.t/TR.tw):ease((TR.t-TR.tb)/TR.tw),A=into?TR.from:TR.spot,Bp=into?TR.spot:TR.to;
+    walkerAt(A[0]+(Bp[0]-A[0])*k,A[1]+(Bp[1]-A[1])*k,Math.hypot(Bp[0]-A[0],Bp[1]-A[1])>.05?Math.atan2(Bp[1]-A[1],Bp[0]-A[0]):inA);return}
+  const u=into?ease((TR.t-TR.tw)/(TR.dur-TR.tw)):1-ease(TR.t/TR.tb);      // 0 = an der Tür, 1 = im Auto
+  const x=TR.spot[0]-lx*TR.side*.9*u,y=TR.spot[1]-ly*TR.side*.9*u;
+  g.visible=true;g.position.set(l.x,VEH[l.id].fly?heightAt(l.x,l.y):groundY(l.x,l.y),l.y);g.rotation.set(0,-l.a,0);
+  walker.visible=u<.97;walkerAt(x,y,inA+(TR.side>0?1:-1)*u*Math.PI/2*.9,-.35*u);crouch(Math.min(1,u*1.6))}
+{const base=updateCamera;updateCamera=function(dt,VH){trVisual();base(dt,VH)}}
+{const base=interactables;interactables=function(VH){return TR.on?[]:base(VH)}}   /* kein „Einsteigen“-Hinweis während des Übergangs */
+
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){
   const FX=MG.FX,P=o=>{const p=FX(o.x,o.y);o.x=p[0];o.y=p[1]};
