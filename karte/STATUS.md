@@ -17,6 +17,22 @@ Die bisherige verdichtete Spielkarte bleibt das Hauptspiel, bis alle Missionen u
   **Stadtteilnamen** aus den amtlichen Grenzen, **Startpunkt** auf dem Gehweg vor der Schule Am Torfbend.
 - **Quellenangabe** © OpenStreetMap-Mitwirkende (ODbL) mit Lizenzlink im Startbildschirm und in der Kartenansicht.
 
+## Figuren freispielen
+Neue Profile wählen nur **Noah**, **Schülerin** oder **Klassisch**; Haut-, Haar- und Kleidungsfarben sind bei allen frei wählbar.
+Die übrigen Figuren sind im Startbildschirm (Menü „Figuren“ und im Figuren-Editor) mit Schloss, Bedingung, Fortschrittsbalken und 3D-Vorschau zu sehen.
+
+| Figur | Spielzeit | gelöste Aufgaben |
+|---|---|---|
+| Fußballfan | 10 Min. | 8 |
+| Passant | 15 Min. | 12 |
+| Joggerin | 20 Min. | 18 |
+| Straßenbauer | 30 Min. | 25 |
+| Geschäftsfrau | 40 Min. | 32 |
+| Seniorin | 50 Min. | 40 |
+| Senior | 60 Min. | 50 |
+
+Spielzeit zählt nur im laufenden Spiel (`save.playTime`, Sekunden). Werte stehen in `FIG_REQ` in `tools/story.js`.
+
 ## Testergebnisse (Playwright, Software-Rendering – kein echtes iPad)
 | Ort | Straße/Stadtteil im Spiel | Dreiecke pro Bild | Zeichenaufrufe |
 |---|---|---|---|

@@ -257,12 +257,13 @@ const PG={inst:null,model:null,cur:null,state:"idle"};
 function skinMul(hex){const b=new THREE.Color("#f6d5b8"),c=new THREE.Color(hex);return "#"+new THREE.Color(Math.min(1,c.r/b.r),Math.min(1,c.g/b.g),Math.min(1,c.b/b.b)).getHexString()}
 function playerGlbApply(){
   if(!walker||walker.userData.glbDone)return;let look={};try{look=JSON.parse(walker.userData.lookKey||"{}")}catch(e){}
-  const name=look.model||LOOK_DEF.model;if(name==="classic"||!GLB.models[name])return;
+  let name=look.model||LOOK_DEF.model;const preview=state.mode==="start"&&(TITLE.view==="create"||TITLE.view==="figs");
+  if(!preview&&!figUnlocked(name,save))name=LOOK_DEF.model;      /* gesperrte Figur → Noah */
+  if(name==="classic"||!GLB.models[name])return;
   if(!PG.inst||PG.model!==name){if(PG.inst)PG.inst.obj.parent&&PG.inst.obj.parent.remove(PG.inst.obj);
     const M=GLB.models[name],obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);
     PG.inst={obj,mixer,act,M};PG.model=name;PG.cur=null}
-  const I=PG.inst;if(name==="Noah_Pythagoras")tintGlb(I,{});   /* Noah behält sein Original-Outfit */
-  else tintGlb(I,{shirt:look.jacket,pants:look.jeans,bag:look.bagCol,hair:look.hair,skin:skinMul(look.skin||"#d6a07a")});
+  const I=PG.inst;tintGlb(I,{shirt:look.jacket,pants:look.jeans,bag:look.bagCol,hair:look.hair,skin:skinMul(look.skin||"#d6a07a")});
   // in die Hülle der alten Figur einsetzen (Hülle ist 0,092-fach skaliert, Blick nach +x)
   const box=new THREE.Group();box.scale.setScalar(1/walker.scale.x);box.rotation.y=Math.PI/2;box.add(I.obj);I.obj.position.y=I.M.offY;
   footShadow(box,.9);

@@ -36,6 +36,22 @@ R("</style>", """
 #title .figs span{width:100%;font-size:13px;color:var(--muted);font-weight:700}
 #title .figs button{padding:6px 10px;font-size:13px;border-radius:999px}
 #title .figs button.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:var(--glow)}
+#title .figs button.locked{opacity:.62}
+#title .figs button.locked.on{opacity:1}
+#title .lockinfo{font-size:13px;color:#FFB36B;margin:0 0 8px;line-height:1.4}
+#title .fpanel{max-width:560px}
+#title .fsub{font-size:13.5px;color:var(--muted);margin:0 0 10px;line-height:1.45}
+#title .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;max-height:min(52vh,420px);overflow:auto;padding:2px}
+#title .fcard{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:10px;border-radius:14px;min-height:96px}
+#title .fcard i{font-style:normal;font-size:26px;line-height:1}
+#title .fcard b{font-size:14px}
+#title .fcard small{font-size:11.5px;color:var(--muted);font-weight:600}
+#title .fcard small.ok{color:var(--good)}
+#title .fcard.locked i{filter:grayscale(1);opacity:.6}
+#title .fcard.on{border-color:var(--cyan);box-shadow:var(--glowc)}
+#title .fbar{display:block;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:2px}
+#title .fbar em{display:block;height:100%;background:var(--grad)}
+#title .fbar.t em{background:linear-gradient(90deg,#00F0FF,#3CFFB4)}
 #title .note{font-size:13px;color:var(--good);margin:8px 0 0}
 #title .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 #title .prow{display:flex;gap:6px;margin-bottom:6px}
