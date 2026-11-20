@@ -2,9 +2,12 @@
 R('const persist=()=>{try{localStorage.setItem("pyCity",JSON.stringify(save))}catch(e){}};', 'let SAVE_KEY="pyCity";const persist=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify(save))}catch(e){}};')
 R('desc:"Leise und wendig, ideal für die Fußgängerzone."', 'desc:"Leise und wendig. Aber Achtung: Der E-Scooter gehört auf die Straße, nicht auf den Gehweg!"')
 R('for(const q of QUESTS){const s=qs(q);L.push({x:q.giver.x', 'for(const q of QUESTS){const s=qs(q);if(questLocked(q)){L.push({x:q.giver.x,y:q.giver.y,r:3.4,label:`💬 ${q.giver.name} ansprechen`,act:()=>lockedTalk(q)});continue}L.push({x:q.giver.x')
-R('$("loading").hidden=true; $("start").hidden=false; state.mode="start";', '$("loading").hidden=true; applyLook(); renameQuests(); buildIntroMark(); refreshQuestWorld(); showTitle("press");')
+R('$("loading").hidden=true; $("start").hidden=false; state.mode="start";', '$("loading").hidden=true; applyLook(); renameQuests(); buildIntroMark(); buildEggs(); refreshQuestWorld(); showTitle("press");')
 R('<div class="hud" id="toast"></div>', '<div class="hud" id="toast"></div>\n<div class="hud" id="warn" hidden></div>\n<div id="banner" hidden></div>\n<div id="title" hidden></div>')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'story.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
+R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'extras.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
+R('  let maxF=VH.max, acc=VH.acc;','  let maxF=VH.max*(VH.id!=="walk"&&xOn("turbo")?1.12:1), acc=VH.acc;')
+R('maxF=(boost||car.hold>1.4)?6.2:3.3}','maxF=((boost||car.hold>1.4)?6.2:3.3)*(xOn("shoes")?1.2:1)}')
 R("</style>", """
 /* --- Startbildschirm --- */
 #title{position:fixed;inset:0;z-index:30;display:grid;grid-template-rows:auto 1fr auto;box-sizing:border-box;padding:calc(28px + env(safe-area-inset-top,0px)) calc(32px + env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) calc(36px + env(safe-area-inset-left,0px));
@@ -55,4 +58,16 @@ body.title-on .hud,body.title-on #btnMore,body.title-on #topbtns,body.title-on #
 @media (max-width:760px){#warn{top:calc(118px + env(safe-area-inset-top,0px))}}
 .hsec{font-family:var(--display);font-weight:400;font-size:17px;margin:20px 0 0;color:var(--ink);letter-spacing:.03em}
 .hsec:first-child{margin-top:4px}
+/* --- Extras --- */
+.xgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:12px 0}
+.xcard{background:#fff;border-radius:12px;padding:12px;box-shadow:inset 0 0 0 1.5px #d4d9f3;display:flex;flex-direction:column;gap:4px}
+.xcard .xi{font-size:34px;line-height:1}
+.xcard b{font-size:15px}
+.xcard small{color:#56609a;font-size:12.5px;line-height:1.35}
+.xcard.locked{background:#eef0fa}
+.xcard.locked b{color:#8a90b4}
+.xcard .row{margin-top:auto;padding-top:6px;gap:6px}
+.xcard .row button{padding:7px 12px;font-size:13.5px}
+.nsw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;box-shadow:0 0 0 1.5px #1a2147}
+#talkLater{margin-left:8px}
 </style>""")

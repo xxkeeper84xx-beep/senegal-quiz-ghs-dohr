@@ -84,8 +84,8 @@ function buildIntroMark(){if(!DITT)return;const mt=new THREE.MeshBasicMaterial({
 /* mehrseitige Gespräche */
 let talkSeq=null;
 function talkPages(name,role,pages,done){talkSeq={pages,i:0,done};state.mode="talk";car.v=0;$("tName").textContent=`${name} · ${role}`;showTalkPage();$("talk").hidden=false;$("talkClose").focus()}
-function showTalkPage(){const T=talkSeq;$("tSay").textContent="„"+T.pages[T.i]+"“";$("talkClose").textContent=T.i<T.pages.length-1?"Weiter ▶":"Los geht’s!"}
-$("talkClose").onclick=()=>{if(talkSeq){if(talkSeq.i<talkSeq.pages.length-1){talkSeq.i++;showTalkPage();return}const d=talkSeq.done;talkSeq=null;$("talkClose").textContent="Tschüss";$("talk").hidden=true;state.mode="play";d&&d();return}
+function showTalkPage(){const T=talkSeq;$("tSay").textContent="„"+T.pages[T.i]+"“";$("talkClose").textContent=T.i<T.pages.length-1?"Weiter ▶":(T.last||"Los geht’s!");if($("talkLater"))$("talkLater").hidden=!T.later}
+$("talkClose").onclick=()=>{if(talkSeq){if(talkSeq.i<talkSeq.pages.length-1){talkSeq.i++;showTalkPage();return}const d=talkSeq.done;talkSeq=null;$("talkClose").textContent="Tschüss";if($("talkLater"))$("talkLater").hidden=true;$("talk").hidden=true;state.mode="play";d&&d();return}
   $("talk").hidden=true;state.mode="play"};
 {const base=openTalk;openTalk=function(t){
   if(t===DITT&&!save.introDone){const N=pName();
