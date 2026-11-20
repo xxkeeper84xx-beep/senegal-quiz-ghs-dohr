@@ -46,6 +46,11 @@ const GROUPS=[
   GV.tv&&{at:[GV.tv[0]-5,GV.tv[1]+4],members:[["passant","phone"],["passant","chat"],["businesswoman","chat"]],spread:1.0},
   GV.taxi&&{at:[GV.taxi[0]-6,GV.taxi[1]+3],members:[["business","wait"],["passant","wait"],["seniorin","wait"]],spread:1.4},
 ].filter(Boolean);
+if(MG.real){GROUPS.length=0;const O=MG.real.orte,near=(o,dx,dy)=>[o.x+dx,o.y+dy];
+  if(O.rheydt_marktplatz)GROUPS.push({at:near(O.rheydt_marktplatz,8,10),members:[["passant","chat"],["seniorin","chat"],["passant","phone"],["businesswoman","chat"]],spread:1.4},{at:near(O.rheydt_marktplatz,-12,18),members:[["fan","cheer"],["fan","cheer"],["fan","chat"]],spread:1.3});
+  if(O.rheydt_hbf)GROUPS.push({at:near(O.rheydt_hbf,6,6),members:[["business","wait"],["passant","wait"],["seniorin","wait"],["schuelerin","phone"]],spread:1.6});
+  for(const q of (MG.pois||[]).filter(q=>/bus_stop|platform/.test(q.k)&&Math.hypot(q.x-MG.start[0],q.y-MG.start[1])<450).slice(0,4))GROUPS.push({at:[q.x+1.5,q.y+1.5],members:[["passant","wait"],["schueler","wait"]],spread:1.2});
+  GROUPS.push({at:[MG.start[0]+14,MG.start[1]+3],members:[["schueler","chat"],["schuelerin","chat"],["schuelerin","phone"]],spread:1.1})}
 for(const G of GROUPS){const n=G.members.length;G.members.forEach(([role,act],k)=>{
   const a=k/n*Math.PI*2,x=G.at[0]+Math.cos(a)*G.spread,y=G.at[1]+Math.sin(a)*G.spread;
   const kid=role==="kind",look=makeLook(kid?pick(["schueler","schuelerin"]):role);if(kid){look.scale=rng(.68,.76);look.acc=look.acc.filter(x=>x!=="backpack")}
@@ -256,7 +261,8 @@ function playerGlbApply(){
   if(!PG.inst||PG.model!==name){if(PG.inst)PG.inst.obj.parent&&PG.inst.obj.parent.remove(PG.inst.obj);
     const M=GLB.models[name],obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);
     PG.inst={obj,mixer,act,M};PG.model=name;PG.cur=null}
-  const I=PG.inst;tintGlb(I,{shirt:look.jacket,pants:look.jeans,bag:look.bagCol,hair:look.hair,skin:skinMul(look.skin||"#d6a07a")});
+  const I=PG.inst;if(name==="Noah_Pythagoras")tintGlb(I,{});   /* Noah behält sein Original-Outfit */
+  else tintGlb(I,{shirt:look.jacket,pants:look.jeans,bag:look.bagCol,hair:look.hair,skin:skinMul(look.skin||"#d6a07a")});
   // in die Hülle der alten Figur einsetzen (Hülle ist 0,092-fach skaliert, Blick nach +x)
   const box=new THREE.Group();box.scale.setScalar(1/walker.scale.x);box.rotation.y=Math.PI/2;box.add(I.obj);I.obj.position.y=I.M.offY;
   footShadow(box,.9);
@@ -275,3 +281,6 @@ function playerGlbPose(dt){const I=PG.inst;if(!I)return;const v=Math.abs(car.v);
   if(PG.cur!==a){a.enabled=true;a.setEffectiveWeight(1);a.reset().play();if(PG.cur)PG.cur.crossFadeTo(a,.25,false);PG.cur=a}
   I.mixer.update(dt)}
 {const base=applyLook;applyLook=function(l){base(l);playerGlbApply()}}
+
+/* Quellenangabe der echten Karte in der Kartenansicht (Pflicht laut ODbL) */
+if(MG.real)document.querySelectorAll(".mapnote").forEach(n=>n.insertAdjacentHTML("beforeend",' · Karte: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap-Mitwirkende</a> (ODbL) · Geobasis NRW (dl-de/zero-2-0) · Stadt Mönchengladbach'));

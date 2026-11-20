@@ -5,8 +5,8 @@ let PROFS=(()=>{try{return JSON.parse(localStorage.getItem(PROF_KEY)||"null")}ca
 if(!Array.isArray(PROFS.list))PROFS={list:[],last:null};
 let PROF=PROFS.list.find(p=>p.id===PROFS.last)||null;
 const saveProfs=()=>{try{localStorage.setItem(PROF_KEY,JSON.stringify(PROFS))}catch(e){}};
-const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c",model:"01_Schuelerin"};
-const FIG_CHOICES=[["01_Schuelerin","Schülerin"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["07_Geschaeftsfrau","Geschäftsfrau"],["05_Strassenbauer","Straßenbauer"],["03_Seniorin","Seniorin"],["04_Senior","Senior"],["classic","Klassisch"]];
+const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c",model:"Noah_Pythagoras"};
+const FIG_CHOICES=[["Noah_Pythagoras","Noah"],["01_Schuelerin","Schülerin"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["07_Geschaeftsfrau","Geschäftsfrau"],["05_Strassenbauer","Straßenbauer"],["03_Seniorin","Seniorin"],["04_Senior","Senior"],["classic","Klassisch"]];
 const LOOKS={
   jacket:["#2f4f7a","#c0392b","#2e8b57","#f2b81f","#7b3fa0","#1b1b1b","#e8742a","#e05a8c"],
   hair:["#1c1410","#33251c","#6b4226","#b5793a","#e3c27a","#8c2f1a","#9aa0a8"],
@@ -15,6 +15,8 @@ const LOOKS={
   bagCol:["#e2a91c","#d81e2c","#1b2f6b","#1b1b1b","#3ddc84","#e8742a"]};
 const LOOK_NAMES={jacket:"Jacke",hair:"Haare",skin:"Haut",jeans:"Hose",bagCol:"Rucksack"};
 const pName=()=>PROF?PROF.name:"du";
+const REAL=!!MG.real;   /* echte Karte (Kartenpaket) statt verdichteter Spielkarte */
+const qsx=id=>{const q=questById(id);return q?qs(q):{done:false,acc:false,m:{}}};
 function normSave(d){const s=Object.assign(freshSave(),d||{});
   const MAP={small:"smart",suv:"prius",sport:"aston"};s.owned=(s.owned||["walk"]).map(id=>MAP[id]||id).filter(id=>VEH[id]);
   if(!s.owned.includes("walk"))s.owned.unshift("walk");s.veh=MAP[s.veh]||s.veh;if(!VEH[s.veh]||!s.owned.includes(s.veh))s.veh="walk";
@@ -114,6 +116,7 @@ function missionBanner(kind,big,mid,small){const el=$("banner");el.className=kin
   clearTimeout(bannerT);bannerT=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>{if(el.style.opacity==="0")el.hidden=true},500)},4000)}
 
 function goalText(){
+  if(REAL&&save.introDone)return "🗺️ Echte Karte Rheydt (Vorschau) · Missionen ziehen gerade um – erkunde die Stadt";
   if(save.introDone===undefined||!save.introDone){const d=DITT?Math.round(Math.hypot(DITT.x-car.x,DITT.y-car.y)):0;return `⭐ Hauptmission: Sprich mit Herrn Dittmann vor der GHS Dohr${d>6?` · ${d} m`:""}`}
   for(const q of QUESTS){const s=qs(q);if(!s.acc||s.done)continue;
     const m=q.measures.find(m=>!s.m[m.id]),st=isMain(q)?"⭐":"❗";
@@ -153,7 +156,9 @@ function navTarget(){
 
 /* ---- Verstöße: wer sich nicht an die Regeln hält, verliert sein Fahrzeug ---- */
 const SCHOOL_BOX=[-334,-261.5,-149.8,-63.4];
-const inSchool=(x,y,m=0)=>x>SCHOOL_BOX[0]-m&&x<SCHOOL_BOX[1]+m&&y>SCHOOL_BOX[2]-m&&y<SCHOOL_BOX[3]+m;
+const SCHOOLS=(MG.schools||[]).map(s=>{const p=s.p,xs=p.filter((_,i)=>i%2===0),ys=p.filter((_,i)=>i%2===1);return {p,b:[Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)]}});
+function pip(p,x,y){let c=false;for(let i=0,j=p.length-2;i<p.length;j=i,i+=2){const xi=p[i],yi=p[i+1],xj=p[j],yj=p[j+1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+const inSchool=(x,y,m=0)=>REAL?SCHOOLS.some(s=>x>s.b[0]-m&&x<s.b[1]+m&&y>s.b[2]-m&&y<s.b[3]+m&&(m>0||pip(s.p,x,y))):(x>SCHOOL_BOX[0]-m&&x<SCHOOL_BOX[1]+m&&y>SCHOOL_BOX[2]-m&&y<SCHOOL_BOX[3]+m);
 const RULES={t:0,cool:{},side:0,fast:0,clean:0,road:null};
 function offense(kind,txt,sub,pts=1){const C=RULES.cool;if((C[kind]||0)>0)return;C[kind]=kind==="school"?3:kind==="ped"?3:7;
   save.points=(save.points||0)+pts;RULES.clean=0;persist();
@@ -201,7 +206,8 @@ function titleHTML(){
     else menu+=`<button data-t="new" type="button">Neues Spiel<small>Namen eingeben und Figur gestalten</small></button>`;
     if(multi)menu+=`<button data-t="list" type="button">Spieler wechseln<small>${PROFS.list.length} ${PROFS.list.length===1?"Spieler":"Spieler"} auf diesem Gerät</small></button>`;
     if(PROF)menu+=`<button data-t="new" type="button">Neuer Spieler</button><button data-t="look" type="button">Figur ändern</button>`;
-    menu+=`<button data-t="theory" type="button">Theorie</button><button data-t="info" type="button">Steuerung und Orte</button>`}
+    menu+=`<button data-t="theory" type="button">Theorie</button><button data-t="info" type="button">Steuerung und Orte</button>`;
+    menu+=REAL?`<button data-t="karte" type="button">Zur Spielkarte<small>verdichtete Karte mit allen Missionen</small></button>`:`<button data-t="karte" type="button">Echte Karte Rheydt<small>Vorschau: echte Straßen und Gebäude</small></button>`}
   if(V2==="list"){menu=`<div class="tpanel"><h3>Wer spielt?</h3>${PROFS.list.map(p=>{const d=readSave(p.id)||{};const xp=d.xp||0;let L=0;RANKS.forEach((r,i)=>{if(xp>=r[0])L=i});
       return `<div class="prow"><button data-t="pick" data-id="${p.id}" type="button"><i style="background:${p.look&&p.look.jacket||LOOK_DEF.jacket}"></i>${esc(p.name)}<small>${RANKS[L][1]} · $${(d.money||0).toLocaleString("de-DE")}</small></button><button class="del" data-t="del" data-id="${p.id}" type="button" aria-label="${esc(p.name)} löschen">${TITLE.del===p.id?"Wirklich löschen?":"✕"}</button></div>`}).join("")}
       <div class="row"><button data-t="new" type="button" class="primary">+ Neuer Spieler</button><button data-t="back" type="button">Zurück</button></div></div>`}
@@ -210,12 +216,12 @@ function titleHTML(){
       <label class="nm">Dein Name<input id="pName" maxlength="16" autocomplete="off" value="${esc(D.name)}" placeholder="Vorname"></label>
       <p class="err" id="pErr"></p>
       <div class="figs"><span>Figur</span>${FIG_CHOICES.map(([v,n])=>`<button type="button" data-t="fig" data-v="${v}" class="${(D.look.model||LOOK_DEF.model)===v?"on":""}">${n}</button>`).join("")}</div>
-      ${Object.keys(LOOKS).map(k=>`<div class="sw"><span>${LOOK_NAMES[k]}</span>${LOOKS[k].map(c=>`<button type="button" data-t="sw" data-k="${k}" data-c="${c}" class="${D.look[k]===c?"on":""}" style="background:${c}" aria-label="${LOOK_NAMES[k]} ${c}"></button>`).join("")}</div>`).join("")}
+      ${(D.look.model||LOOK_DEF.model)==="Noah_Pythagoras"?`<p class="note">Noah, die Hauptfigur von Pythagoras City, hat sein festes Outfit mit dem Pythagoras-Rucksack. Wähle eine andere Figur, wenn du Farben selbst bestimmen möchtest.</p>`:Object.keys(LOOKS).map(k=>`<div class="sw"><span>${LOOK_NAMES[k]}</span>${LOOKS[k].map(c=>`<button type="button" data-t="sw" data-k="${k}" data-c="${c}" class="${D.look[k]===c?"on":""}" style="background:${c}" aria-label="${LOOK_NAMES[k]} ${c}"></button>`).join("")}</div>`).join("")}
       ${!PROFS.list.length&&hasLegacy()?`<p class="note">Dein bisheriger Spielstand wird für diesen Spieler übernommen.</p>`:""}
       <div class="row"><button class="primary" data-t="ok" type="button">${D.edit?"Speichern":"Los geht’s ▶"}</button>${PROFS.list.length||D.edit?`<button data-t="cancel" type="button">Abbrechen</button>`:""}</div></div>`}
   return `<div class="tlogo"><div class="logo">Pythagoras<span>City</span></div><div class="sub">Mönchengladbach · Mathe Klasse 9</div></div>
     <nav class="menu">${menu}</nav>
-    <div class="tfoot"><div class="tip"><b>TIPP</b> <span id="tipTxt">${TIPS[TITLE.tip%TIPS.length]}</span></div><div class="credit">Spielkarte – Wege und Entfernungen vereinfacht · GHS Dohr, Standort Torfbend</div></div>`}
+    <div class="tfoot"><div class="tip"><b>TIPP</b> <span id="tipTxt">${TIPS[TITLE.tip%TIPS.length]}</span></div><div class="credit">${REAL?'Karte: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" style="color:inherit">© OpenStreetMap-Mitwirkende</a> (ODbL) · Gelände und 3D-Gebäude: Geobasis NRW (dl-de/zero-2-0) · Stadtteile: Stadt Mönchengladbach':"Spielkarte – Wege und Entfernungen vereinfacht · GHS Dohr, Standort Torfbend"}</div></div>`}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const hasLegacy=()=>{try{const d=JSON.parse(localStorage.getItem("pyCity")||"null");return !!(d&&(d.xp>0||d.solved>0||d.money>0))}catch(e){return false}};
 function renderTitle(){const el=$("title");el.innerHTML=titleHTML();el.dataset.view=TITLE.view;
@@ -245,7 +251,8 @@ $("title").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(t==="fig"){TITLE.draft.name=$("pName").value;TITLE.draft.look.model=b.dataset.v;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="sw"){TITLE.draft.name=$("pName").value;TITLE.draft.look[b.dataset.k]=b.dataset.c;applyLook(TITLE.draft.look);renderTitle()}
   if(t==="cancel"){const D=TITLE.draft;TITLE.draft=null;applyLook();if(TITLE.restoreVeh&&save.owned.includes(TITLE.restoreVeh)){setVehicle(TITLE.restoreVeh)}TITLE.restoreVeh=null;TITLE.view=PROF?"menu":"list";renderTitle()}
-  if(t==="ok")submitCreate()});
+  if(t==="ok")submitCreate();
+  if(t==="karte"){if(REAL&&history.length>1)history.back();else location.href=REAL?"./":"echt.html"}});
 $("title").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="pName"){e.preventDefault();submitCreate()}});
 $("title").addEventListener("input",e=>{if(e.target.id==="pName"&&TITLE.draft){TITLE.draft.name=e.target.value;$("pErr").textContent=""}});
 function submitCreate(){const D=TITLE.draft,n=($("pName").value||"").trim().replace(/\s+/g," ");
@@ -263,7 +270,7 @@ setInterval(()=>{if($("title").hidden)return;TITLE.tip++;const t=$("tipTxt");if(
   if(TITLE.cam==="creator"){const ca=TITLE.ca??car.a;car.a=ca+Math.sin(t*.7)*.55;const gy=groundY(car.x,car.y),wide=innerWidth>innerHeight*1.15,d=wide?3.6:4.3;
     const cx=car.x+Math.cos(ca)*d,cz=car.y+Math.sin(ca)*d,rx=-Math.sin(ca),rz=Math.cos(ca),off=wide?TITLE.side*1.15:0;
     _cv.set(cx,gy+1.35,cz);camPos.lerp(_cv,Math.min(1,dt*4));camera.position.copy(camPos);camera.lookAt(car.x+rx*off,gy+(wide?.95:.8),car.y+rz*off);
-  }else{const a=t*.04,C=[-292,-104];_cv.set(C[0]+Math.cos(a)*120,58+Math.sin(t*.13)*6,C[1]+Math.sin(a)*120);camPos.lerp(_cv,Math.min(1,dt*1.5));camera.position.copy(camPos);camera.lookAt(C[0],2,C[1])}
+  }else{const a=t*.04,C=REAL?[MG.start[0],MG.start[1]]:[-292,-104];_cv.set(C[0]+Math.cos(a)*120,58+Math.sin(t*.13)*6,C[1]+Math.sin(a)*120);camPos.lerp(_cv,Math.min(1,dt*1.5));camera.position.copy(camPos);camera.lookAt(C[0],2,C[1])}
   if(Math.abs(camera.fov-50)>.05){camera.fov=50;camera.updateProjectionMatrix()}
   if(skyDome)skyDome.position.copy(camera.position)}}
 /* alte Start-Knöpfe führen jetzt zurück ins Menü */

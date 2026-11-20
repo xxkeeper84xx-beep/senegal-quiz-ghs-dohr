@@ -15,5 +15,5 @@ function setBtn(id,icon,label){const b=$(id);if(!b)return;const keep=[...b.child
 const NEON_MAP={"#ffc933":"#FF7B00","#3fd8ff":"#00F0FF","#3ddc84":"#3CFFB4","#ff5d6c":"#FF2A85","#ffd21f":"#FFB000"};
 {const base=toast;toast=function(big,small,col){base(big,small,NEON_MAP[(col||"").toLowerCase()]||col)}}
 /* Startmenü: Icons vor den Einträgen */
-const TITLE_IC={play:"play",new:"user-plus",list:"users",look:"shirt",theory:"graduation-cap",info:"gamepad-2"};
+const TITLE_IC={play:"play",new:"user-plus",list:"users",look:"shirt",theory:"graduation-cap",info:"gamepad-2",karte:"map"};
 {const base=renderTitle;renderTitle=function(){base();document.querySelectorAll("#title nav button[data-t]").forEach(b=>{const n=TITLE_IC[b.dataset.t];if(n)b.insertAdjacentHTML("afterbegin",ic(n,"tm"))})}}

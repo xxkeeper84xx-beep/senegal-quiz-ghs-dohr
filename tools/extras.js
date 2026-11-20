@@ -87,7 +87,7 @@ const JOBDEF={
     steps:[{t:"race",fixed:[-322,-56.2],time:24,txt:"Sprinte zur Bushaltestelle",icon:"🏃"},{t:"return",txt:"Zurück zu Herrn Maaß",race:true,time:24}],
     thanks:N=>`Stark, ${N}! Die Turnschuhe gehören dir. Du bist jetzt zu Fuß richtig schnell.`},
 };
-const JOB_NEED={trial:()=>xs().jobs.ramp&&save.jobs.ramp.done,sprint:()=>qs(questById("werkhof")).done};
+const JOB_NEED={trial:()=>xs().jobs.ramp&&save.jobs.ramp.done,sprint:()=>qsx("werkhof").done};
 function giverPos(G){if(G.talk){const t=TALK.find(t=>t.name===G.talk);return t?{x:t.x,y:t.y,name:t.name,role:t.role}:null}
   if(G.quest){const q=questById(G.quest);return q?{x:q.giver.x,y:q.giver.y,name:q.giver.name,role:q.giver.role}:null}return G.pos}
 function giverJob(G){xs();for(const id of G.jobs){const s=save.jobs[id];if(s&&s.done)continue;if(JOB_NEED[id]&&!JOB_NEED[id]())return null;return id}return null}
@@ -227,7 +227,8 @@ function makeDuck(){const g=new THREE.Group(),y=xmat("#ffd21f",{emissive:"#4a3a0
   for(const s of [1,-1]){const e=new THREE.Mesh(new THREE.SphereGeometry(.018,6,5),xmat("#111"));e.position.set(.19,.35,s*.05);g.add(e)}
   const t=new THREE.Mesh(new THREE.ConeGeometry(.06,.12,8),y);t.rotation.z=Math.PI/2.6;t.position.set(-.2,.2,0);g.add(t);
   g.traverse(o=>{if(o.isMesh)o.castShadow=true});g.scale.setScalar(1.3);scene.add(g);return g}
-function buildEggs(){duckMeshes=DUCKS.map(([x,y,w],i)=>{const p=freeSpot(x,y,false),m=makeDuck();m.position.set(p.x,groundY(p.x,p.y),p.y);m.userData={x:p.x,y:p.y,w,i};m.visible=!xs().ducks.includes(i);return m});
+function buildEggs(){if(MG.real){SEIL.x=SEIL.y=NaN;if(!XJ.beacon){XJ.beacon=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,40,16,1,true),new THREE.MeshBasicMaterial({color:0x3ddc84,transparent:true,opacity:.28,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false}));XJ.beacon.visible=false;scene.add(XJ.beacon)}for(const G of XG)G.mark=xMarker("#3ddc84");PED.mark=xMarker("#3fd8ff");PED.mark.visible=false;sanitizeJobs();applyEquip();return}
+  duckMeshes=DUCKS.map(([x,y,w],i)=>{const p=freeSpot(x,y,false),m=makeDuck();m.position.set(p.x,groundY(p.x,p.y),p.y);m.userData={x:p.x,y:p.y,w,i};m.visible=!xs().ducks.includes(i);return m});
   // Das ägyptische Knotenseil 3-4-5 im Nordpark
   const sp=freeSpot(-246,-300,false);SEIL.x=sp.x;SEIL.y=sp.y;const gy=groundY(sp.x,sp.y)+.05,rope=xmat("#c9a46a"),knot=xmat("#7a5a2e");
   const P=[[0,0],[4,0],[0,3]].map(([a,b])=>[sp.x-1.3+a,sp.y-1+b]);

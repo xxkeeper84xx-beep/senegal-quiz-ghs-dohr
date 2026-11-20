@@ -7,3 +7,6 @@ R('pH.setColorAt(i,c.set(pick(["#f1c9a5","#c68e63","#8d5a3b","#e0ac7e","#5c3b28"
 R('pL=new THREE.InstancedMesh(pedLegs,new THREE.MeshLambertMaterial({color:0x2a3142}),peds.length);', 'pL=new THREE.InstancedMesh(pedLegs,new THREE.MeshLambertMaterial({color:0xffffff}),peds.length);')
 R('/* ================= Start ================= */', open(os.path.join(os.path.dirname(gfx),'crowd.js'), encoding="utf-8").read() + '\n/* ================= Start ================= */')
 R('if(VH.id==="walk"){poseHuman(walker.userData.hu,car.ph,car.wk,car.rn,now/1000,stl);walker.position.y=car.alt}', 'if(VH.id==="walk"){if(walker.userData.glbDone)playerGlbPose(dt);else poseHuman(walker.userData.hu,car.ph,car.wk,car.rn,now/1000,stl);walker.position.y=car.alt}')
+# echte Karte: weniger, dafür gezielt gesetzte Bäume (iPad-Leistung)
+R('const dens={park:200,wood:70,grass:700,cemetery:250};', 'const dens=MG.real?{park:450,wood:160,grass:2400,cemetery:600}:{park:200,wood:70,grass:700,cemetery:250};')
+R('treeList.length<9000;', 'treeList.length<(MG.real?(isTouch?1200:2200):9000);')

@@ -248,7 +248,7 @@ function huntFound(i){save.hunt=save.hunt||[];if(!save.hunt.includes(i))save.hun
   const n=save.hunt.length;if(n>=HUNT.length&&!save.huntDone){save.huntDone=true;save.money+=150;save.xp+=40;persist();updateHud();jingle();toast("Alle Schilder gefunden!","Dreiecksjagd geschafft · +40 XP · +$150","#3ddc84")}
   else toast(`Schild ${n} von ${HUNT.length}`,n<HUNT.length?"Such weiter rund um die GHS Dohr":"","#ffc933")}
 let huntMeshes=[];
-function buildHunt(){const yellow=new THREE.MeshLambertMaterial({color:0xf2c230,side:THREE.DoubleSide}),green=new THREE.MeshLambertMaterial({color:0x3ddc84,side:THREE.DoubleSide}),pole=new THREE.MeshLambertMaterial({color:0x6b7178}),edge=new THREE.MeshLambertMaterial({color:0x1a2147,side:THREE.DoubleSide});
+function buildHunt(){if(MG.real)return;const yellow=new THREE.MeshLambertMaterial({color:0xf2c230,side:THREE.DoubleSide}),green=new THREE.MeshLambertMaterial({color:0x3ddc84,side:THREE.DoubleSide}),pole=new THREE.MeshLambertMaterial({color:0x6b7178}),edge=new THREE.MeshLambertMaterial({color:0x1a2147,side:THREE.DoubleSide});
   const tri=s=>{const sh=new THREE.Shape([new THREE.Vector2(0,0),new THREE.Vector2(.55*s,0),new THREE.Vector2(0,.42*s)]);return new THREE.ShapeGeometry(sh)};
   HUNT.forEach((H,i)=>{const g=new THREE.Group(),[px,pz]=H.post,gy=groundY(px,pz);
     const p=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.5,8),pole);p.position.y=.75;g.add(p);
@@ -264,6 +264,7 @@ function refreshHunt(){const f=save.hunt||[];huntMeshes.forEach((h,i)=>{h.m.mate
   <ul class="chk">${HUNT.map((H,i)=>`<li class="${f.includes(i)?"ok":""}">${f.includes(i)?"✓":"○"} Schild ${i+1}: ${f.includes(i)||i<2?H.where:"<small>noch unbekannt – such weiter</small>"}</li>`).join("")}</ul></div>`)}}
 
 /* ================= Messaufträge auf dem Schulgelände ================= */
+if(!MG.real){
 QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die Außentreppe",
   giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Lehrerin an der GHS Dohr",shirt:"#c0392b"},
   intro:"„Die Außentreppe am Erweiterungsbau bekommt einen neuen Handlauf. Er soll genau so lang sein wie die Treppe schräg von unten bis zum Podest. Miss bitte die Höhe des Podests und wie weit die Treppe waagerecht reicht.“",
@@ -285,3 +286,4 @@ QUESTS.push({id:"schulhof",district:"Dohr/Torfbend",title:"Quer über den Schulh
   choice:{q:"Welche Strecke nimmt Herr Ballhorn für den Sprint?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
     fb:v=>v==="diag"?"Die Diagonale ist die längste gerade Strecke auf dem Hof.":"Am Zaun ist es länger, aber nicht gerade: Es gibt eine Ecke."},
   doneText:"Die Laufstrecke ist abgesteckt. Beim Sponsorenlauf rennen alle quer über den Hof.",xp:40,money:110});
+}   /* Ende: nur auf der Spielkarte */
