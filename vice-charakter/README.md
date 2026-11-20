@@ -1,4 +1,4 @@
-# Vice-Charakter – 3D-Charakter im Miami-Sunset-Look
+# Vice-Charakter – 3D-Charakter in zwei Stimmungen
 
 Eigenständige Three.js-Szene (r160): PBR-Materialien, weiche Schatten, HDRI-Reflexionen,
 Bloom, ACES Filmic Tone Mapping, Tiefenunschärfe, Vignette und Orbit-Kamera.
@@ -19,7 +19,11 @@ python3 -m http.server 8080      # oder: npx serve .
 | `character.glb` | nein (sonst Platzhalter) | Dein Charakter als glTF-Binary, gern mit Animation „Idle“ |
 | `sunset.hdr` | nein (sonst prozeduraler Sonnenuntergang) | Eigene HDRI für Reflexionen und Hintergrund |
 
-Pfade und alle Stellschrauben (Licht, Bloom, Unschärfe, Kamera) stehen oben in `main.js` im `CONFIG`-Objekt.
+Zwei Stimmungen (Knöpfe oben rechts, Taste L oder `?mood=neon` in der Adresse):
+- **Sonnenuntergang:** Gegenlicht-Sonne, Küstendunst, Skyline-Silhouette, warme Farbkorrektur
+- **Neon-Nacht:** Club-Terrasse mit LED-umwickelten Palmen, Lichterketten, Neonröhren, magentafarbenem Hauptlicht
+
+Licht, Nebel, Bloom, Unschärfe, Farbkorrektur und Kulisse jeder Stimmung stehen in `moods.js`. Pfade und Kamera stehen oben in `main.js` im `CONFIG`-Objekt.
 Materialien veredelt `characterMaterials.js` (Haut mit Streuungs-Shader, Augen, Haare, Stoff, Denim, Leder, Metall) anhand der Material- oder Mesh-Namen (`skin`, `eye`, `hair`, `jeans`, `leather` …). Die Werte stehen dort im `LOOK`-Objekt, die Namensmuster in `MATCH`.
 
 ## Abhängigkeiten

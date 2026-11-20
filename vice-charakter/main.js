@@ -1,13 +1,13 @@
 /**
- * Vice-Charakter: 3D-Charakter im Miami-Sunset-Look
+ * Vice-Charakter: 3D-Charakter in zwei Stimmungen – Sonnenuntergang an der Küste und Neon-Nacht im Club
  * Three.js r160 · PBR · HDRI · Bloom · ACES Filmic · Tiefenunschärfe · Vignette · Orbit-Kamera
  *
  * Aufbau:
  *   1. CONFIG            – alle Stellschrauben an einem Ort
  *   2. Renderer & Szene
- *   3. Umgebung (HDRI oder prozeduraler Sonnenuntergang)
+ *   3. Umgebung je Stimmung (HDRI oder prozeduraler Himmel, siehe moods.js)
  *   4. Licht
- *   5. Boden & Neon-Kulisse
+ *   5. Boden & Kulissen, Stimmung anwenden
  *   6. Charakter laden, Materialien verbessern, Idle-Animation
  *   7. Post-Processing
  *   8. Kamera & Orbit-Steuerung
@@ -25,6 +25,7 @@ import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { enhanceCharacter, addRimLight } from './characterMaterials.js';
+import { MOODS, createSkyScene, buildSets } from './moods.js';
 
 /* ------------------------------------------------------------------ 1. CONFIG */
 const isMobile = matchMedia('(pointer: coarse)').matches;
@@ -32,25 +33,16 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const CONFIG = {
   modelUrl: './character.glb',      // dein Charakter (glTF-Binary)
-  hdrUrl: './sunset.hdr',           // optional: eigene HDRI; fehlt sie, wird ein Sonnenuntergang erzeugt
+  hdrUrl: './sunset.hdr',           // optional: eigene HDRI für die Stimmung „Sonnenuntergang“
   dracoDecoderPath: 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/', // nur für Draco-komprimierte Modelle
   targetHeight: 1.8,                // Modelle werden auf diese Größe (Meter) normiert
   idleClipPattern: /idle|breath|stand|wait/i,
+  startMood: new URLSearchParams(location.search).get('mood') === 'neon' ? 'neon' : 'sunset',
 
-  exposure: 1.0,
   pixelRatio: Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2),
   shadowMapSize: isMobile ? 1024 : 2048,
-
-  sun:     { color: 0xffa65c, intensity: 4.2, elevationDeg: 10, azimuthDeg: -128 }, // tiefstehende Goldorange-Sonne, seitlich hinter der Figur
-  ambient: { sky: 0x6c5cff, ground: 0x2a0f3a, intensity: 0.95 },                     // kühles Violett-Blau
-  rimPink: { color: 0xff2a85, intensity: 45 },
-  rimCyan: { color: 0x00f0ff, intensity: 28 },
-
-  bloom:    { strength: 0.55, radius: 0.5, threshold: 1.4 },   // nur echte HDR-Lichter (Sonne, Neon) leuchten
-  dof:      { enabled: !isMobile, aperture: 0.0016, maxBlur: 0.006 },
-  vignette: { offset: 1.05, darkness: 1.15, grain: 0.035 },
-  fog:      { color: 0x2a1238, density: 0.035 },
-
+  dof:      { enabled: !isMobile, maxBlur: 0.007 },
+  vignette: { offset: 1.05, darkness: 1.1, grain: 0.035 },
   camera:   { fov: 32, distance: 2.9, minDistance: 1.3, maxDistance: 6 },
   autoRotateSpeed: reducedMotion ? 0 : 0.35,
 };
@@ -62,140 +54,105 @@ renderer.setPixelRatio(CONFIG.pixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;   // wird im OutputPass angewendet
-renderer.toneMappingExposure = CONFIG.exposure;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(CONFIG.fog.color, CONFIG.fog.density);
+scene.fog = new THREE.FogExp2(0x000000, 0.02);
+scene.backgroundBlurriness = 0.25;    // weicher Hintergrund wie bei offener Blende
 
-const camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, innerWidth / innerHeight, 0.1, 200);
+const camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, innerWidth / innerHeight, 0.1, 600);
 
 const ui = {
   loader: document.getElementById('loader'),
   bar: document.querySelector('#bar i'),
   note: document.getElementById('note'),
+  moodButtons: [...document.querySelectorAll('[data-mood]')],
   showNote(text) { this.note.textContent = text; this.note.hidden = false; },
   progress(p) { this.bar.style.width = `${Math.round(p * 100)}%`; },
   done() { this.loader.style.opacity = '0'; setTimeout(() => (this.loader.hidden = true), 500); },
 };
 
-/* ------------------------------------------------------------------ 3. Umgebung */
-const sunDir = new THREE.Vector3().setFromSphericalCoords(
-  1,
-  THREE.MathUtils.degToRad(90 - CONFIG.sun.elevationDeg),
-  THREE.MathUtils.degToRad(CONFIG.sun.azimuthDeg),
-);
-
-/** Prozeduraler Sonnenuntergang als HDR-Umgebung (Fallback ohne HDRI-Datei). */
-function createSunsetEnvironment() {
-  const envScene = new THREE.Scene();
-  const sky = new THREE.Mesh(
-    new THREE.SphereGeometry(50, 64, 32),
-    new THREE.ShaderMaterial({
-      side: THREE.BackSide,
-      depthWrite: false,
-      uniforms: {
-        uSunDir: { value: sunDir },
-        uZenith: { value: new THREE.Color(0x1b0b45) },
-        uMid: { value: new THREE.Color(0xd8306f) },
-        uHorizon: { value: new THREE.Color(0xff8a2a) },
-        uGround: { value: new THREE.Color(0x12061f) },
-      },
-      vertexShader: /* glsl */`
-        varying vec3 vDir;
-        void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-      fragmentShader: /* glsl */`
-        uniform vec3 uSunDir, uZenith, uMid, uHorizon, uGround;
-        varying vec3 vDir;
-        void main() {
-          float h = vDir.y;
-          vec3 col = mix(uHorizon, uMid, smoothstep(0.0, 0.18, h));
-          col = mix(col, uZenith, smoothstep(0.15, 0.65, h));
-          col = mix(col, uGround, smoothstep(0.0, -0.12, h));
-          float s = max(dot(vDir, normalize(uSunDir)), 0.0);
-          col += vec3(1.0, 0.55, 0.22) * pow(s, 8.0) * 1.6;          // Halo
-          col += vec3(1.0, 0.75, 0.45) * smoothstep(0.9985, 0.9995, s) * 40.0; // Sonnenscheibe (HDR)
-          gl_FragColor = vec4(col, 1.0);
-        }`,
-    }),
-  );
-  envScene.add(sky);
-  return envScene;
-}
-
-async function setupEnvironment() {
+/* ------------------------------------------------------------------ 3. Umgebung je Stimmung */
+const envCache = {};
+async function environmentFor(id) {
+  if (envCache[id]) return envCache[id];
   const pmrem = new THREE.PMREMGenerator(renderer);
-  let envMap = null;
-  try {
-    const head = await fetch(CONFIG.hdrUrl, { method: 'HEAD' });
-    if (head.ok) {
-      const hdr = await new RGBELoader().loadAsync(CONFIG.hdrUrl);
-      hdr.mapping = THREE.EquirectangularReflectionMapping;
-      envMap = pmrem.fromEquirectangular(hdr).texture;
-      scene.background = hdr;
-    }
-  } catch { /* keine HDRI vorhanden: prozedurale Umgebung */ }
-
-  if (!envMap) {
-    const envScene = createSunsetEnvironment();
-    envMap = pmrem.fromScene(envScene, 0.02).texture;
-    scene.background = envMap;
+  const { env, sunDir } = createSkyScene(MOODS[id]);
+  let entry = null;
+  if (id === 'sunset') {
+    try {
+      const head = await fetch(CONFIG.hdrUrl, { method: 'HEAD' });
+      if (head.ok) {
+        const hdr = await new RGBELoader().loadAsync(CONFIG.hdrUrl);
+        hdr.mapping = THREE.EquirectangularReflectionMapping;
+        entry = { env: pmrem.fromEquirectangular(hdr).texture, background: hdr, sunDir };
+      }
+    } catch { /* keine HDRI vorhanden: prozeduraler Himmel */ }
   }
-  scene.environment = envMap;
-  scene.backgroundBlurriness = 0.25;   // weicher Hintergrund wie bei offener Blende
-  scene.backgroundIntensity = 0.9;
+  if (!entry) { const tex = pmrem.fromScene(env, 0.02).texture; entry = { env: tex, background: tex, sunDir }; }
   pmrem.dispose();
+  return (envCache[id] = entry);
 }
 
-/* ------------------------------------------------------------------ 4. Licht */
+/* ------------------------------------------------------------------ 4. Licht (Werte kommen aus der Stimmung) */
+const L = {};
 function setupLights() {
-  // Warme, tiefstehende Sonne: Hauptlicht mit weichen Schatten
-  const sun = new THREE.DirectionalLight(CONFIG.sun.color, CONFIG.sun.intensity);
-  sun.position.copy(sunDir).multiplyScalar(12);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(CONFIG.shadowMapSize, CONFIG.shadowMapSize);
-  Object.assign(sun.shadow.camera, { left: -2.5, right: 2.5, top: 2.8, bottom: -0.6, near: 1, far: 30 });
-  sun.shadow.bias = -0.0003;
-  sun.shadow.normalBias = 0.025;
-  sun.shadow.radius = 4;
-  scene.add(sun, sun.target);
-
-  // Schwaches warmes Fülllicht von vorn, damit Haut und Gesicht lesbar bleiben
-  const fill = new THREE.DirectionalLight(0xffc9a0, 0.9);
-  fill.position.set(2.5, 2.2, 4);
-  scene.add(fill);
-
-  // Kühles violett-blaues Umgebungslicht für den Kontrast
-  scene.add(new THREE.HemisphereLight(CONFIG.ambient.sky, CONFIG.ambient.ground, CONFIG.ambient.intensity));
-
-  // Neon-Kantenlichter von hinten (Vice-City-Rim)
-  const rimPink = new THREE.SpotLight(CONFIG.rimPink.color, CONFIG.rimPink.intensity, 12, Math.PI / 6, 0.6, 2);
-  rimPink.position.set(-2.2, 2.4, -2.6);
-  const rimCyan = new THREE.SpotLight(CONFIG.rimCyan.color, CONFIG.rimCyan.intensity, 12, Math.PI / 6, 0.6, 2);
-  rimCyan.position.set(2.4, 1.6, -2.2);
-  for (const l of [rimPink, rimCyan]) { l.target.position.set(0, 1.1, 0); scene.add(l, l.target); }
+  L.key = new THREE.DirectionalLight(0xffffff, 1);            // Hauptlicht mit weichen Schatten
+  L.key.castShadow = true;
+  L.key.shadow.mapSize.set(CONFIG.shadowMapSize, CONFIG.shadowMapSize);
+  Object.assign(L.key.shadow.camera, { left: -2.5, right: 2.5, top: 2.8, bottom: -0.6, near: 1, far: 30 });
+  L.key.shadow.bias = -0.0003;
+  L.key.shadow.normalBias = 0.025;
+  L.key.shadow.radius = 4;
+  L.fill = new THREE.DirectionalLight(0xffffff, 1);           // Fülllicht fürs Gesicht
+  L.hemi = new THREE.HemisphereLight(0xffffff, 0x000000, 1);  // Umgebungslicht für den Kontrast
+  L.rimA = new THREE.SpotLight(0xffffff, 1, 12, Math.PI / 6, 0.6, 2);   // Kantenlichter von hinten
+  L.rimB = new THREE.SpotLight(0xffffff, 1, 12, Math.PI / 6, 0.6, 2);
+  for (const l of [L.rimA, L.rimB]) l.target.position.set(0, 1.1, 0);
+  scene.add(L.key, L.key.target, L.fill, L.hemi, L.rimA, L.rimA.target, L.rimB, L.rimB.target);
 }
 
-/* ------------------------------------------------------------------ 5. Boden & Kulisse */
+/* ------------------------------------------------------------------ 5. Boden & Kulissen */
+let ground, sets;
 function setupStage() {
-  const ground = new THREE.Mesh(
-    new THREE.CircleGeometry(14, 64),
-    new THREE.MeshStandardMaterial({ color: 0x1c1026, roughness: 0.42, metalness: 0.15 }), // leicht nasser Asphalt
-  );
+  ground = new THREE.Mesh(new THREE.CircleGeometry(14, 64), new THREE.MeshStandardMaterial());
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);
+  sets = buildSets();
+  for (const g of Object.values(sets)) { g.visible = false; scene.add(g); }
+}
 
-  // Neonröhren im Hintergrund: leuchten über Bloom und verschwimmen in der Tiefenunschärfe
-  const neon = (color, w, x, y, z, rotZ = 0) => {
-    const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.03, w, 4, 12),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(6), toneMapped: true }));
-    m.position.set(x, y, z); m.rotation.z = Math.PI / 2 + rotZ; scene.add(m);
-  };
-  neon(0xff2a85, 3.2, -1.6, 2.6, -5.5);
-  neon(0x00f0ff, 2.4, 2.2, 1.9, -6.5);
-  neon(0xff7b00, 1.6, 0.6, 3.3, -7.5, 0.12);
+/* ------------------------------------------------------------------ Stimmung anwenden */
+let post = null, currentMood = null;
+async function applyMood(id) {
+  const M = MOODS[id], E = await environmentFor(id);
+  currentMood = id;
+  scene.environment = E.env;
+  scene.background = E.background;
+  scene.backgroundIntensity = id === 'neon' ? 0.7 : 0.8;
+  scene.fog.color.set(M.fog.color);
+  scene.fog.density = M.fog.density;
+  renderer.toneMappingExposure = M.exposure;
+
+  L.key.color.set(M.key.color); L.key.intensity = M.key.intensity;
+  if (M.key.fromSun) L.key.position.copy(E.sunDir).multiplyScalar(12); else L.key.position.set(...M.key.position);
+  L.fill.color.set(M.fill.color); L.fill.intensity = M.fill.intensity; L.fill.position.set(...M.fill.position);
+  L.hemi.color.set(M.hemi.sky); L.hemi.groundColor.set(M.hemi.ground); L.hemi.intensity = M.hemi.intensity;
+  for (const k of ['rimA', 'rimB']) { L[k].color.set(M[k].color); L[k].intensity = M[k].intensity; L[k].position.set(...M[k].position); }
+
+  ground.material.color.set(M.ground.color); ground.material.roughness = M.ground.roughness; ground.material.metalness = M.ground.metalness;
+  for (const [name, g] of Object.entries(sets)) g.visible = name === M.set;
+
+  if (post) {
+    Object.assign(post.bloom, { strength: M.bloom.strength, radius: M.bloom.radius, threshold: M.bloom.threshold });
+    if (post.bokeh) post.bokeh.uniforms.aperture.value = M.dofAperture;
+    const u = post.grade.uniforms;
+    u.uLift.value.set(...M.grade.lift); u.uGamma.value.set(...M.grade.gamma); u.uGain.value.set(...M.grade.gain); u.uSaturation.value = M.grade.saturation;
+  }
+  for (const b of ui.moodButtons) b.setAttribute('aria-pressed', String(b.dataset.mood === id));
+  document.body.dataset.scene = id;
 }
 
 /* ------------------------------------------------------------------ 6. Charakter */
@@ -277,18 +234,27 @@ async function loadCharacter(manager) {
 }
 
 /* ------------------------------------------------------------------ 7. Post-Processing */
-const VignetteShader = {
-  uniforms: { tDiffuse: { value: null }, uOffset: { value: 1 }, uDarkness: { value: 1 }, uGrain: { value: 0 }, uTime: { value: 0 } },
+/** Farbkorrektur (Lift/Gamma/Gain, Sättigung), Vignette und Filmkorn – nach dem Tone Mapping. */
+const GradeShader = {
+  uniforms: {
+    tDiffuse: { value: null }, uTime: { value: 0 },
+    uLift: { value: new THREE.Vector3() }, uGamma: { value: new THREE.Vector3(1, 1, 1) }, uGain: { value: new THREE.Vector3(1, 1, 1) }, uSaturation: { value: 1 },
+    uOffset: { value: 1 }, uDarkness: { value: 1 }, uGrain: { value: 0 },
+  },
   vertexShader: /* glsl */`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
   fragmentShader: /* glsl */`
-    uniform sampler2D tDiffuse; uniform float uOffset, uDarkness, uGrain, uTime; varying vec2 vUv;
+    uniform sampler2D tDiffuse; uniform vec3 uLift, uGamma, uGain; uniform float uSaturation, uOffset, uDarkness, uGrain, uTime; varying vec2 vUv;
     float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
     void main(){
-      vec4 c = texture2D(tDiffuse, vUv);
+      vec3 c = texture2D(tDiffuse, vUv).rgb;
+      c = c * uGain + uLift * (1.0 - c);                                   // Lichter tönen, Schatten anheben (Dunst)
+      c = pow(max(c, 0.0), 1.0 / uGamma);
+      float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+      c = mix(vec3(l), c, uSaturation);
       vec2 uv = (vUv - 0.5) * uOffset;
-      c.rgb *= mix(1.0, 1.0 - uDarkness, dot(uv, uv));                 // Vignette
-      c.rgb += (hash(vUv * 1000.0 + uTime) - 0.5) * uGrain;            // feines Filmkorn
-      gl_FragColor = c;
+      c *= mix(1.0, 1.0 - uDarkness, dot(uv, uv));                         // Vignette
+      c += (hash(vUv * 1000.0 + uTime) - 0.5) * uGrain;                    // Filmkorn
+      gl_FragColor = vec4(c, 1.0);
     }`,
 };
 
@@ -302,22 +268,22 @@ function setupPostprocessing() {
 
   let bokeh = null;
   if (CONFIG.dof.enabled) {
-    bokeh = new BokehPass(scene, camera, { focus: CONFIG.camera.distance, aperture: CONFIG.dof.aperture, maxblur: CONFIG.dof.maxBlur });
+    bokeh = new BokehPass(scene, camera, { focus: CONFIG.camera.distance, aperture: 0.002, maxblur: CONFIG.dof.maxBlur });
     composer.addPass(bokeh);
   }
 
-  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), CONFIG.bloom.strength, CONFIG.bloom.radius, CONFIG.bloom.threshold);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.6, 0.6, 1.2);   // Werte setzt die Stimmung
   composer.addPass(bloom);
 
   composer.addPass(new OutputPass());          // ACES Filmic + sRGB
 
-  const vignette = new ShaderPass(VignetteShader);
-  vignette.uniforms.uOffset.value = CONFIG.vignette.offset;
-  vignette.uniforms.uDarkness.value = CONFIG.vignette.darkness;
-  vignette.uniforms.uGrain.value = CONFIG.vignette.grain;
-  composer.addPass(vignette);
+  const grade = new ShaderPass(GradeShader);
+  grade.uniforms.uOffset.value = CONFIG.vignette.offset;
+  grade.uniforms.uDarkness.value = CONFIG.vignette.darkness;
+  grade.uniforms.uGrain.value = CONFIG.vignette.grain;
+  composer.addPass(grade);
 
-  return { composer, bokeh, bloom, vignette };
+  return { composer, bokeh, bloom, grade };
 }
 
 /* ------------------------------------------------------------------ 8. Kamera & Steuerung */
@@ -350,13 +316,18 @@ async function init() {
 
   setupLights();
   setupStage();
-  await setupEnvironment();
+  await environmentFor('sunset'); await environmentFor('neon');   // beide Himmel vorab berechnen
   ui.progress(0.3);
   const height = await loadCharacter(manager);
   ui.progress(1);
 
   const controls = setupCamera(height);
-  const post = setupPostprocessing();
+  post = setupPostprocessing();
+  await applyMood(CONFIG.startMood);
+
+  // Stimmung umschalten: Knöpfe oder Taste L
+  for (const b of ui.moodButtons) b.addEventListener('click', () => applyMood(b.dataset.mood));
+  addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'l') applyMood(currentMood === 'sunset' ? 'neon' : 'sunset'); });
 
   const onResize = () => {
     const w = innerWidth, h = innerHeight;
@@ -381,7 +352,7 @@ async function init() {
     }
     controls.update();
     if (post.bokeh) post.bokeh.uniforms.focus.value = camera.position.distanceTo(controls.target);
-    post.vignette.uniforms.uTime.value = t;
+    post.grade.uniforms.uTime.value = t;
     post.composer.render(dt);
   });
 

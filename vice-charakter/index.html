@@ -23,6 +23,15 @@
     #bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--pink),var(--orange)); box-shadow:0 0 12px var(--pink); transition:width .2s; }
     #note { position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%); max-width:calc(100vw - 32px);
       padding:8px 14px; border-radius:12px; font-size:13px; background:rgba(22,11,40,.75); border:1px solid rgba(0,240,255,.4); z-index:1; }
+    .moods { position:fixed; z-index:1; top:calc(14px + env(safe-area-inset-top,0px)); right:calc(14px + env(safe-area-inset-right,0px)); display:flex; gap:4px; padding:4px;
+      border-radius:14px; background:rgba(22,11,40,.6); border:1px solid rgba(255,42,133,.3); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+    .moods button { font:600 13px 'Inter',system-ui,sans-serif; letter-spacing:.04em; text-transform:uppercase; color:#d9cff0; background:none; border:0; border-radius:10px;
+      padding:9px 14px; cursor:pointer; transition:background .15s,color .15s,box-shadow .15s,transform .15s; }
+    .moods button:hover { color:#fff; box-shadow:0 0 0 1px var(--cyan),0 0 14px rgba(0,240,255,.35); transform:scale(1.02); }
+    .moods button[aria-pressed="true"] { color:#fff; background:linear-gradient(90deg,var(--pink),var(--orange)); box-shadow:0 0 18px rgba(255,42,133,.4); }
+    .moods button:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    body[data-scene="neon"] .hud, body[data-scene="neon"] .moods { border-color:rgba(0,240,255,.35); }
+    @media (max-width:560px) { #note { top:calc(64px + env(safe-area-inset-top,0px)); } .moods { left:14px; right:14px; justify-content:center; } }
     [hidden] { display:none !important; }
   </style>
   <!-- Three.js als ES-Module direkt vom CDN, feste Version -->
@@ -39,7 +48,11 @@
   <canvas id="scene" aria-label="3D-Charakter im Sonnenuntergang, mit Ziehen drehbar"></canvas>
   <div id="loader"><b>Vice Charakter</b><div id="bar"><i></i></div></div>
   <div id="note" hidden></div>
-  <div class="hud">Ziehen zum Drehen · Zwei Finger / Mausrad zum Zoomen</div>
+  <div class="moods" role="group" aria-label="Stimmung">
+    <button type="button" data-mood="sunset" aria-pressed="true">Sonnenuntergang</button>
+    <button type="button" data-mood="neon" aria-pressed="false">Neon-Nacht</button>
+  </div>
+  <div class="hud">Ziehen zum Drehen · Zwei Finger / Mausrad zum Zoomen · Taste L: Stimmung</div>
   <script type="module" src="./main.js"></script>
 </body>
 </html>
