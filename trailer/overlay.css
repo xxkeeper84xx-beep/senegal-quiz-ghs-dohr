@@ -1,0 +1,21 @@
+body.trailer *{visibility:hidden!important}
+body.trailer canvas#game,body.trailer #tr,body.trailer #tr *{visibility:visible!important}
+#tr{position:fixed;inset:0;z-index:99999;pointer-events:none;font-family:"Montserrat","Arial Black","Helvetica Neue",Arial,sans-serif}
+#tr .cap{position:absolute;left:84px;bottom:150px;color:#fff;font-weight:900;font-style:italic;font-size:64px;letter-spacing:.02em;text-transform:uppercase;
+  text-shadow:0 4px 22px rgba(0,0,0,.65),0 0 2px rgba(0,0,0,.8);line-height:1;transition:none}
+#tr .cap small{display:block;font-size:22px;font-style:normal;letter-spacing:.32em;font-weight:700;margin-top:14px;color:#ffe3c7}
+#tr .cap.grad{background:linear-gradient(95deg,#FF2A85 0%,#FF7B00 60%,#FFC44D 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 4px 18px rgba(0,0,0,.6))}
+#tr .mid{left:0;right:0;bottom:auto;top:40%;text-align:center;font-size:110px;text-transform:none}
+#tr .flash{position:absolute;inset:0;background:#fff;opacity:0}
+#tr .black{position:absolute;inset:0;background:#05020c;opacity:0}
+#tr .logo{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 62%,#ffb347 0 13%,#ff7b00 13.4% 14%,transparent 14.2%),
+  linear-gradient(180deg,#1a0633 0%,#4a0f4f 38%,#c2185b 64%,#ff7b00 82%,#2a0a2a 82.2%,#090414 100%)}
+#tr .logo .sun{position:absolute;left:50%;top:62%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;
+  background:repeating-linear-gradient(180deg,#ffd36b 0 14px,transparent 14px 20px),linear-gradient(#ffd36b,#ff2a85);-webkit-mask:linear-gradient(#000 52%,transparent 52%) ;opacity:.9}
+#tr .logo .palm{position:absolute;bottom:17%;font-size:230px;line-height:1;filter:brightness(0) drop-shadow(0 0 1px #000)}
+#tr .logo h1{position:absolute;left:0;right:0;top:20%;margin:0;text-align:center;font-weight:900;font-style:italic;font-size:132px;line-height:.9;letter-spacing:.01em;
+  background:linear-gradient(180deg,#ffffff 0%,#ffd1e6 30%,#FF2A85 62%,#FF7B00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 6px 0 #2a0a3a) drop-shadow(0 0 28px rgba(255,42,133,.65))}
+#tr .logo p{position:absolute;left:0;right:0;text-align:center;margin:0;color:#00F0FF;font-weight:800;letter-spacing:.42em;font-size:24px;text-shadow:0 0 14px rgba(0,240,255,.7)}
+
+#tr .cap.nocase{text-transform:none}
