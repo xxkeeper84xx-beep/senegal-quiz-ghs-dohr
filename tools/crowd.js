@@ -172,7 +172,7 @@ async function initGlbCrowd(){
   const first=(PROF&&PROF.look&&PROF.look.model)||LOOK_DEF.model,names=[...new Set([first,...Object.values(GLB.files),...FIG_CHOICES.map(f=>f[0]).filter(n=>n!=="classic")])];
   GLB.total=names.length;GLB.loaded=0;
   for(const name of names){         // nacheinander im Hintergrund laden, Spielfigur zuerst
-    try{let g=await loader.loadAsync(GLB.base+name+".json");if(!g.animations||!g.animations.length)g=rigFigure(g);   /* starre Figur: Skelett und Animationen erzeugen */  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g,name);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
+    try{let g=await loader.loadAsync(GLB.base+name+".json");if(!g.animations||!g.animations.length)g=GLB.models["08_Passant"]?rigFromDonor(g,GLB.models["08_Passant"]):rigFigure(g);   /* starre Figur: Skelett, Gewichte und Bewegungen der Passant-Figur übernehmen */  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g,name);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
     catch(e){console.info("3D-Figur nicht geladen:",name,e);GLB.err=(name+": "+(e&&e.message||e)).slice(0,140);if(name===first)GLB.failed=true}
     GLB.loaded++}
   if(!GLB.ready)GLB.failed=true}

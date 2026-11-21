@@ -46,7 +46,7 @@ function buildLights(){const ampScene=VK.amp.scene,ab=new THREE.Box3().setFromOb
       const ped=new THREE.Mesh(new THREE.PlaneGeometry(.32,.48),new THREE.MeshBasicMaterial({map:PED_R,toneMapped:false}));   // Fußgängersignal quer zur Fahrbahn
       ped.position.set(x+px*.16,groundY(x,y)+Math.min(2.4,ah*.62),y+py*.16);ped.rotation.y=-a;X.group.add(ped);X.ped.push(ped);
       const ped2=ped.clone();ped2.position.set(x-px*.16,ped.position.y,y-py*.16);ped2.rotation.y=-a+Math.PI;X.group.add(ped2);X.ped.push(ped2)}
-    scene.add(X.group);VK.X.push(X)}}
+    X.dirs=dirs.slice(0,4);X.w=c.w;scene.add(X.group);VK.X.push(X)}}
 function phase(X,t){const c=((t+X.off)%24+24)%24;return {car:c<11?"gruen":c<13?"gelb":"rot",ped:c>=14&&c<22}}
 function updateLights(){const t=VK.t;for(const X of VK.X){const P=phase(X,t);
   for(const k of ["rot","gelb","gruen"]){const m=X.mats[k];if(!m)continue;const on=P.car===k;m.emissive=m.emissive||new THREE.Color();m.emissive.copy(on?m.userData.base:new THREE.Color(0));m.emissiveIntensity=on?2.2:0;m.color.copy(m.userData.base).multiplyScalar(on?1:.18)}
@@ -137,3 +137,25 @@ async function loadVerkehr(){if(!THREE.GLTFLoader)return;for(let k=0;k<900&&!(wa
 {const base=updateCamera;updateCamera=function(dt,VH){if(state.mode!=="play")VK.t+=dt;updateLights();updateCops(dt);
   VK.vis-=dt;if(VK.vis<=0){VK.vis=.5;for(const X of VK.X)X.group.visible=Math.hypot(X.x-car.x,X.y-car.y)<240}
   if(save.scootTuned)scootGlow();updateBrief();base(dt,VH)}}
+
+/* ---------- Martinshorn: gelieferte Aufnahme (sounds/martinshorn.wav) als Endlosschleife, solange ein Streifenwagen Blaulicht hat;
+   lauter, je näher er ist. Die Datei wird per fetch() geladen (auf der veröffentlichten Seite erlaubt) und mit Web Audio abgespielt.
+   Klappt das Laden nicht, ertönt ein erzeugtes „Tatü-tata“ (a′ und d″ im Wechsel). ---------- */
+const SIREN={buf:null,loading:false,src:null,g:null,o:null};
+async function sirenLoad(){if(SIREN.buf||SIREN.loading)return;SIREN.loading=true;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const r=await fetch("sounds/martinshorn.wav");const ab=await r.arrayBuffer();
+    SIREN.buf=await new Promise((ok,no)=>{const p=actx.decodeAudioData(ab,ok,no);if(p&&p.then)p.then(ok,no)})}catch(e){console.info("Martinshorn nicht geladen",e);SIREN.buf=false}}
+function sirenStop(){if(!SIREN.g)return;const t=actx.currentTime;SIREN.g.gain.setTargetAtTime(0,t,.08);const n=SIREN.src||SIREN.o;try{n.stop(t+.4)}catch(e){}SIREN.src=SIREN.o=SIREN.g=null}
+function sirenUpdate(){let d=1e9;for(const c of VK.cops)if(c.alarm>0&&c.n.x!==undefined)d=Math.min(d,Math.hypot(c.n.x-car.x,c.n.y-car.y));
+  const want=d<170&&state.mode==="play";
+  try{if(!want){sirenStop();return}
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();
+    if(SIREN.buf===null){sirenLoad();return}
+    const t=actx.currentTime;
+    if(!SIREN.g){const g=actx.createGain();g.gain.value=0;g.connect(actx.destination);SIREN.g=g;
+      if(SIREN.buf){const src=actx.createBufferSource();src.buffer=SIREN.buf;src.loop=true;src.connect(g);src.start();SIREN.src=src}
+      else{const o=actx.createOscillator(),f=actx.createBiquadFilter();o.type="sawtooth";f.type="lowpass";f.frequency.value=1800;o.connect(f);f.connect(g);o.start();SIREN.o=o}}
+    if(SIREN.o)SIREN.o.frequency.setTargetAtTime(Math.floor(t/.62)%2?587:440,t,.012);
+    SIREN.g.gain.setTargetAtTime((SIREN.src?.55:.075)*Math.pow(1-d/170,1.4),t,.06)}catch(e){}}
+setTimeout(sirenLoad,8000);   // früh vorladen, damit die Sirene beim ersten Einsatz sofort da ist
+{const base=updateCamera;updateCamera=function(dt,VH){sirenUpdate();base(dt,VH)}}
