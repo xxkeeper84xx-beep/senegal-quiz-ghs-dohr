@@ -50,3 +50,11 @@ function doorUpdate(){for(const id in vehMeshes){const g=vehMeshes[id];if(!g||!g
   if(!TR.on||(TR.kind!=="enter"&&TR.kind!=="exit")||VEH[TR.l.id].fly)return;const g=vehMeshes[TR.l.id];if(!g)return;
   const d=carDoor(g,TR.side),a=doorAngle();d.visible=a>.01;d.rotation.y=TR.side*a*1.15}
 {const base=updateCamera;updateCamera=function(dt,VH){base(dt,VH);doorUpdate()}}
+
+/* 5) Beläge ohne Fugenraster: Gehwegplatten (texPave) und Pflaster (texCobble) hatten ein feines Raster aus dunklen Fugen.
+      In der Entfernung und im flachen Blickwinkel flimmerte es (Moiré). Jetzt: heller, fugenloser Beton für Gehwege, Wege
+      und Boden; sandfarbener, feinkörniger Belag für Plätze und Fußgängerzonen. */
+function redraw(tex,draw){const c=tex.image,g=c.getContext("2d");g.clearRect(0,0,c.width,c.height);draw(g,c.width,c.height);tex.needsUpdate=true}
+function blotches(g,w,h,n,a){for(let i=0;i<n;i++){const l=Math.random()<.5;g.fillStyle=l?`rgba(255,252,244,${a})`:`rgba(40,36,30,${a})`;g.beginPath();g.ellipse(Math.random()*w,Math.random()*h,w*(.08+Math.random()*.2),h*(.06+Math.random()*.16),Math.random()*3,0,7);g.fill()}}
+redraw(texPave,(g,w,h)=>{g.fillStyle="#b8b4aa";g.fillRect(0,0,w,h);blotches(g,w,h,14,.035);noise(g,w,h,26000,["rgba(0,0,0,.05)","rgba(255,255,255,.07)","rgba(110,100,80,.05)"],2)});
+redraw(texCobble,(g,w,h)=>{g.fillStyle="#b9ad98";g.fillRect(0,0,w,h);blotches(g,w,h,8,.03);noise(g,w,h,9000,["rgba(0,0,0,.07)","rgba(255,255,255,.08)","rgba(120,95,60,.06)"],1.5)});

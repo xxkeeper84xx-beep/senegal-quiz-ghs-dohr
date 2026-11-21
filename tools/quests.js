@@ -312,11 +312,10 @@ function buildSchool(){
     for(let i=0;i<7;i++){g.fillStyle=i%2?"rgba(0,0,0,.08)":"rgba(255,255,255,.05)";g.beginPath();g.ellipse(Math.random()*512,Math.random()*512,40+Math.random()*80,20+Math.random()*40,Math.random()*3,0,7);g.fill()}
     g.strokeStyle="rgba(20,20,22,.6)";g.lineWidth=1.4;for(let i=0;i<4;i++){g.beginPath();let x=Math.random()*512,y=Math.random()*512;g.moveTo(x,y);for(let k=0;k<7;k++){x+=(Math.random()-.5)*50;y+=Math.random()*35;g.lineTo(x,y)}g.stroke()}
     for(let i=0;i<190;i++){g.save();g.translate(Math.random()*512,Math.random()*512);g.rotate(Math.random()*6.3);g.fillStyle=pick(["#d9a53a","#c9772c","#b8432f","#e2c25a","#8a5a2a","#a8742f"]);g.beginPath();g.ellipse(0,0,3+Math.random()*4,2+Math.random()*2,0,0,7);g.fill();g.restore()}});
-  const paverTex=()=>canvasTex(512,512,(g)=>{g.fillStyle="#4c4b48";g.fillRect(0,0,512,512);const w=51.2,h=25.6;
-    for(let r=0;r<20;r++)for(let k=-1;k<11;k++){const x=k*w+(r%2)*w/2,y=r*h;const v=104+Math.floor(Math.random()*30);g.fillStyle=`rgb(${v},${v-1},${v-5})`;g.fillRect(x+1.5,y+1.5,w-3,h-3)}
-    noise(g,512,512,8000,["rgba(0,0,0,.08)","rgba(255,255,255,.05)"],2);
-    for(let i=0;i<40;i++){g.save();g.translate(Math.random()*512,Math.random()*512);g.rotate(Math.random()*6.3);g.fillStyle=pick(["#d9a53a","#c9772c","#e2c25a"]);g.beginPath();g.ellipse(0,0,4,2.5,0,0,7);g.fill();g.restore()}});
-  const cobbleTex=()=>canvasTex(256,256,(g)=>{g.fillStyle="#4a4a48";g.fillRect(0,0,256,256);for(let y=0;y<256;y+=26)for(let x=0;x<256;x+=26){const v=110+Math.floor(Math.random()*35);g.fillStyle=`rgb(${v},${v},${v-4})`;g.fillRect(x+2,y+2,22,22)}});
+  const paverTex=()=>canvasTex(512,512,(g)=>{g.fillStyle="#7a776f";g.fillRect(0,0,512,512);   /* fugenloser Betonbelag statt Platten (Fugenraster flimmerte) */
+    for(let i=0;i<10;i++){g.fillStyle=`rgba(${i%2?255:0},${i%2?250:0},${i%2?240:0},.035)`;g.beginPath();g.ellipse(Math.random()*512,Math.random()*512,60+Math.random()*120,40+Math.random()*90,Math.random()*3,0,7);g.fill()}
+    noise(g,512,512,22000,["rgba(0,0,0,.07)","rgba(255,255,255,.06)","rgba(80,70,55,.06)"],2)});
+  const cobbleTex=()=>canvasTex(256,256,(g)=>{g.fillStyle="#6e6c66";g.fillRect(0,0,256,256);noise(g,256,256,9000,["rgba(0,0,0,.08)","rgba(255,255,255,.06)"],2)});   /* Rinne fugenlos */
   const signTex=(w,h,draw)=>{const t=canvasTex(w,h,draw);t.wrapS=t.wrapT=THREE.ClampToEdgeWrapping;return t};
 
   /* ---------- Materialien ---------- */
