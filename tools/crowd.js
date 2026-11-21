@@ -367,14 +367,14 @@ function lateral(a){return [-Math.sin(a),Math.cos(a)]}
   const fwd=[Math.cos(l.a),Math.sin(l.a)],door=two?.62:1.25,ahead=two?-.1:.35;
   const spot=[l.x+lx*side*door+fwd[0]*ahead,l.y+ly*side*door+fwd[1]*ahead];
   const walk=Math.hypot(spot[0]-car.x,spot[1]-car.y),tw=Math.min(.9,walk/1.8);
-  trStart({kind:two?"mount":"enter",l:{...l},side,from:[car.x,car.y],spot,tw,dur:tw+(two?(l.id==="scoot"?.55:.85):.75),done:base})}}
+  trStart({kind:two?"mount":"enter",l:{...l},side,from:[car.x,car.y],spot,tw,dur:tw+(two?(l.id==="scoot"?.55:.85):1.3),done:base})}}
 {const base=exitVehicle;exitVehicle=function(){const VH=V(),id=VH.id;
   if(TR.on||id==="walk"||!PG.inst||state.mode!=="play")return base();
   const l0={id,x:car.x,y:car.y,a:car.a};base();if(V().id!=="walk")return;         // z. B. Hubschrauber in der Luft: nichts passiert
   const two=TWO.has(id)&&RIDE[id],[lx,ly]=lateral(l0.a),side=((car.x-l0.x)*lx+(car.y-l0.y)*ly)>=0?1:-1;
   const fwd=[Math.cos(l0.a),Math.sin(l0.a)],door=two?.62:1.25,ahead=two?-.1:.35;
   const spot=[l0.x+lx*side*door+fwd[0]*ahead,l0.y+ly*side*door+fwd[1]*ahead];
-  const tw=Math.min(.6,Math.hypot(car.x-spot[0],car.y-spot[1])/1.8),tb=two?(id==="scoot"?.5:.8):.75;
+  const tw=Math.min(.6,Math.hypot(car.x-spot[0],car.y-spot[1])/1.8),tb=two?(id==="scoot"?.5:.8):1.0;
   trStart({kind:two?"dismount":"exit",l:l0,side,spot,to:[car.x,car.y],tb,tw,dur:tb+tw})}}
 /* Steuerung sperren */
 {const base=update;update=function(dt){if(!TR.on)return base(dt);const k={...keys};for(const n in keys)keys[n]=false;car.v=0;base(dt);Object.assign(keys,k);
@@ -409,7 +409,7 @@ function trVisual(){if(!TR.on)return;const l=TR.l,[lx,ly]=lateral(l.a),inA=l.a-T
   const into=TR.kind==="enter";const walking=into?TR.t<TR.tw:TR.t>TR.tb;
   if(walking){walker.visible=true;const k=into?ease(TR.t/TR.tw):ease((TR.t-TR.tb)/TR.tw),A=into?TR.from:TR.spot,Bp=into?TR.spot:TR.to;
     walkerAt(A[0]+(Bp[0]-A[0])*k,A[1]+(Bp[1]-A[1])*k,Math.hypot(Bp[0]-A[0],Bp[1]-A[1])>.05?Math.atan2(Bp[1]-A[1],Bp[0]-A[0]):inA);return}
-  const u=into?ease((TR.t-TR.tw)/(TR.dur-TR.tw)):1-ease(TR.t/TR.tb);      // 0 = an der Tür, 1 = im Auto
+  const u=into?ease((TR.t-TR.tw-.3)/.7):1-ease((TR.t-.3)/.7);   /* erst Tür auf, dann hinein bzw. heraus */      // 0 = an der Tür, 1 = im Auto
   const x=TR.spot[0]-lx*TR.side*.9*u,y=TR.spot[1]-ly*TR.side*.9*u;
   g.visible=true;g.position.set(l.x,VEH[l.id].fly?heightAt(l.x,l.y):groundY(l.x,l.y),l.y);g.rotation.set(0,-l.a,0);
   walker.visible=u<.97;walkerAt(x,y,inA+(TR.side>0?1:-1)*u*Math.PI/2*.9,-.35*u);crouch(Math.min(1,u*1.6))}
