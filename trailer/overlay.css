@@ -19,3 +19,5 @@ body.trailer canvas#game,body.trailer #tr,body.trailer #tr *{visibility:visible!
 #tr .logo p{position:absolute;left:0;right:0;text-align:center;margin:0;color:#00F0FF;font-weight:800;letter-spacing:.42em;font-size:24px;text-shadow:0 0 14px rgba(0,240,255,.7)}
 
 #tr .cap.nocase{text-transform:none}
+
+#tr .logo .wz{position:absolute;bottom:18%;width:auto;filter:drop-shadow(0 0 1px #000)}
