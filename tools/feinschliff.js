@@ -35,7 +35,7 @@ function bodyBox(g){g.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy
     tmp.copy(o.geometry.boundingBox).applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld));box.union(tmp);any=true});
   if(!any)box.setFromObject(g).applyMatrix4(inv);return box}
 function carDoor(g,side){const key="door"+side;if(g.userData[key])return g.userData[key];
-  const b=bodyBox(g),len=b.max.x-b.min.x,L=Math.min(1.15,len*.26),hz=side>0?b.max.z+.015:b.min.z-.015,xF=b.min.x+len*.56,y0=b.min.y+.1,y1=b.min.y+(b.max.y-b.min.y)*.62,y2=b.max.y-.08;
+  const b=bodyBox(g),len=b.max.x-b.min.x,L=Math.min(1.15,len*.26),hz=side>0?b.max.z+.015:b.min.z-.015,xF=b.max.x-len*.3,y0=b.min.y+.1,y1=b.min.y+(b.max.y-b.min.y)*.62,y2=b.max.y-.08;
   const piv=new THREE.Group();piv.position.set(xF,0,hz);
   const paint=g.userData.paint||new THREE.MeshLambertMaterial({color:0x5a6a7a});
   const panel=new THREE.Mesh(new THREE.BoxGeometry(L,y1-y0,.05),paint);panel.position.set(-L/2,(y0+y1)/2,side*.025);panel.castShadow=true;piv.add(panel);
