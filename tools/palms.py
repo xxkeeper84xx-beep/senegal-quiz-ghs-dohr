@@ -1,4 +1,4 @@
-# Erzeugt tools/theme2.css: Palmen-Silhouetten (eigene Zeichnung) als Daten-URIs + Menü-Feinschliff
+# Erzeugt tools/theme2.css: Silhouetten Mönchengladbacher Wahrzeichen (früher Palmen) als Daten-URIs + Menü-Feinschliff
 import urllib.parse, sys
 def palm(fill, flip=False, op=1):
     tr = ' transform="translate(220 0) scale(-1 1)"' if flip else ''
@@ -9,16 +9,18 @@ def palm(fill, flip=False, op=1):
       "M122 117 C124 86 128 60 140 34 C132 64 130 90 126 120 Z"]
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 400"><g fill="{fill}" fill-opacity="{op}"{tr}>' + "".join(f'<path d="{d}"/>' for d in paths) + '</g></svg>'
     return 'url("data:image/svg+xml,' + urllib.parse.quote(svg, safe=' /=:"') .replace('"',"'") + '")'
-P1 = palm("#12061f", op=.85); P2 = palm("#12061f", True, .85); P3 = palm("#1a0b2e", op=.7)
-Q1 = palm("#12061f", op=.5); Q2 = palm("#12061f", True, .5); Q3 = palm("#1a0b2e", op=.4)
+# Statt Palmen: Mönchengladbacher Wahrzeichen (links Münster St. Vitus, rechts Wasserturm, klein Schloss Rheydt)
+import os,sys;sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));from wahrzeichen import url as wz
+P1 = wz("muenster","#12061f",.85); P2 = wz("wasserturm","#12061f",.85); P3 = wz("schloss","#1a0b2e",.7)
+Q1 = wz("hauptkirche","#12061f",.5); Q2 = wz("wasserturm","#12061f",.5,True); Q3 = wz("abteiberg","#1a0b2e",.4)
 css = f"""
-/* ================= Atmosphäre: Sonnenuntergang & Palmen, In-Game-Menüs ================= */
+/* ================= Atmosphäre: Sonnenuntergang & Mönchengladbacher Wahrzeichen, In-Game-Menüs ================= */
 :root{{--palmL:{P1};--palmR:{P2};--palmB:{P3};--palmLs:{Q1};--palmRs:{Q2};--palmBs:{Q3}}}
-/* Hintergrund hinter allen Menüs: Glühen am Horizont und Palmen-Silhouetten */
+/* Hintergrund hinter allen Menüs: Glühen am Horizont und Wahrzeichen-Silhouetten */
 .overlay{{background:var(--palmLs) left -40px bottom -40px/auto 50% no-repeat,var(--palmRs) right -30px bottom -50px/auto 58% no-repeat,var(--palmBs) left 9% bottom -60px/auto 34% no-repeat,
   radial-gradient(70% 45% at 50% 108%,rgba(255,123,0,.45),transparent 70%),radial-gradient(60% 50% at 12% 110%,rgba(255,42,133,.4),transparent 70%),radial-gradient(60% 50% at 92% 110%,rgba(255,42,133,.32),transparent 70%),
   linear-gradient(180deg,rgba(9,4,20,.72),rgba(13,6,26,.58) 55%,rgba(40,10,50,.55))}}
-/* Startbildschirm: Sonne mit Palmen davor */
+/* Startbildschirm: Sonne mit Wahrzeichen davor */
 #title::after{{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:var(--palmL) left -50px bottom -30px/auto 62vh no-repeat,var(--palmB) left 20vh bottom -50px/auto 40vh no-repeat,var(--palmRs) right -40px bottom -40px/auto 56vh no-repeat,
   linear-gradient(180deg,rgba(70,12,90,.42),rgba(255,42,133,.14) 42%,rgba(255,123,0,.22) 72%,rgba(255,42,133,.28))}}

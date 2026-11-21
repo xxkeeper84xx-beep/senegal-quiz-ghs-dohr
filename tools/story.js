@@ -9,7 +9,7 @@ const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",b
 const FIG_CHOICES=[["Noah_Pythagoras","Noah"],["01_Schuelerin","Schülerin"],["classic","Klassisch"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["05_Strassenbauer","Straßenbauer"],["07_Geschaeftsfrau","Geschäftsfrau"],["03_Seniorin","Seniorin"],["04_Senior","Senior"]];
 /* Figuren freispielen: am Anfang nur die Schülerfiguren, alle anderen über Spielzeit und gelöste Aufgaben */
 const FIG_REQ={"02_Fussballfan":{min:10,tasks:8},"08_Passant":{min:15,tasks:12},"06_Joggerin":{min:20,tasks:18},"05_Strassenbauer":{min:30,tasks:25},"07_Geschaeftsfrau":{min:40,tasks:32},"03_Seniorin":{min:50,tasks:40},"04_Senior":{min:60,tasks:50}};
-const FIG_ICON={Noah_Pythagoras:"🎒","01_Schuelerin":"🎒","02_Fussballfan":"⚽","08_Passant":"🌴","06_Joggerin":"🏃‍♀️","05_Strassenbauer":"🦺","07_Geschaeftsfrau":"💼","03_Seniorin":"👵","04_Senior":"👴",classic:"🧍"};
+const FIG_ICON={Noah_Pythagoras:"🎒","01_Schuelerin":"🎒","02_Fussballfan":"⚽","08_Passant":"🚶","06_Joggerin":"🏃‍♀️","05_Strassenbauer":"🦺","07_Geschaeftsfrau":"💼","03_Seniorin":"👵","04_Senior":"👴",classic:"🧍"};
 const figName=id=>(FIG_CHOICES.find(f=>f[0]===id)||[0,id])[1];
 const figProgress=s=>({min:Math.floor(((s&&s.playTime)||0)/60),tasks:(s&&s.solved)||0});
 function figUnlocked(id,s){const r=FIG_REQ[id];if(!r)return true;const P=figProgress(s);return P.min>=r.min&&P.tasks>=r.tasks}
