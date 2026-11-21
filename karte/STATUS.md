@@ -4,6 +4,9 @@ Stand 20.11.2026. **Das Spiel nutzt nur noch die echte Karte** (`pythagoras-city
 Die Auswahl zwischen Spielkarte und echter Karte ist entfernt; `echt.html` leitet auf das Spiel weiter.
 
 ## Alle Personen als 3D-Figuren
+GLTFLoader und SkeletonUtils sind direkt ins Spiel eingebaut (vorher Nachladen von cdn.jsdelivr.net, das in Schulnetzen gesperrt sein kann:
+dann blieben alle Menschen einfache Klötzchen). Einfache Figuren erscheinen nur noch als Notlösung, wenn die 3D-Figuren nach 60 s nicht
+geladen sind. Der Spielstart wartet, bis Noah geladen ist; unten läuft eine Ladeanzeige „3D-Figuren werden geladen … x von 9“.
 Passanten, Gruppen, Lehrkräfte, Ladenbesitzer und Auftraggeber nutzen die 3D-Stadtfiguren aus `figuren/` (Idle, Walk, Run,
 umgefärbte Kleidung). Die einfachen Figuren erscheinen nur noch, solange die 3D-Figuren laden. Auf Tablets höchstens 18 Passanten
 im Umkreis von 70 m (Computer 40 im Umkreis von 110 m); weiter entfernte Figuren werden seltener animiert.

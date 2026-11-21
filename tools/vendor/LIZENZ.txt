@@ -1,0 +1,2 @@
+GLTFLoader.js und SkeletonUtils.js aus three.js r128 (examples/js), MIT-Lizenz, Copyright © 2010-2021 three.js authors.
+Sie sind ins Spiel eingebaut, damit nichts von cdn.jsdelivr.net nachgeladen werden muss.

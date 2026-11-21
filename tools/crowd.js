@@ -138,7 +138,7 @@ function updateCrowd(dt,now){
     const useGlb=new Set();if(GLB.ready)for(const q of ranked){const mn=GLB.files[q.look.role];if(mn&&GLB.models[mn])useGlb.add(q)}
     for(const p of peds){const on=keep.has(p),g=useGlb.has(p);
       if(g&&!p.glb)p.glb=glbTake(GLB.files[p.look.role],p);if(!g&&p.glb){glbGive(p.glb);p.glb=null}
-      const proc=on&&!g;if(proc&&!p.mesh){p.mesh=makeCitizen(p.look);crowdGroup.add(p.mesh)}
+      const proc=on&&!g&&GLB.failed;if(proc&&!p.mesh){p.mesh=makeCitizen(p.look);crowdGroup.add(p.mesh)}
       if(on&&p.look.dog&&!p.dogM)p.dogM=makeDog();
       p.det=on;if(p.mesh)p.mesh.visible=proc;if(p.dogM)p.dogM.visible=on}}
   const t=now/1000;
@@ -166,17 +166,20 @@ const GLB={base:"figuren/",ready:false,near:isTouch?6:12,models:{},pools:{},
 const GLB_ACTS=new Set(["wait","chat","phone"]);      // Stehende, für die die Idle-Animation passt
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
 async function initGlbCrowd(){
-  try{if(!THREE.GLTFLoader)await loadScript("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js");
-      if(!THREE.SkeletonUtils)await loadScript("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/SkeletonUtils.js")}
-  catch(e){console.info("3D-Figuren: Lader nicht erreichbar, es bleiben die einfachen Figuren");return}
+  /* GLTFLoader und SkeletonUtils sind ins Spiel eingebaut: kein Nachladen von einem fremden Server (Schulnetze sperren solche Server oft) */
+  if(!THREE.GLTFLoader||!THREE.SkeletonUtils){GLB.failed=true;return}
   const loader=new THREE.GLTFLoader();
   const first=(PROF&&PROF.look&&PROF.look.model)||LOOK_DEF.model,names=[...new Set([first,...Object.values(GLB.files),...FIG_CHOICES.map(f=>f[0]).filter(n=>n!=="classic")])];
+  GLB.total=names.length;GLB.loaded=0;
   for(const name of names){         // nacheinander im Hintergrund laden, Spielfigur zuerst
-    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
-    catch(e){console.info("3D-Figur nicht geladen:",name)}}
-}
+    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g,name);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
+    catch(e){console.info("3D-Figur nicht geladen:",name);if(name===first)GLB.failed=true}
+    GLB.loaded++}
+  if(!GLB.ready)GLB.failed=true}
 /** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
-function prepGlb(gltf){
+/* Vorab gemessene Werte (Bodenabstand, Schritttempo von Walk/Run): spart auf dem iPad mehrere Sekunden Rechenzeit pro Figur */
+const GLB_PREP={"Noah_Pythagoras": {"offY": 0.0077, "walk": 1.279, "run": 2.997}, "01_Schuelerin": {"offY": 0.0065, "walk": 1.114, "run": 2.626}, "02_Fussballfan": {"offY": 0.0082, "walk": 1.358, "run": 3.167}, "03_Seniorin": {"offY": 0.0021, "walk": 1.172, "run": 2.749}, "04_Senior": {"offY": 0.0012, "walk": 1.33, "run": 3.144}, "05_Strassenbauer": {"offY": -0.0003, "walk": 1.452, "run": 3.446}, "06_Joggerin": {"offY": 0.0015, "walk": 1.261, "run": 2.954}, "08_Passant": {"offY": 0.0089, "walk": 1.497, "run": 3.494}, "07_Geschaeftsfrau": {"offY": 0.0076, "walk": 1.312, "run": 3.074}};
+function prepGlb(gltf,name){
   const scene=gltf.scene,clips={};
   for(const c of gltf.animations){
     for(const tr of c.tracks)if(/Hips\.position$/.test(tr.name)){const v=tr.values;for(let i=0;i<v.length;i+=3){v[i]=v[0];v[i+2]=v[2]}}   // nur Auf-und-Ab bleibt
@@ -186,9 +189,11 @@ function prepGlb(gltf){
   const M={scene,clips,offY:0,speed:{walk:1.3,run:3.2},slots:new Map()};
   scene.traverse(o=>{if(!o.isMesh)return;const m=o.material,slot=glbSlot(m.name);if(!slot||M.slots.has(m))return;
     const info={slot,base:m.color.clone()};
-    if(m.map&&slot!=="skin")info.gray=recolorTex(m.map,slot==="outfit"?null:0);
-    if(m.map&&slot==="outfit")info.hues=[40,80,140,200,260,320].map(h=>recolorTex(m.map,h));
+    /* umgefärbte Texturen erst bei Bedarf erzeugen (spart beim Laden viel Zeit) */
+    if(m.map&&slot!=="skin"){let gr;Object.defineProperty(info,"gray",{get:()=>gr||(gr=recolorTex(m.map,slot==="outfit"?null:0))})}
+    if(m.map&&slot==="outfit"){const hs=[];info.hues=new Proxy([40,80,140,200,260,320],{get:(t,k)=>{const i=+k;if(Number.isInteger(i)&&i>=0&&i<t.length)return hs[i]||(hs[i]=recolorTex(m.map,t[i]));return t[k]}})}
     M.slots.set(m,info)});
+  const known=GLB_PREP[name];if(known){M.offY=known.offY;M.speed={walk:known.walk,run:known.run}}else{
   // Messung an einer Kopie: Füße bei Idle auf den Boden, Standfuß-Tempo von Walk und Run
   const probe=THREE.SkeletonUtils.clone(scene),mx=new THREE.AnimationMixer(probe),feet=[];probe.updateMatrixWorld(true);
   probe.traverse(o=>{if(o.isBone&&/(Left|Right)ToeBase$/.test(o.name))feet.push(o)});
@@ -201,7 +206,8 @@ function prepGlb(gltf){
     const vs=[];for(let fi=0;fi<feet.length;fi++){const ys=pts.map(q=>q[fi].y),lo=Math.min(...ys);   // nur die Mitte des Bodenkontakts (Fuß ganz unten)
       for(let i=1;i<=N;i++)if(pts[i][fi].y<lo+.006&&pts[i-1][fi].y<lo+.006)vs.push(-(pts[i][fi].z-pts[i-1][fi].z)/dt)}
     vs.sort((x,y)=>x-y);if(vs.length)M.speed[k]=Math.max(.3,vs[vs.length>>1])}
-  mx.stopAllAction();
+  mx.stopAllAction();}
+
   return M}
 function glbTake(name,p){const M=GLB.models[name],pool=GLB.pools[name]||(GLB.pools[name]=[]);let I=pool.pop();
   if(!I){const obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);I={obj,mixer,act,M,cur:null};scene.add(obj)}
@@ -295,7 +301,7 @@ if(MG.real)document.querySelectorAll(".mapnote").forEach(n=>n.insertAdjacentHTML
 
 /* ================= Ansprechpersonen (Lehrkräfte, Ladenbesitzer, Auftraggeber) als 3D-Figuren ================= */
 const STANDS=[];
-{const base=standPerson;standPerson=function(x,y,a,shirt){const p=base(x,y,a,shirt);STANDS.push({p,x,y,a,shirt,glb:null});return p}}
+{const base=standPerson;standPerson=function(x,y,a,shirt){const p=base(x,y,a,shirt);p.visible=!!GLB.failed;STANDS.push({p,x,y,a,shirt,glb:null});return p}}
 const STAND_MODEL={"Mats":"02_Fussballfan","Elif":"01_Schuelerin","Jana":"06_Joggerin","Tarik":"05_Strassenbauer","Kalle":"05_Strassenbauer",
   "Herr Ballhorn":"05_Strassenbauer","Herr Brands":"04_Senior","Bäcker Hennes":"08_Passant"};
 function standName(S){const p=S.p;for(const q of QUESTS)if(q.person===p)return q.giver.name;for(const t of TALK)if(t.person===p)return t.name;
@@ -415,3 +421,12 @@ function trVisual(){if(!TR.on)return;const l=TR.l,[lx,ly]=lateral(l.a),inA=l.a-T
   walker.visible=u<.97;walkerAt(x,y,inA+(TR.side>0?1:-1)*u*Math.PI/2*.9,-.35*u);crouch(Math.min(1,u*1.6))}
 {const base=updateCamera;updateCamera=function(dt,VH){trVisual();base(dt,VH)}}
 {const base=interactables;interactables=function(VH){return TR.on?[]:base(VH)}}   /* kein „Einsteigen“-Hinweis während des Übergangs */
+
+/* ================= Ladeanzeige: Spielstart erst, wenn die 3D-Spielfigur da ist ================= */
+{const box=document.createElement("div");box.id="glbLoad";box.style.cssText="position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;padding:8px 16px;border-radius:999px;background:rgba(9,4,20,.78);color:#00F0FF;font:700 13px Inter,Arial,sans-serif;letter-spacing:.08em;pointer-events:none";document.body.appendChild(box);
+  setInterval(()=>{const on=!GLB.failed&&GLB.total&&GLB.loaded<GLB.total;box.hidden=!on;if(on)box.textContent=`3D-Figuren werden geladen … ${GLB.loaded} von ${GLB.total}`},300);
+  setTimeout(()=>{if(!GLB.ready){GLB.failed=true;for(const S of STANDS)if(!S.glb)S.p.visible=true}},60000)}   // nach 60 s ohne Figur: Notlösung mit einfachen Figuren
+{const base=hideTitle;hideTitle=function(){if(walker&&!walker.userData.glbDone&&!GLB.failed&&!(PROF&&PROF.look&&PROF.look.model==="classic")){
+  const t=$("title"),w=document.getElementById("glbWait")||t.appendChild(Object.assign(document.createElement("div"),{id:"glbWait"}));
+  w.style.cssText="position:absolute;left:0;right:0;bottom:22%;text-align:center;color:#fff;font:800 18px Montserrat,Arial,sans-serif;text-shadow:0 2px 12px #000";w.textContent="Noah wird geladen … gleich geht es los";
+  const iv=setInterval(()=>{if(walker.userData.glbDone||GLB.failed){clearInterval(iv);w.remove();base()}},200);return}base()}}

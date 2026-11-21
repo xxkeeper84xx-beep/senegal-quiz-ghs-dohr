@@ -39,7 +39,8 @@ function vehRadius(id){const s=VG.size[id];if(!s)return;const r=id==="heli"?Math
 function vehSwap(id,gltf){const old=vehMeshes[id],g=vehFromGlb(id,gltf);
   if(old){g.position.copy(old.position);g.rotation.copy(old.rotation);g.visible=old.visible;if(old.userData.rider){g.add(old.userData.rider);g.userData.rider=old.userData.rider}scene.remove(old)}
   scene.add(g);vehMeshes[id]=g;VG.done[id]=true;vehRadius(id);applyPaint(id)}
-async function loadVehicles(){for(let k=0;k<200&&!THREE.GLTFLoader;k++)await new Promise(r=>setTimeout(r,100));if(!THREE.GLTFLoader)return;
+async function loadVehicles(){if(!THREE.GLTFLoader)return;
+  for(let k=0;k<600&&!(walker&&walker.userData.glbDone)&&!GLB.failed;k++)await new Promise(r=>setTimeout(r,100));   // erst die Spielfigur, dann die Fahrzeuge
   const loader=new THREE.GLTFLoader();
   const order=[V().id,...Object.keys(VMOD)].filter((v,i,a)=>VMOD[v]&&a.indexOf(v)===i);
   for(const id of order){try{const g=await loader.loadAsync("fahrzeuge/"+VMOD[id]+".json");vehSwap(id,g)}catch(e){console.info("Fahrzeugmodell nicht geladen:",id)}}}
