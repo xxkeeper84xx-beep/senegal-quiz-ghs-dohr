@@ -1,9 +1,9 @@
 /* Szenen des Trailers (läuft in der Spielseite). Zeiten passend zur Musik: 100 BPM, ein Takt = 2,4 s. */
-window.requestAnimationFrame=()=>0;              // eigene Spielschleife anhalten: jedes Bild wird hier gezielt berechnet
+window.requestAnimationFrame=()=>0;VK.cool=1e9;VK.scootCool=1e9;   // keine Strafen während der Aufnahme              // eigene Spielschleife anhalten: jedes Bild wird hier gezielt berechnet
 document.body.classList.add("trailer");
 const ov=document.createElement("div");ov.id="tr";ov.innerHTML=`<div class="cap" id="cap"></div><div class="black" id="blk"></div><div class="flash" id="fl"></div>
 <div class="logo" id="logo"><div class="sun"></div><svg class="wz" style="left:-1%;height:170px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200"><g fill="#0b0412" fill-opacity="1"><path d="M0 200 L22 118 Q210 74 398 118 L420 200 Z"/><path d="M10 126 Q210 64 410 126 L410 132 Q210 72 10 132 Z"/><path d="M60 104 L66 82 H72 L70 104 Z"/><path d="M150 90 L154 66 H160 L160 90 Z"/><path d="M260 90 L260 66 H266 L270 90 Z"/><path d="M350 104 L348 82 H354 L360 104 Z"/></g></svg><svg class="wz" style="left:13%;height:330px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 400"><g fill="#0b0412" fill-opacity="1"><path d="M150 400 V92 H204 V400 Z"/><path d="M146 94 L177 6 L208 94 Z"/><path d="M171 18 h12 v-14 h-12 z"/><path d="M18 400 V214 H150 V400 Z"/><path d="M14 216 L84 160 L154 216 Z"/><path d="M204 400 V250 H248 V400 Z"/><path d="M200 252 L226 214 L252 252 Z"/><path d="M30 400 V300 H40 V400 Z"/><path d="M60 400 V300 H70 V400 Z"/><path d="M90 400 V300 H100 V400 Z"/><path d="M120 400 V300 H130 V400 Z"/></g></svg><svg class="wz" style="left:26%;height:250px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400"><g fill="#0b0412" fill-opacity="1"><path d="M84 400 V120 H116 V400 Z"/><path d="M80 122 L100 0 L120 122 Z"/><path d="M20 400 V250 H84 V400 Z"/><path d="M16 252 L50 210 L84 252 Z"/><path d="M116 400 V270 H176 V400 Z"/><path d="M112 272 L146 236 L180 272 Z"/></g></svg><svg class="wz" style="left:63%;height:150px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220"><g fill="#0b0412" fill-opacity="1"><path d="M0 220 V150 H320 V220 Z"/><path d="M10 150 L10 112 L50 132 L50 112 L90 132 L90 112 L130 132 L130 112 L170 132 V150 Z"/><path d="M212 220 V36 H262 V220 Z"/><path d="M206 40 H268 V30 H206 Z"/><path d="M180 150 V118 H212 V150 Z"/></g></svg><svg class="wz" style="left:75%;height:300px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400"><g fill="#0b0412" fill-opacity="1"><path d="M76 400 L82 150 H118 L124 400 Z"/><path d="M42 150 V78 H158 V150 Z"/><path d="M36 80 Q100 30 164 80 Z"/><path d="M93 50 V30 H107 V50 Z"/><path d="M90 32 L100 16 L110 32 Z"/><path d="M60 400 V360 H140 V400 Z"/></g></svg><svg class="wz" style="left:84%;height:170px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260"><g fill="#0b0412" fill-opacity="1"><path d="M70 236 V118 H290 V236 Z"/><path d="M64 120 L90 82 H270 L296 120 Z"/><path d="M28 236 V104 H72 V236 Z"/><path d="M24 106 L50 52 L76 106 Z"/><path d="M288 236 V104 H332 V236 Z"/><path d="M284 106 L310 52 L336 106 Z"/><path d="M168 120 V56 H192 V120 Z"/><path d="M162 58 Q180 18 198 58 Z"/><path d="M177 30 h6 v-16 h-6 z"/><path d="M0 260 V236 H400 V260 Z"/></g></svg>
-<h1>PYTHAGORAS<br>CITY</h1><p style="top:85%">MÖNCHENGLADBACH · MATHE KLASSE 9</p><p style="top:92%;color:#fff;letter-spacing:.3em;font-size:20px;text-shadow:none">DEMNÄCHST ALS SPIEL AN DEINER GHS DOHR</p></div>`;
+<h1>PYTHAGORAS<br>CITY</h1><div id="soon">COMING SOON</div><p style="top:85%">MÖNCHENGLADBACH · MATHE KLASSE 9</p><p style="top:92%;color:#fff;letter-spacing:.3em;font-size:20px;text-shadow:none">DEMNÄCHST ALS SPIEL AN DEINER GHS DOHR</p></div>`;
 document.body.appendChild(ov);
 const $c=document.getElementById("cap"),$b=document.getElementById("blk"),$f=document.getElementById("fl"),$l=document.getElementById("logo");
 const sm=u=>u<0?0:u>1?1:u*u*(3-2*u),lerp=(a,b,u)=>a+(b-a)*u;
@@ -22,35 +22,45 @@ const rd=(s,off)=>rdA(s,off).slice(0,2);const RD={a:0};
 const SHOTS=[
  {id:"A",t0:0,t1:4.8,start(){place("walk",S0[0],S0[1],S0[2],0)},frame(t){const u=sm(t/4.8);CAMF=()=>({p:[lerp(560,700,u),lerp(150,95,u),lerp(420,330,u)],l:[lerp(860,880,u),0,lerp(210,220,u)],fov:45});
    $b.style.opacity=t<1.2?1-t/1.2:0;cap("Mönchengladbach.<small>Rheydt · Mülfort</small>",t,1.4,4.6)}},
- {id:"B",t0:4.8,t1:9.6,start(){place("walk",S0[0],S0[1],S0[2],0)},frame(t){const u=(t-4.8)/4.8;CAMF=()=>({p:[S0[0]-30+u*24,6+u*1.5,S0[1]+20-u*2],l:[SCH[0]+2,6,SCH[1]+10],fov:50});
-   cap("Deine Schule.<small>GHS Dohr · Standort Am Torfbend</small>",t,5.2,9.4)}},
+ {id:"B",t0:4.8,t1:9.6,start(){place("walk",S0[0]+40,S0[1]+30,S0[2],0)},frame(t){const u=(t-4.8)/4.8,C=TALK.find(q=>q.name==="Frau Costantino")||{x:850,y:234};
+   CAMF=()=>({p:[C.x-4.5+u*8,1.75,C.y+6.2],l:[C.x+u*3.5,1.35,C.y-7],fov:48});
+   cap("Deine Schule.<br>Deine Lehrer.<small>GHS Dohr · Frau Costantino</small>",t,5.2,9.4)}},
  {id:"C",t0:9.6,t1:14.4,start(){place("walk",S0[0]-11*Math.cos(S0[2]),S0[1]-11*Math.sin(S0[2]),S0[2],1.8);ST.c=[car.x,car.y]},frame(t){const u=t-9.6,a=S0[2],x=ST.c[0]+Math.cos(a)*1.8*u,y=ST.c[1]+Math.sin(a)*1.8*u;
    car.x=x;car.y=y;car.a=a;car.v=1.8;CAMF=()=>({p:[x+Math.cos(a)*3.6+Math.sin(a)*1.2,1.25,y+Math.sin(a)*3.6-Math.cos(a)*1.2],l:[x,1.05,y],fov:42});
    cap("Noah.<small>Klasse 9 · Mathe-Ass in Ausbildung</small>",t,10.2,14.2)}},
  {id:"D",t0:14.4,t1:19.2,start(){place("walk",MK[0]+4,MK[1]+18,-Math.PI/2,0)},frame(t){const u=(t-14.4)/4.8,ang=1.9+u*.9;CAMF=()=>({p:[MK[0]+Math.cos(ang)*34,9-u*3,MK[1]+Math.sin(ang)*34],l:[MK[0],1.5,MK[1]],fov:50});
    cap("Die ganze Stadt<br>ist dein Klassenzimmer.",t,14.8,19.0)}},
- {id:"E1",t0:19.2,t1:21.6,start(){const [x,y,a]=rdA(150,2.3);place("bike",x,y,a,6)},frame(t){const s=150+(t-19.2)*6,[x,y,A]=rdA(s,2.3);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=6;const L=[-Math.sin(A),Math.cos(A)];
+ {id:"E1",t0:19.2,t1:21.6,start(){save.scootTuned=true;VK.scootCool=1e9;const [x,y,a]=rdA(150,2.2);place("scoot",x,y,a,11);scootGlow()},frame(t){const s=150+(t-19.2)*11,[x,y,A]=rdA(s,2.2);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=11;cap("Getunt?<small>Lass dich nicht erwischen</small>",t,19.5,21.5);const L=[-Math.sin(A),Math.cos(A)];
    CAMF=()=>({p:[x+L[0]*4.2+Math.cos(RD.a)*.8,1.2,y+L[1]*4.2+Math.sin(RD.a)*.8],l:[x,1.0,y],fov:44});$f.style.opacity=Math.max(0,1-(t-19.2)/.25)}},
  {id:"E2",t0:21.6,t1:24.0,start(){const [x,y,a]=rdA(175);place("moped",x,y,a,10)},frame(t){const s=175+(t-21.6)*10,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=10;
    CAMF=()=>({p:[x+Math.cos(RD.a)*5.5,.7,y+Math.sin(RD.a)*5.5+.6],l:[x,1.1,y],fov:40})}},
  {id:"F",t0:24.0,t1:28.8,start(){const [x,y,a]=rdA(160);place("auto",x,y,a,16)},frame(t){const s=160+(t-24)*16,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=16;const L=[-Math.sin(RD.a),Math.cos(RD.a)],k=(t-24)/4.8;
    CAMF=()=>({p:[x-Math.cos(RD.a)*(7-k*3)+L[0]*(2.5+k*3),.9+k*.6,y-Math.sin(RD.a)*(7-k*3)+L[1]*(2.5+k*3)],l:[x+Math.cos(RD.a)*2,.8,y+Math.sin(RD.a)*2],fov:46});
    cap("a² + b² = c²",t,25.8,28.6,"grad mid")}},
- {id:"G1",t0:28.8,t1:31.2,start(){place("heli",830,120,.6,12);car.alt=38},frame(t){const k=t-28.8,x=830+Math.cos(.6)*12*k,y=120+Math.sin(.6)*12*k;car.x=x;car.y=y;car.a=.6;car.v=12;car.alt=38;car.rotor=1;
-   CAMF=()=>({p:[x-13+k*1.5,42,y+13],l:[x,37.5,y],fov:46});cap("Rechne dich<br>durch die Stadt.",t,29.2,33.4)}},
+ {id:"G1",t0:28.8,t1:31.2,start(){const X=VK.X[0],a=X.dirs[0],d=[Math.cos(a),Math.sin(a)],P=[-d[1],d[0]],A=X.group.children[0].position;
+   const N=[A.x+d[0]*1.1-P[0]*.2,A.z+d[1]*1.1-P[1]*.2];place("walk",N[0],N[1],a+Math.PI/2,0);
+   for(const n of npcs)if(!n.police&&n.x!==undefined&&Math.hypot(n.x-X.x,n.y-X.y)<90)placeAgent(n,carEdges,X.x,X.y,220,420,true);   // freie Straße
+   ST.g={X,a,d,P,N};VK.t=-X.off+3},
+  frame(t){const k=t-28.8,G=ST.g,X=G.X,d=G.d,P=G.P,N=G.N;VK.t=-X.off+3+k;      // Autos Grün, Fußgänger Rot
+   car.x=N[0];car.y=N[1];car.v=0;car.a=G.a+Math.PI/2;
+   const c=VK.cops[0];if(c){const s=-14+k*13;c.n.x=X.x+d[0]*s+P[0]*1.7;c.n.y=X.y+d[1]*s+P[1]*1.7;c.n.ang=G.a;c.n.v=13;c.alarm=5}
+   for(const n of npcs)if(!n.police&&n.x!==undefined&&Math.hypot(n.x-X.x,n.y-X.y)<60)placeAgent(n,carEdges,X.x,X.y,220,420,true);
+   CAMF=()=>({p:[N[0]+d[0]*7.5-P[0]*1.6,1.65,N[1]+d[1]*7.5-P[1]*1.6],l:[N[0]-d[0]*3+P[0]*2.2,1.3,N[1]-d[1]*3+P[1]*2.2],fov:50});cap("Bei Rot?<br>Lieber warten.",t,29.1,31.1)}},
  {id:"G2",t0:31.2,t1:33.6,start(){place("plane",700,60,.35,30);VEH.plane.fly=true;car.alt=55;car.vy=0},frame(t){const k=t-31.2,x=700+Math.cos(.35)*30*k,y=60+Math.sin(.35)*30*k;car.x=x;car.y=y;car.a=.35;car.v=30;VEH.plane.fly=true;car.alt=55+k*2;car.vy=2;car.steer=.35;
-   CAMF=()=>({p:[x-Math.cos(.35)*12-Math.sin(.35)*7,car.alt+3,y-Math.sin(.35)*12+Math.cos(.35)*7],l:[x+Math.cos(.35)*4,car.alt,y+Math.sin(.35)*4],fov:50});cap("Rechne dich<br>durch die Stadt.",t,29.2,33.4)}},
+   CAMF=()=>({p:[x-Math.cos(.35)*12-Math.sin(.35)*7,car.alt+3,y-Math.sin(.35)*12+Math.cos(.35)*7],l:[x+Math.cos(.35)*4,car.alt,y+Math.sin(.35)*4],fov:50});cap("Rechne dich<br>durch die Stadt.",t,31.4,33.4)}},
  {id:"H",t0:33.6,t1:38.4,start(){place("walk",WK.giver[0]-3,WK.giver[1]+18,-Math.PI/2,0);const q=questById("werkhof"),s=qs(q);s.acc=true;s.m={a:true,b:true};s.done=false;applyEffect("werkhof",false,false);refreshQuestWorld();ST.lit=false},
   frame(t){const k=(t-33.6)/4.8,c=[WK.wall[0]+4,WK.wall[1]],ang=2.3+k*.7;CAMF=()=>({p:[c[0]+Math.cos(ang)*14,4+k*2,c[1]+Math.sin(ang)*14],l:[c[0],3,c[1]],fov:50});
    if(t>=36&&!ST.lit){ST.lit=true;const q=questById("werkhof");qs(q).done=true;applyEffect("werkhof",true,true);refreshQuestWorld();for(const m of q.measures){m.tube.visible=m.lab.visible=true}}
    $f.style.opacity=t>=36&&t<36.3?1-(t-36)/.3:0;cap(t<36?"6 m und 8 m …":"… sind 10 m Kabel.<small>Licht an im Werkhof</small>",t,33.9,38.3,"nocase")}},
- {id:"I1",t0:38.4,t1:40.8,start(){const [x0,y0,a0]=rdA(300,2.4);RD.a=a0;place("bike",x0,y0,a0,0);exitVehicle();TR.on=false;TR.done=null;const L=[-Math.sin(RD.a),Math.cos(RD.a)];car.x+=L[0]*1.8;car.y+=L[1]*1.8;ST.i=[x0,y0];enterVehicle()},
-  frame(t){const [x,y]=ST.i;CAMF=()=>({p:[x+Math.sin(RD.a)*-5.2+Math.cos(RD.a)*1.5,1.6,y-Math.cos(RD.a)*-5.2+Math.sin(RD.a)*1.5],l:[x,1.0,y],fov:42});cap("Steig auf.",t,38.8,40.7)}},
- {id:"I2",t0:40.8,t1:43.2,start(){const [x0,y0,a0]=rdA(330,1.9);RD.a=a0;place("auto",x0,y0,a0,0);exitVehicle();TR.on=false;TR.done=null;const L=[-Math.sin(RD.a),Math.cos(RD.a)];car.x+=L[0]*1.2;car.y+=L[1]*1.2;ST.i=[x0,y0];enterVehicle()},
+ {id:"I1",t0:38.4,t1:40.8,start(){save.playTime=1e6;save.solved=999;save.xp=9999;const [x0,y0,a0]=rdA(300,5.6);place("walk",x0,y0,a0+Math.PI,1.8);
+   applyLook(Object.assign({},LOOK_DEF,{model:"Dittmann_Cap"}));ST.i=[x0,y0,a0+Math.PI]},
+  frame(t){const k=t-38.4,[x0,y0,a]=ST.i,x=x0+Math.cos(a)*1.8*k,y=y0+Math.sin(a)*1.8*k;car.x=x;car.y=y;car.a=a;car.v=1.8;
+   CAMF=()=>({p:[x+Math.cos(a)*3.6+Math.sin(a)*1.1,1.45,y+Math.sin(a)*3.6-Math.cos(a)*1.1],l:[x,1.15,y],fov:40});cap("Freispielbar:<br>Herr Dittmann.<small>Nur für echte Profis</small>",t,38.7,40.7)}},
+ {id:"I2",t0:40.8,t1:43.2,start(){applyLook(Object.assign({},LOOK_DEF));const [x0,y0,a0]=rdA(330,1.9);RD.a=a0;place("auto",x0,y0,a0,0);exitVehicle();TR.on=false;TR.done=null;const L=[-Math.sin(RD.a),Math.cos(RD.a)];car.x+=L[0]*1.2;car.y+=L[1]*1.2;ST.i=[x0,y0];enterVehicle()},
   frame(t){const [x,y]=ST.i;CAMF=()=>({p:[x+Math.sin(RD.a)*-6.5+Math.cos(RD.a)*2.5,1.7,y-Math.cos(RD.a)*-6.5+Math.sin(RD.a)*2.5],l:[x,1.0,y],fov:44});cap("Steig ein.",t,41.1,43.1);
    $b.style.opacity=t>42.7?(t-42.7)/.5:0}},
  {id:"J",t0:43.2,t1:48,start(){},frame(t){const k=t-43.2;$b.style.opacity=0;$c.style.opacity=0;$l.style.opacity=Math.min(1,k/.15);$f.style.opacity=Math.max(0,1-k/.4);
-   $l.querySelector("h1").style.transform=`scale(${1.08-.08*sm(k/2.5)})`;if(k>4)$l.style.opacity=Math.max(0,1-(k-4)/.8)}},
+   $l.querySelector("h1").style.transform=`scale(${1.08-.08*sm(k/2.5)})`;const so=document.getElementById("soon"),T=3.1,u2=(k-T)/.3;so.style.opacity=k<T?0:Math.min(1,u2*1.5);so.style.transform=`translateX(-50%) scale(${k<T?1.6:1+.6*(1-sm(u2))})`;/* auf den Höhepunkt der Titelmelodie (46,3 s) */if(k>4.45)$l.style.opacity=Math.max(0,1-(k-4.45)/.35)}},
 ];
 window.SHOTS=SHOTS;
 window.shotStart=id=>{const s=SHOTS.find(s=>s.id===id);$c.style.opacity=0;$f.style.opacity=0;$b.style.opacity=0;$l.style.opacity=0;CAMF=null;ST={};s.start();

@@ -9,7 +9,7 @@ await p.route(/cdnjs.cloudflare.com/,r=>r.fulfill({body:three,contentType:'appli
 await p.route(/cdn\.jsdelivr\.net\/npm\/three@0\.128\.0\/(.*)$/,r=>{const rel=r.request().url().split('three@0.128.0/')[1];r.fulfill({path:path.join(T128,rel),contentType:'application/javascript'})});
 await p.goto('http://localhost:8766/index.html');await p.waitForFunction(()=>window.__ready,null,{timeout:300000});
 await p.evaluate(()=>{startCreate(false);createProfile('Noah',Object.assign({},LOOK_DEF));hideTitle();});
-await p.waitForFunction(()=>walker&&walker.userData.glbDone&&Object.keys(GLB.models).length>=9&&Object.keys(VG.done).length>=6,null,{timeout:1800000,polling:2000});
+await p.waitForFunction(()=>walker&&walker.userData.glbDone&&Object.keys(GLB.models).length>=10&&Object.keys(VG.done).length>=6&&VK.X.length&&VK.cops.length,null,{timeout:1800000,polling:2000});
 await p.addStyleTag({path:__dirname+'/overlay.css'});
 await p.evaluate(fs=>{eval(fs)},fs.readFileSync(__dirname+'/szenen.js','utf8'));
 const shots=await p.evaluate(()=>SHOTS.map(s=>[s.id,s.t0,s.t1]));

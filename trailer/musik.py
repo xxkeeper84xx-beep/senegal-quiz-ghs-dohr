@@ -84,6 +84,8 @@ for (a,b) in [(16.8,19.2),(40.8,43.2)]:
 for ts in (43.2,):
     put(KICK*1.4,ts,0,1); tt=t_(4.8); hit=sum(saw(note(n),tt,.008) for n in [45,57,60,64,69])/5
     put(lp_fast(hit,1800)*np.exp(-tt*.7),ts,0,.35)
+# zweiter Schlag für „COMING SOON“ (45,1 s): Kick plus Becken
+put(KICK*1.5,45.1,0,1);tt=t_(1.6);put(rng.uniform(-1,1,len(tt))*np.exp(-tt*3.5)*.35,45.1,.0,1)
 # Hall (einfache Echos) und Master
 def echo(x,d,g): y=x.copy(); k=int(d*SR); y[k:]+=x[:-k]*g; return y
 L=echo(echo(L,.31,.25),.47,.15); R=echo(echo(R,.37,.25),.53,.15)

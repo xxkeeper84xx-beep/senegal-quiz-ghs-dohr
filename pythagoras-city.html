@@ -8871,8 +8871,11 @@ function costantinoTask(){const [a,b]=pick([[9,12],[12,16],[6,8],[15,20],[10,24]
 
 /* ---------- E-Scooter-Tuning bei Kalle ---------- */
 const TUNE_PRICE=80;
-function scootGlow(){const g=vehMeshes.scoot;if(!g)return;if(!g.userData.glow){const m=new THREE.Mesh(new THREE.PlaneGeometry(9,2.6),new THREE.MeshBasicMaterial({color:0x00f0ff,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));
-  m.rotation.x=-Math.PI/2;m.position.set(0,.35,0);g.add(m);g.userData.glow=m}g.userData.glow.visible=!!save.scootTuned}
+function scootGlow(){const g=vehMeshes.scoot;if(!g)return;if(!g.userData.glow){const grp=new THREE.Group(),neon=new THREE.MeshBasicMaterial({color:0x00f0ff,toneMapped:false});
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(14,6),new THREE.MeshBasicMaterial({color:0x00f0ff,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false}));
+  m.rotation.x=-Math.PI/2;m.position.set(0,.25,0);grp.add(m);                                   // Lichtschein auf dem Boden
+  for(const z of [-1.9,1.9]){const b=new THREE.Mesh(new THREE.BoxGeometry(9.5,.35,.25),neon);b.position.set(-.8,1.05,z);grp.add(b)}   // Neonleisten an beiden Seiten unter dem Trittbrett
+  g.add(grp);g.userData.glow=grp}g.userData.glow.visible=!!save.scootTuned}
 {const base=interactables;interactables=function(VH){const L=base(VH);const k=XG.find(g=>g.id==="kalle");
   if(k&&k.at&&save.owned.includes("scoot")&&!save.scootTuned)L.push({x:k.at[0],y:k.at[1],r:4,label:`🔧 E-Scooter tunen lassen (${TUNE_PRICE} $)`,act:()=>{
     if(save.money<TUNE_PRICE){toast("Zu wenig Geld",`Tuning kostet ${TUNE_PRICE} $`,"#ff5d6c");return}

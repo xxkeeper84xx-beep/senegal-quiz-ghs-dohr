@@ -21,3 +21,7 @@ body.trailer canvas#game,body.trailer #tr,body.trailer #tr *{visibility:visible!
 #tr .cap.nocase{text-transform:none}
 
 #tr .logo .wz{position:absolute;bottom:18%;width:auto;filter:drop-shadow(0 0 1px #000)}
+
+#tr .logo h1{top:8%!important}
+#tr #soon{position:absolute;left:50%;top:46%;transform:translateX(-50%);white-space:nowrap;font-weight:900;font-style:italic;font-size:150px;line-height:1;letter-spacing:.02em;
+  color:#fff;-webkit-text-stroke:3px #FF2A85;text-shadow:0 0 30px rgba(255,42,133,.9),0 0 60px rgba(0,240,255,.55),0 8px 0 #2a0a3a;opacity:0}
