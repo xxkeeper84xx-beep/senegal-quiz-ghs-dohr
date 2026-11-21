@@ -1740,7 +1740,7 @@
 			this.nodeNamesUsed = {}; // Use an THREE.ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 			// expensive work of uploading a texture to the GPU off the main thread.
 
-			if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
+			if ( false ) { // Pythagoras City: immer TextureLoader (Bild-Element). ImageBitmapLoader nutzt fetch() auf data:-Adressen, das die Artifact-Sicherheitsregeln sperren.
 
 				this.textureLoader = new THREE.ImageBitmapLoader( this.options.manager );
 

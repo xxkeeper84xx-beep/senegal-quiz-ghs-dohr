@@ -173,7 +173,7 @@ async function initGlbCrowd(){
   GLB.total=names.length;GLB.loaded=0;
   for(const name of names){         // nacheinander im Hintergrund laden, Spielfigur zuerst
     try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g,name);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
-    catch(e){console.info("3D-Figur nicht geladen:",name);if(name===first)GLB.failed=true}
+    catch(e){console.info("3D-Figur nicht geladen:",name,e);GLB.err=(name+": "+(e&&e.message||e)).slice(0,140);if(name===first)GLB.failed=true}
     GLB.loaded++}
   if(!GLB.ready)GLB.failed=true}
 /** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
@@ -424,7 +424,7 @@ function trVisual(){if(!TR.on)return;const l=TR.l,[lx,ly]=lateral(l.a),inA=l.a-T
 
 /* ================= Ladeanzeige: Spielstart erst, wenn die 3D-Spielfigur da ist ================= */
 {const box=document.createElement("div");box.id="glbLoad";box.style.cssText="position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;padding:8px 16px;border-radius:999px;background:rgba(9,4,20,.78);color:#00F0FF;font:700 13px Inter,Arial,sans-serif;letter-spacing:.08em;pointer-events:none";document.body.appendChild(box);
-  setInterval(()=>{const on=!GLB.failed&&GLB.total&&GLB.loaded<GLB.total;box.hidden=!on;if(on)box.textContent=`3D-Figuren werden geladen … ${GLB.loaded} von ${GLB.total}`},300);
+  setInterval(()=>{const on=(!GLB.failed&&GLB.total&&GLB.loaded<GLB.total)||!!GLB.err;box.hidden=!on;if(on)box.textContent=GLB.err?`3D-Figuren: Fehler beim Laden (${GLB.err})`:`3D-Figuren werden geladen … ${GLB.loaded} von ${GLB.total}`},300);
   setTimeout(()=>{if(!GLB.ready){GLB.failed=true;for(const S of STANDS)if(!S.glb)S.p.visible=true}},60000)}   // nach 60 s ohne Figur: Notlösung mit einfachen Figuren
 {const base=hideTitle;hideTitle=function(){if(walker&&!walker.userData.glbDone&&!GLB.failed&&!(PROF&&PROF.look&&PROF.look.model==="classic")){
   const t=$("title"),w=document.getElementById("glbWait")||t.appendChild(Object.assign(document.createElement("div"),{id:"glbWait"}));
