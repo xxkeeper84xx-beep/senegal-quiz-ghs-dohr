@@ -3,6 +3,21 @@
 Stand 20.11.2026. **Das Spiel nutzt nur noch die echte Karte** (`pythagoras-city.html` lädt `mg-echt.js`).
 Die Auswahl zwischen Spielkarte und echter Karte ist entfernt; `echt.html` leitet auf das Spiel weiter.
 
+## Verkehr, Regeln und neue Figuren (`tools/verkehr.js`, `tools/rig.js`)
+- **Ampeln** (`fahrzeuge/Ampel.*`) an 12 echten Kreuzungen um Schule, Rheydter Markt, Rheydt Hbf und Haupthaus, mit Fußgängersignal.
+  Zyklus 24 s; Autos des Stadtverkehrs halten bei Rot. Bei Rot über die Kreuzung: gesehen von Polizei (70 m) oder Lehrkraft (35 m)
+  → Bußgeld (zu Fuß 5 $, Fahrrad/E-Scooter 60 $, Motorrad/Auto 90 $). Ohne Zeugen meist Glück, manchmal ruft eine Nachbarin die Eltern an.
+  Ab dem zweiten Verstoß, bei Lehrkraft-Zeugen oder wenn das Geld nicht reicht: **Elternbrief** (SMS von Mama, Hinweis oben links,
+  Autohaus verkauft nichts) – erledigt durch **Verkehrsunterricht bei Frau Costantino** (Pythagoras-Aufgabe: Diagonale über die Kreuzung).
+- **Polizei** (`fahrzeuge/Polizeifahrzeug.*`): zwei Streifenwagen im Stadtverkehr, bleiben in der Nähe, Blaulicht bei Kontrollen.
+- **E-Scooter-Tuning** bei Kalle (80 $): bis 40 km/h, Neonlicht unter dem Trittbrett. Schneller als 20 km/h in Sicht von Polizei (40 m)
+  oder Lehrkraft (24 m) → E-Scooter einkassiert (Polizei: zusätzlich Elternbrief).
+- **Frau Costantino**: Lehrerin für Mathe und Deutsch, Verkehrsbeauftragte, steht vor dem Schuleingang, auch im Smartphone. Mama ist ebenfalls Kontakt.
+- **Lehrkräfte** haben eine helle Hautfarbe.
+- **Herr Dittmann (Cap, Freizeitlook)** als spielbare Figur (`figuren/Dittmann_Cap.*`): freischalten mit 90 Min. Spielzeit, 80 gelösten
+  Aufgaben und 2500 XP. Das gelieferte Modell ist starr; `tools/rig.js` erzeugt beim Laden Skelett und Animationen (Idle, Walk, Run).
+  Bekannte Schwäche: an Hüfte und Schultern verzieht sich das T-Shirt bei großen Bewegungen etwas.
+
 ## Alle Personen als 3D-Figuren
 GLTFLoader und SkeletonUtils sind direkt ins Spiel eingebaut (vorher Nachladen von cdn.jsdelivr.net, das in Schulnetzen gesperrt sein kann:
 dann blieben alle Menschen einfache Klötzchen). Einfache Figuren erscheinen nur noch als Notlösung, wenn die 3D-Figuren nach 60 s nicht

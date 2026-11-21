@@ -172,7 +172,7 @@ async function initGlbCrowd(){
   const first=(PROF&&PROF.look&&PROF.look.model)||LOOK_DEF.model,names=[...new Set([first,...Object.values(GLB.files),...FIG_CHOICES.map(f=>f[0]).filter(n=>n!=="classic")])];
   GLB.total=names.length;GLB.loaded=0;
   for(const name of names){         // nacheinander im Hintergrund laden, Spielfigur zuerst
-    try{const g=await loader.loadAsync(GLB.base+name+".json");  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g,name);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
+    try{let g=await loader.loadAsync(GLB.base+name+".json");if(!g.animations||!g.animations.length)g=rigFigure(g);   /* starre Figur: Skelett und Animationen erzeugen */  /* glTF mit eingebetteten Daten: das Hosting liefert kein .glb */GLB.models[name]=prepGlb(g,name);GLB.ready=true;if(walker&&!walker.userData.glbDone)playerGlbApply();standGlbUpgrade()}
     catch(e){console.info("3D-Figur nicht geladen:",name,e);GLB.err=(name+": "+(e&&e.message||e)).slice(0,140);if(name===first)GLB.failed=true}
     GLB.loaded++}
   if(!GLB.ready)GLB.failed=true}
@@ -306,11 +306,13 @@ const STAND_MODEL={"Mats":"02_Fussballfan","Elif":"01_Schuelerin","Jana":"06_Jog
   "Herr Ballhorn":"05_Strassenbauer","Herr Brands":"04_Senior","Bäcker Hennes":"08_Passant"};
 function standName(S){const p=S.p;for(const q of QUESTS)if(q.person===p)return q.giver.name;for(const t of TALK)if(t.person===p)return t.name;
   for(const G of XG)if(G.person===p)return G.name||G.talk||"";return ""}
+function standRole(S){const p=S.p;for(const q of QUESTS)if(q.person===p)return q.giver.role||"";for(const t of TALK)if(t.person===p)return t.role||"";for(const G of XG)if(G.person===p)return G.role||"";return ""}
 function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue;const n=standName(S);
   const mn=STAND_MODEL[n]||(/^Frau /.test(n)?"07_Geschaeftsfrau":"08_Passant");const M=GLB.models[mn];if(!M)continue;
   const obj=THREE.SkeletonUtils.clone(M.scene),mixer=new THREE.AnimationMixer(obj),act={};for(const k in M.clips)act[k]=mixer.clipAction(M.clips[k]);
   const I={obj,mixer,act,M,cur:null};const role=mn==="07_Geschaeftsfrau"?"businesswoman":mn==="05_Strassenbauer"?"bauarbeiter":mn==="04_Senior"?"senior":"passant";
-  tintGlb(I,Object.assign(randomTint(role),{shirt:S.shirt,outfit:-1}));
+  const rl=standRole(S),teach=/lehrer/i.test(rl);   /* alle Lehrkräfte mit heller Hautfarbe */
+  tintGlb(I,Object.assign(randomTint(role),{shirt:S.shirt,outfit:-1},teach?{skin:pick(SKIN_MUL.slice(0,3))}:{}));
   if(act.idle){act.idle.play();act.idle.time=Math.random()*act.idle.getClip().duration}
   obj.position.set(S.x,groundY(S.x,S.y)+M.offY,S.y);obj.rotation.y=Math.PI/2-S.a;scene.add(obj);S.p.visible=false;S.glb=I}}
 {const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);

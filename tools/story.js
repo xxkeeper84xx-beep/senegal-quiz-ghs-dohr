@@ -6,14 +6,14 @@ if(!Array.isArray(PROFS.list))PROFS={list:[],last:null};
 let PROF=PROFS.list.find(p=>p.id===PROFS.last)||null;
 const saveProfs=()=>{try{localStorage.setItem(PROF_KEY,JSON.stringify(PROFS))}catch(e){}};
 const LOOK_DEF={jacket:"#2f4f7a",hair:"#33251c",skin:"#d6a07a",jeans:"#3a4f72",bagCol:"#e2a91c",model:"Noah_Pythagoras"};
-const FIG_CHOICES=[["Noah_Pythagoras","Noah"],["01_Schuelerin","Schülerin"],["classic","Klassisch"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["05_Strassenbauer","Straßenbauer"],["07_Geschaeftsfrau","Geschäftsfrau"],["03_Seniorin","Seniorin"],["04_Senior","Senior"]];
+const FIG_CHOICES=[["Noah_Pythagoras","Noah"],["01_Schuelerin","Schülerin"],["classic","Klassisch"],["02_Fussballfan","Fußballfan"],["08_Passant","Passant"],["06_Joggerin","Joggerin"],["05_Strassenbauer","Straßenbauer"],["07_Geschaeftsfrau","Geschäftsfrau"],["03_Seniorin","Seniorin"],["04_Senior","Senior"],["Dittmann_Cap","Herr Dittmann"]];
 /* Figuren freispielen: am Anfang nur die Schülerfiguren, alle anderen über Spielzeit und gelöste Aufgaben */
-const FIG_REQ={"02_Fussballfan":{min:10,tasks:8},"08_Passant":{min:15,tasks:12},"06_Joggerin":{min:20,tasks:18},"05_Strassenbauer":{min:30,tasks:25},"07_Geschaeftsfrau":{min:40,tasks:32},"03_Seniorin":{min:50,tasks:40},"04_Senior":{min:60,tasks:50}};
-const FIG_ICON={Noah_Pythagoras:"🎒","01_Schuelerin":"🎒","02_Fussballfan":"⚽","08_Passant":"🚶","06_Joggerin":"🏃‍♀️","05_Strassenbauer":"🦺","07_Geschaeftsfrau":"💼","03_Seniorin":"👵","04_Senior":"👴",classic:"🧍"};
+const FIG_REQ={"02_Fussballfan":{min:10,tasks:8},"08_Passant":{min:15,tasks:12},"06_Joggerin":{min:20,tasks:18},"05_Strassenbauer":{min:30,tasks:25},"07_Geschaeftsfrau":{min:40,tasks:32},"03_Seniorin":{min:50,tasks:40},"Dittmann_Cap":{min:90,tasks:80,xp:2500},"04_Senior":{min:60,tasks:50}};
+const FIG_ICON={Noah_Pythagoras:"🎒","01_Schuelerin":"🎒","02_Fussballfan":"⚽","08_Passant":"🚶","06_Joggerin":"🏃‍♀️","05_Strassenbauer":"🦺","07_Geschaeftsfrau":"💼","03_Seniorin":"👵","04_Senior":"👴",Dittmann_Cap:"🧢",classic:"🧍"};
 const figName=id=>(FIG_CHOICES.find(f=>f[0]===id)||[0,id])[1];
-const figProgress=s=>({min:Math.floor(((s&&s.playTime)||0)/60),tasks:(s&&s.solved)||0});
-function figUnlocked(id,s){const r=FIG_REQ[id];if(!r)return true;const P=figProgress(s);return P.min>=r.min&&P.tasks>=r.tasks}
-function figMissing(id,s){const r=FIG_REQ[id],P=figProgress(s),o=[];if(!r)return "";if(P.min<r.min)o.push(`noch ${r.min-P.min} Min. Spielzeit`);if(P.tasks<r.tasks)o.push(`noch ${r.tasks-P.tasks} gelöste Aufgaben`);return o.join(" und ")}
+const figProgress=s=>({min:Math.floor(((s&&s.playTime)||0)/60),tasks:(s&&s.solved)||0,xp:(s&&s.xp)||0});
+function figUnlocked(id,s){const r=FIG_REQ[id];if(!r)return true;const P=figProgress(s);return P.min>=r.min&&P.tasks>=r.tasks&&P.xp>=(r.xp||0)}
+function figMissing(id,s){const r=FIG_REQ[id],P=figProgress(s),o=[];if(!r)return "";if(P.min<r.min)o.push(`noch ${r.min-P.min} Min. Spielzeit`);if(P.tasks<r.tasks)o.push(`noch ${r.tasks-P.tasks} gelöste Aufgaben`);if(r.xp&&P.xp<r.xp)o.push(`noch ${r.xp-P.xp} XP`);return o.join(" und ")}
 const figSave=()=>TITLE.draft&&TITLE.draft.edit?save:(PROF&&TITLE.view==="figs"?save:{});
 const LOOKS={
   jacket:["#2f4f7a","#c0392b","#2e8b57","#f2b81f","#7b3fa0","#1b1b1b","#e8742a","#e05a8c"],
@@ -227,7 +227,7 @@ function titleHTML(){
     menu=`<div class="tpanel fpanel"><h3>Figuren</h3><p class="fsub">Am Anfang spielst du eine Schülerfigur. Die anderen schaltest du mit Spielzeit und gelösten Aufgaben frei.${PROF?` Dein Stand: <b>${P.min} Min.</b> · <b>${P.tasks} Aufgaben</b>`:""}</p>
       <div class="fgrid">${FIG_CHOICES.map(([v,n])=>{const ok=figUnlocked(v,fs),r=FIG_REQ[v],pm=r?Math.min(1,P.min/r.min):1,pt=r?Math.min(1,P.tasks/r.tasks):1;
         return `<button type="button" data-t="fprev" data-v="${v}" class="fcard ${ok?"":"locked"} ${TITLE.figPrev===v?"on":""}"><i>${FIG_ICON[v]||"🧍"}</i><b>${n}</b>${ok?`<small class="ok">✓ ${r?"freigespielt":"von Anfang an"}</small>`:
-          `<small>🔒 ${r.min} Min. · ${r.tasks} Aufgaben</small><span class="fbar"><em style="width:${pm*100}%"></em></span><span class="fbar t"><em style="width:${pt*100}%"></em></span>`}</button>`}).join("")}</div>
+          `<small>🔒 ${r.min} Min. · ${r.tasks} Aufgaben${r.xp?` · ${r.xp} XP`:""}</small>${r.xp?`<span class="fbar"><em style="width:${Math.min(1,P.xp/r.xp)*100}%;background:linear-gradient(90deg,#FFC44D,#FF7B00)"></em></span>`:""}<span class="fbar"><em style="width:${pm*100}%"></em></span><span class="fbar t"><em style="width:${pt*100}%"></em></span>`}</button>`}).join("")}</div>
       <div class="row"><button data-t="figback" type="button">Zurück</button></div></div>`}
   if(V2==="create"){const D=TITLE.draft;
     menu=`<div class="tpanel"><h3>${D.edit?"Figur ändern":"Neuer Spieler"}</h3>

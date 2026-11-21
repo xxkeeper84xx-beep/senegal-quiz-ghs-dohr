@@ -72,6 +72,9 @@ const OVR={Elif:{at:[600,612],role:"in der Grünanlage",say:["Quer über die Wie
   "Frau Okafor":{at:[-458,-812],say:["Der Turm da drüben gehört zur Evangelischen Hauptkirche Rheydt. Den sieht man schon von der Hauptstraße aus.","Vom Markt zum Rathaus sind es nur ein paar Schritte. Diagonal über den Platz ist es noch kürzer."]},
   Tarik:{at:[388,400],role:"Platzwart im Mülforter Bruch"}};
 MG.talk=F.talk.map(t=>{const o=OVR[t.name]||{},r=Object.assign({},t,o);const p=o.at?free(...o.at):FX(t.x,t.y);r.x=p[0];r.y=p[1];delete r.at;r.say=r.say.map(RT);r.role=RT(r.role);return r});
+/* Frau Costantino: Lehrerin und Verkehrsbeauftragte, am Gehweg vor dem Schuleingang */
+{const p=free(...FX(-304,-58.6));MG.talk.push({x:p[0],y:p[1],name:"Frau Costantino",role:"Lehrerin für Mathe und Deutsch · Verkehrsbeauftragte der GHS Dohr",shirt:"#b03060",
+  say:["Hallo! Ich bin Frau Costantino. An der Ampel gilt: Erst bei Grün gehen – auch wenn gerade kein Auto kommt.","Schräg über die Kreuzung ist die längste Strecke auf der Fahrbahn. Das kannst du mit Pythagoras ausrechnen!","Ein E-Scooter darf höchstens 20 km/h fahren. Getunte Roller kassieren wir ein."]})}
 MG.parked=[];MG.signs=[];MG.zebra=[];MG.decals=[];
 MG.spielkarte=false;
 })();
