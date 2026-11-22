@@ -30,32 +30,30 @@ const SHOTS=[
    cap("Noah.<small>Klasse 9 · Mathe-Ass in Ausbildung</small>",t,10.2,14.2)}},
  {id:"D",t0:14.4,t1:19.2,start(){place("walk",MK[0]+4,MK[1]+18,-Math.PI/2,0)},frame(t){const u=(t-14.4)/4.8,ang=1.9+u*.9;CAMF=()=>({p:[MK[0]+Math.cos(ang)*34,9-u*3,MK[1]+Math.sin(ang)*34],l:[MK[0],1.5,MK[1]],fov:50});
    cap("Die ganze Stadt<br>ist dein Klassenzimmer.",t,14.8,19.0)}},
- {id:"E1",t0:19.2,t1:21.6,start(){save.scootTuned=true;VK.scootCool=1e9;const [x,y,a]=rdA(150,2.2);place("scoot",x,y,a,11);scootGlow()},frame(t){const s=150+(t-19.2)*11,[x,y,A]=rdA(s,2.2);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=11;cap("Getunt?<small>Lass dich nicht erwischen</small>",t,19.5,21.5);const L=[-Math.sin(A),Math.cos(A)];
+ {id:"E1",t0:19.2,t1:21.6,start(){save.scootTuned=false;const [x,y,a]=rdA(150,2.3);place("bike",x,y,a,6)},frame(t){const s=150+(t-19.2)*6,[x,y,A]=rdA(s,2.3);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=6;const L=[-Math.sin(A),Math.cos(A)];
    CAMF=()=>({p:[x+L[0]*4.2+Math.cos(RD.a)*.8,1.2,y+L[1]*4.2+Math.sin(RD.a)*.8],l:[x,1.0,y],fov:44});$f.style.opacity=Math.max(0,1-(t-19.2)/.25)}},
  {id:"E2",t0:21.6,t1:24.0,start(){const [x,y,a]=rdA(175);place("moped",x,y,a,10)},frame(t){const s=175+(t-21.6)*10,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=10;
    CAMF=()=>({p:[x+Math.cos(RD.a)*5.5,.7,y+Math.sin(RD.a)*5.5+.6],l:[x,1.1,y],fov:40})}},
  {id:"F",t0:24.0,t1:28.8,start(){const [x,y,a]=rdA(160);place("auto",x,y,a,16)},frame(t){const s=160+(t-24)*16,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=16;const L=[-Math.sin(RD.a),Math.cos(RD.a)],k=(t-24)/4.8;
    CAMF=()=>({p:[x-Math.cos(RD.a)*(7-k*3)+L[0]*(2.5+k*3),.9+k*.6,y-Math.sin(RD.a)*(7-k*3)+L[1]*(2.5+k*3)],l:[x+Math.cos(RD.a)*2,.8,y+Math.sin(RD.a)*2],fov:46});
    cap("a² + b² = c²",t,25.8,28.6,"grad mid")}},
- {id:"G1",t0:28.8,t1:31.2,start(){const X=VK.X[0],a=X.dirs[0],d=[Math.cos(a),Math.sin(a)],P=[-d[1],d[0]],A=X.group.children[0].position;
-   const N=[A.x+d[0]*1.1-P[0]*.2,A.z+d[1]*1.1-P[1]*.2];place("walk",N[0],N[1],a+Math.PI/2,0);
-   for(const n of npcs)if(!n.police&&n.x!==undefined&&Math.hypot(n.x-X.x,n.y-X.y)<90)placeAgent(n,carEdges,X.x,X.y,220,420,true);   // freie Straße
-   ST.g={X,a,d,P,N};VK.t=-X.off+3},
-  frame(t){const k=t-28.8,G=ST.g,X=G.X,d=G.d,P=G.P,N=G.N;VK.t=-X.off+3+k;      // Autos Grün, Fußgänger Rot
-   car.x=N[0];car.y=N[1];car.v=0;car.a=G.a+Math.PI/2;
-   const c=VK.cops[0];if(c){const s=-14+k*13;c.n.x=X.x+d[0]*s+P[0]*1.7;c.n.y=X.y+d[1]*s+P[1]*1.7;c.n.ang=G.a;c.n.v=13;c.alarm=5}
-   for(const n of npcs)if(!n.police&&n.x!==undefined&&Math.hypot(n.x-X.x,n.y-X.y)<60)placeAgent(n,carEdges,X.x,X.y,220,420,true);
-   CAMF=()=>({p:[N[0]+d[0]*7.5-P[0]*1.6,1.65,N[1]+d[1]*7.5-P[1]*1.6],l:[N[0]-d[0]*3+P[0]*2.2,1.3,N[1]-d[1]*3+P[1]*2.2],fov:50});cap("Bei Rot?<br>Lieber warten.",t,29.1,31.1)}},
+ {id:"G1",t0:28.8,t1:31.2,start(){const q=questById("markt"),st=qs(q);st.acc=true;st.m={a:true,b:true};st.done=false;applyEffect("markt",false,false);refreshQuestWorld();
+   const z=MG.q.markt.zone;showRoute([[z[0],z[1]],[z[2],z[3]]]);ST.z=z;place("walk",z[0]-3,z[3]+4,-.6,0)},
+  frame(t){const k=(t-28.8)/2.4,z=ST.z,cx=(z[0]+z[2])/2,cy=(z[1]+z[3])/2,ang=.55+k*.35;
+   CAMF=()=>({p:[cx+Math.cos(ang)*17,10.5-k*1.5,cy+Math.sin(ang)*17],l:[cx,0,cy],fov:46});
+   cap("9 m und 12 m …<br>quer nur 15 m.<small>Mission: Quer über den Markt</small>",t,29.0,31.1,"nocase")}},
  {id:"G2",t0:31.2,t1:33.6,start(){place("plane",700,60,.35,30);VEH.plane.fly=true;car.alt=55;car.vy=0},frame(t){const k=t-31.2,x=700+Math.cos(.35)*30*k,y=60+Math.sin(.35)*30*k;car.x=x;car.y=y;car.a=.35;car.v=30;VEH.plane.fly=true;car.alt=55+k*2;car.vy=2;car.steer=.35;
    CAMF=()=>({p:[x-Math.cos(.35)*12-Math.sin(.35)*7,car.alt+3,y-Math.sin(.35)*12+Math.cos(.35)*7],l:[x+Math.cos(.35)*4,car.alt,y+Math.sin(.35)*4],fov:50});cap("Rechne dich<br>durch die Stadt.",t,31.4,33.4)}},
  {id:"H",t0:33.6,t1:38.4,start(){place("walk",WK.giver[0]-3,WK.giver[1]+18,-Math.PI/2,0);const q=questById("werkhof"),s=qs(q);s.acc=true;s.m={a:true,b:true};s.done=false;applyEffect("werkhof",false,false);refreshQuestWorld();ST.lit=false},
   frame(t){const k=(t-33.6)/4.8,c=[WK.wall[0]+4,WK.wall[1]],ang=2.3+k*.7;CAMF=()=>({p:[c[0]+Math.cos(ang)*14,4+k*2,c[1]+Math.sin(ang)*14],l:[c[0],3,c[1]],fov:50});
    if(t>=36&&!ST.lit){ST.lit=true;const q=questById("werkhof");qs(q).done=true;applyEffect("werkhof",true,true);refreshQuestWorld();for(const m of q.measures){m.tube.visible=m.lab.visible=true}}
-   $f.style.opacity=t>=36&&t<36.3?1-(t-36)/.3:0;cap(t<36?"6 m und 8 m …":"… sind 10 m Kabel.<small>Licht an im Werkhof</small>",t,33.9,38.3,"nocase")}},
- {id:"I1",t0:38.4,t1:40.8,start(){save.playTime=1e6;save.solved=999;save.xp=9999;const [x0,y0,a0]=rdA(300,5.6);place("walk",x0,y0,a0+Math.PI,1.8);
-   applyLook(Object.assign({},LOOK_DEF,{model:"Dittmann_Cap"}));ST.i=[x0,y0,a0+Math.PI]},
-  frame(t){const k=t-38.4,[x0,y0,a]=ST.i,x=x0+Math.cos(a)*1.8*k,y=y0+Math.sin(a)*1.8*k;car.x=x;car.y=y;car.a=a;car.v=1.8;
-   CAMF=()=>({p:[x+Math.cos(a)*3.6+Math.sin(a)*1.1,1.45,y+Math.sin(a)*3.6-Math.cos(a)*1.1],l:[x,1.15,y],fov:40});cap("Freispielbar:<br>Herr Dittmann.<small>Nur für echte Profis</small>",t,38.7,40.7)}},
+   $f.style.opacity=t>=36&&t<36.3?1-(t-36)/.3:0;cap(t<36?"6 m und 8 m …<small>Mission: Licht für den Werkhof</small>":"… sind 10 m Kabel.<small>Mission: Licht für den Werkhof</small>",t,33.9,38.3,"nocase")}},
+ {id:"I1",t0:38.4,t1:40.8,start(){const q=questById("treppe"),st=qs(q);st.acc=true;st.m={a:true,b:true};st.done=false;refreshQuestWorld();
+   let cx=0,cy=0,cz=0;for(const m of q.measures){cx+=m.line[0]+m.line[3];cy+=m.line[1]+m.line[4];cz+=m.line[2]+m.line[5]}cx/=4;cy/=4;cz/=4;
+   const dx=cx-SCH[0],dz=cz-SCH[1],L=Math.hypot(dx,dz)||1;ST.t={cx,cy,cz,ux:dx/L,uz:dz/L};place("walk",cx+dx/L*3,cz+dz/L*3,0,0)},
+  frame(t){const k=(t-38.4)/2.4,T=ST.t,px=-T.uz,pz=T.ux;
+   CAMF=()=>({p:[T.cx+T.ux*8.5+px*(3-k*4),3.2,T.cz+T.uz*8.5+pz*(3-k*4)],l:[T.cx,2.2,T.cz],fov:50});
+   cap("3,9 m und 5,5 m …<br>6,7 m Handlauf.<small>Mission: Ein Handlauf für die Außentreppe</small>",t,38.6,40.7,"nocase")}},
  {id:"I2",t0:40.8,t1:43.2,start(){applyLook(Object.assign({},LOOK_DEF));const [x0,y0,a0]=rdA(330,1.9);RD.a=a0;place("auto",x0,y0,a0,0);exitVehicle();TR.on=false;TR.done=null;const L=[-Math.sin(RD.a),Math.cos(RD.a)];car.x+=L[0]*1.2;car.y+=L[1]*1.2;ST.i=[x0,y0];enterVehicle()},
   frame(t){const [x,y]=ST.i;CAMF=()=>({p:[x+Math.sin(RD.a)*-6.5+Math.cos(RD.a)*2.5,1.7,y-Math.cos(RD.a)*-6.5+Math.sin(RD.a)*2.5],l:[x,1.0,y],fov:44});cap("Steig ein.",t,41.1,43.1);
    $b.style.opacity=t>42.7?(t-42.7)/.5:0}},
