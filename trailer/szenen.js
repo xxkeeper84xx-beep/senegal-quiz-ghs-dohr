@@ -58,7 +58,7 @@ const SHOTS=[
   frame(t){const [x,y]=ST.i;CAMF=()=>({p:[x+Math.sin(RD.a)*-6.5+Math.cos(RD.a)*2.5,1.7,y-Math.cos(RD.a)*-6.5+Math.sin(RD.a)*2.5],l:[x,1.0,y],fov:44});cap("Steig ein.",t,40.1,41.55);
    $b.style.opacity=t>41.35?(t-41.35)/.25:0}},
  {id:"J",t0:41.6,t1:48,start(){},frame(t){const k=t-41.6;$b.style.opacity=0;$c.style.opacity=0;$l.style.opacity=Math.min(1,k/.15);$f.style.opacity=Math.max(0,1-k/.4);
-   $l.querySelector("h1").style.transform=`scale(${1.08-.08*sm(k/4)})`;const so=document.getElementById("soon"),T=4.8,u2=(k-T)/.3;so.style.opacity=k<T?0:Math.min(1,u2*1.5);so.style.transform=`translateX(-50%) scale(${k<T?1.6:1+.6*(1-sm(u2))})`;/* Logo mit dem Anstieg (41,6 s), COMING SOON auf dem Höhepunkt (46,4 s); Schnitte liegen auf den Takten der Titelmelodie (150 BPM, Takt 1,6 s) */if(k>6.05)$l.style.opacity=Math.max(0,1-(k-6.05)/.35)}},
+   $l.querySelector("h1").style.transform=`scale(${1.08-.08*sm(k/4)})`;const so=document.getElementById("soon"),T=3.2,u2=(k-T)/.3;so.style.opacity=k<T?0:Math.min(1,u2*1.5);so.style.transform=`translateX(-50%) scale(${k<T?1.6:1+.6*(1-sm(u2))})`;/* Logo mit dem Takt bei 41,6 s, COMING SOON ab 44,8 s und bis zum Schluss; am Ende Abblende auf Schwarz (Takt 150 BPM, 1,6 s) */if(k>6.05)$b.style.opacity=Math.min(1,(k-6.05)/.35)}},
 ];
 window.SHOTS=SHOTS;
 window.shotStart=id=>{const s=SHOTS.find(s=>s.id===id);$c.style.opacity=0;$f.style.opacity=0;$b.style.opacity=0;$l.style.opacity=0;CAMF=null;ST={};s.start();
