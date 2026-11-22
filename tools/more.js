@@ -37,6 +37,7 @@ const CONTACTS=[
   {id:"ditt",name:"Herr Dittmann",role:"Klassenlehrer der 9c",icon:"👨‍🏫",col:"#ffc933",known:true},
   {id:"maass",name:"Herr Maaß",role:"Sportlehrer",icon:"⚽",col:"#3ddc84",known:true},
   {id:"jessen",name:"Herr Jessen",role:"Deutschlehrer",icon:"📖",col:"#5b6bb0",known:true},
+  {id:"meindorfner",name:"Herr Meindorfner",role:"Mathelehrer",icon:"📐",col:"#3a6ea5",known:true},
   {id:"ziemer",name:"Frau Ziemer",role:"Klassenlehrerin der 9a",icon:"📐",col:"#e05a8c",known:true},
   {id:"ballhorn",name:"Herr Ballhorn",role:"Hausmeister",icon:"🔑",col:"#7b8cff",known:true},
   {id:"krahe",name:"Frau Krahe",role:"Klassenlehrerin der 10b",icon:"🍎",col:"#ff8a3d",known:true},
@@ -84,6 +85,7 @@ function callLines(id){const N=pName(),q=mainQuest(),dq=DUCKS.map((d,i)=>i).find
     case "maass":return save.jobs&&save.jobs.sprint&&save.jobs.sprint.done?`Na, ${N}, läufst du noch mit den Turbo-Turnschuhen? Bewegung ist das halbe Leben!`:qsx("sporthalle").done?`${N}! Komm mal in die Sporthalle, ich hab noch eine sportliche Herausforderung für dich.`:`Hallo ${N}, hier ist Herr Maaß. Wenn du so weit bist: In der Sporthalle wartet der Diagonal-Sprint auf dich!`;
     case "ziemer":return `Hallo ${N}! ${qsx("treppe").done?"Der neue Handlauf ist super geworden, danke!":"Die Außentreppe braucht einen neuen Handlauf. Schau mal bei mir vorbei, wenn du so weit bist."} ${tip}`;
     case "ballhorn":return `Ballhorn hier. ${qsx("werkhof").done?"Das Licht im Werkhof brennt, danke nochmal!":"Am Werkhof brauche ich deine Hilfe – ich warte dort."} ${N}, ich sag’s nur einmal: Auf dem Schulgelände wird nicht gefahren! ${save.fines?`Du hast schon ${save.fines} Fahrzeug${save.fines>1?"e":""} bei mir abgeben müssen.`:"Bisher hast du dich gut gehalten."}`;
+    case "meindorfner":return `Meindorfner hier. Hallo ${N}! ${save.solved>=20?`Du hast schon ${save.solved} Aufgaben gelöst – stark!`:"Je mehr Aufgaben du löst, desto sicherer wirst du."} Komm auf den Schulhof, wenn du für die Mathearbeit trainieren willst.`;
     case "jessen":return `Hallo ${N}, hier ist Herr Jessen. ${qsx("schulhof").done?"Der Sponsorenlauf war ein Erfolg – danke für die Strecke!":"Für den Sponsorenlauf brauche ich dich auf dem Schulhof."} Und denk dran: Satzanfänge schreibt man groß – auch in Mathe-Antworten! 😉`;
     case "krahe":return `Hallo ${N}! ${qsx("markt").done?"Unsere Marktstände stehen perfekt. Danke!":"Auf dem Rheydter Markt bauen wir bald die Stände auf – dafür brauche ich dich."}`;
     case "kruemel":return `Wuff! Wuff wuff! 🐾 (Krümel rennt sofort zu dir.)`;

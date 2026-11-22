@@ -77,6 +77,11 @@ function mptTask(name){if(state.task)return;const d=AU.diff(),t=themeTask(d),dl=
   t.hint=`<b>Tipp von ${name.replace(/^Herr /,"Herrn ")}:</b> ${MPT[name]}<br>${t.hint||""}`;
   showTask(Object.assign(t,{tag:`MPT-Übung bei ${name.replace(/^Herr /,"Herrn ")} · ${dl}`,deliver:"Danke!",hunt:"rolle_mpt",tries:0,solved:false,sel:[],diff:d}))}
 
+/* ---------- Herr Meindorfner (Mathelehrer): Training für die Mathearbeit ---------- */
+function matheTask(){if(state.task)return;const d=AU.diff(),t=themeTask(d),dl={1:"leicht",2:"mittel",3:"schwer"}[d];
+  t.hint=`<b>Herr Meindorfner:</b> Skizze machen, rechten Winkel markieren, Hypotenuse finden – dann erst rechnen.<br>${t.hint||""}`;
+  showTask(Object.assign(t,{tag:`Mathe-Training bei Herrn Meindorfner · ${dl}`,deliver:"Danke!",hunt:"rolle_mathe",tries:0,solved:false,sel:[],diff:d}))}
+
 /* ---------- Frau Costantino: Aufgaben auf Englisch ---------- */
 const EN_HINT_H="The <b>hypotenuse</b> is the longest side, opposite the right angle: c² = a² + b², then take the square root. <i>(Gesucht ist die Hypotenuse: quadrieren, addieren, Wurzel ziehen.)</i>";
 const EN_HINT_L="You know the <b>hypotenuse</b>. A leg is: a² = c² − b², then take the square root. <i>(Gesucht ist eine Kathete: Hypotenuse² minus Kathete², dann Wurzel.)</i>";
@@ -94,11 +99,12 @@ function englishTask(){if(state.task)return;const d=AU.diff(),t=pick(EN)(d),dl={
     q:"How long is the diagonal way across the crossing? (Wie lang ist der schräge Weg?)",hint:EN_HINT_H,tag:"Elternbrief · Road safety lesson"})}}
 
 /* Belohnung für Übungen */
-{const base=huntFound;huntFound=function(i){if(i!=="rolle_mpt"&&i!=="rolle_en")return base(i);const xp=i==="rolle_en"?12:8,m=i==="rolle_en"?12:10;save.xp+=xp;save.money+=m;persist();updateHud();jingle();
+{const base=huntFound;huntFound=function(i){if(i!=="rolle_mpt"&&i!=="rolle_en"&&i!=="rolle_mathe")return base(i);const xp=i==="rolle_en"?12:8,m=i==="rolle_en"?12:10;save.xp+=xp;save.money+=m;persist();updateHud();jingle();
   toast(i==="rolle_en"?"Well done! 🇬🇧":"Super gelöst!",`+${xp} XP · +${m} $`,"#3ddc84")}}
 {const base=interactables;interactables=function(VH){const L=base(VH);if(VH.id!=="walk"||state.task)return L;
   for(const t of TALK){if(Math.abs(t.x-car.x)>6||Math.abs(t.y-car.y)>6)continue;
     if(MPT[t.name])L.push({x:t.x,y:t.y,r:3,label:`💡 Übungsaufgabe von ${t.name.replace(/^Herr /,"Herrn ")} (MPT)`,act:()=>mptTask(t.name)});
+    if(t.name==="Herr Meindorfner")L.push({x:t.x,y:t.y,r:3,label:"📐 Mathe-Training bei Herrn Meindorfner",act:matheTask});
     if(t.name==="Frau Costantino")L.push({x:t.x,y:t.y,r:3,label:"🇬🇧 English task – Mrs Costantino",act:englishTask})}
   return L}}
 

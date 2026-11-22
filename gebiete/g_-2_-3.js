@@ -77,6 +77,9 @@ MG.talk=F.talk.filter(t=>t.name!=="Herr Jessen").map(t=>{const o=OVR[t.name]||{}
 /* Frau Costantino: Lehrerin und Verkehrsbeauftragte, am Gehweg vor dem Schuleingang */
 {const p=free(...FX(-304,-58.6));MG.talk.push({x:p[0],y:p[1],name:"Frau Costantino",role:"Englischlehrerin · Verkehrsbeauftragte der GHS Dohr",shirt:"#b03060",
   say:["Hello! I'm Mrs Costantino, your English teacher. (Ich bin Frau Costantino, eure Englischlehrerin.) Ask me for an English task!","Traffic lights: wait for green – even if there is no car. (An der Ampel erst bei Grün gehen.)","The hypotenuse is the longest side of a right-angled triangle. (Die Hypotenuse ist die längste Seite.)"]})}
+/* Herr Meindorfner: Mathelehrer, auf dem Schulhof */
+{const p=free(...FX(-296,-90));MG.talk.push({x:p[0],y:p[1],name:"Herr Meindorfner",role:"Mathelehrer an der GHS Dohr",shirt:"#3a6ea5",
+  say:["Ich bin Herr Meindorfner, euer Mathelehrer. Pythagoras gilt nur im rechtwinkligen Dreieck – prüf immer zuerst, wo der rechte Winkel ist!","a² + b² = c²: c ist die Hypotenuse, sie liegt dem rechten Winkel gegenüber.","Sprich mich an, wenn du für die nächste Mathearbeit trainieren willst."]})}
 MG.parked=[];MG.signs=[];MG.zebra=[];MG.decals=[];
 MG.spielkarte=false;
 })();

@@ -77,7 +77,7 @@ Nicht übernommen: geparkte Autos, Schilder und Zebrastreifen der alten Spielkar
 ## Sporthalle, Läden, ganz Mönchengladbach (22.11.)
 - **Sporthalle GHS Dohr begehbar** (`tools/sporthalle.js`): Tür am Umkleidetrakt (E/Tippen). Innenraum nach den Fotos: Holzpaneele,
   Prallschutz, hohe Fenster, Rasterdecke, Basketballkörbe mit aufgemalten Toren, Sprossenwand mit Weichbodenmatte, Ringe, Langbank,
-  Geräteraum mit Kasten und Bock. Hauptmission **„Der Diagonal-Sprint“** (Kapitel nach dem Schulhof) bei Frau Albers (Sportlehrerin):
+  Geräteraum mit Kasten und Bock. Hauptmission **„Der Diagonal-Sprint“** (Kapitel nach dem Schulhof) bei Herrn Maaß (Sportlehrer):
   grünes Spielfeld 15 m × 8 m vermessen → Diagonale 17 m; Zusatzfrage Weichbodenmatte (2,5 m, 0,7 m Abstand → 2,4 m hoch);
   6 Diagonalen für 100 m; danach den Sprint selbst laufen (Countdown, Zeit wird gespeichert).
 - **Läden begehbar** (`tools/laeden.js`, automatische Schiebetür, drinnen frei laufen, Modelle ausgestellt):
@@ -100,6 +100,7 @@ Nicht übernommen: geparkte Autos, Schilder und Zebrastreifen der alten Spielkar
 - **Rollen:** Herr Dittmann Klassenlehrer 9c · Herr Maaß Sportlehrer (Diagonal-Sprint in der Sporthalle, dort auch sein Sprint-Nebenjob) ·
   Herr Jessen Deutschlehrer (Sponsorenlauf „Quer über den Schulhof“) · Frau Krahe Klassenlehrerin 10b (Markt) · Frau Ziemer Klassenlehrerin 9a (Außentreppe) ·
   Frau Costantino Englischlehrerin und Verkehrsbeauftragte (Aufgaben auf Englisch, auch der Verkehrsunterricht) · Herr Ballhorn Hausmeister (jetzt „Licht für den Werkhof“) ·
+  Herr Meindorfner Mathelehrer (auf dem Schulhof, „Mathe-Training“ passend zur Figur, Kontakt im Handy) ·
   MPT Herr Aktas, Frau Colonna, Frau Brand: Tipps und Übungsaufgaben (`tools/rollen.js`).
 - **Aufgaben je Figur:** Kinder (Noah, Schülerin, Klassisch) leichter, Herr Dittmann immer Stufe 3 (Raumdiagonale, Dachsparren mit Überstand,
   Koordinaten, Kommazahlen). Themen: Straßenbauer Baustelle/Mauern, Joggerin und Fußballfan Sport, Geschäftsfrau Büro, Seniorin/Senior Garten und Rampen,
