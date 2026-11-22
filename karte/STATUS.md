@@ -74,6 +74,28 @@ westlich des Schulgrundstücks): Das Schulmodell nach den Fotos ist 72 m breit, 
 Alter Markt, Nordpark und Schloss Rheydt liegen außerhalb von Phase 1 und stehen im Auftragsheft als „folgt“.
 Nicht übernommen: geparkte Autos, Schilder und Zebrastreifen der alten Spielkarte (lagen auf deren Straßen).
 
+## Sporthalle, Läden, ganz Mönchengladbach (22.11.)
+- **Sporthalle GHS Dohr begehbar** (`tools/sporthalle.js`): Tür am Umkleidetrakt (E/Tippen). Innenraum nach den Fotos: Holzpaneele,
+  Prallschutz, hohe Fenster, Rasterdecke, Basketballkörbe mit aufgemalten Toren, Sprossenwand mit Weichbodenmatte, Ringe, Langbank,
+  Geräteraum mit Kasten und Bock. Hauptmission **„Der Diagonal-Sprint“** (Kapitel nach dem Schulhof) bei Frau Albers (Sportlehrerin):
+  grünes Spielfeld 15 m × 8 m vermessen → Diagonale 17 m; Zusatzfrage Weichbodenmatte (2,5 m, 0,7 m Abstand → 2,4 m hoch);
+  6 Diagonalen für 100 m; danach den Sprint selbst laufen (Countdown, Zeit wird gespeichert).
+- **Läden begehbar** (`tools/laeden.js`, automatische Schiebetür, drinnen frei laufen, Modelle ausgestellt):
+  Fahrradladen „Radwerk Rheydt“ (Hauptstraße): City-, Komfort-, Sport-Roller; Stadtrad, Mountainbike, Rennrad, E-Bike.
+  Autohaus „An der Gracht“: Roller Classic, Motorrad Sport, Smart, Kompaktwagen, Kompakt Sport, Elektro-Kompakt, Transporter, Prius,
+  Aston Martin, Maserati. Modelle = Varianten der Fahrzeugtypen mit eigener Farbe, Ausstattung (Korb, Akku, Streifen, Spoiler),
+  Fahrwerten und Preisen. Gekauftes steht vor dem Laden. Garage (G) zeigt die eigenen Modelle.
+- **Flughafen Mönchengladbach an der echten Stelle** (Phase 4): Bahn 13/31, Rollwege und Vorfelder aus OSM; Flugschule & Verleih
+  am Vorfeld westlich des Terminals. Mieten pro Flug: Rundflug-Hubschrauber, Hubschrauber XL, Ultraleichtflieger, Sportflugzeug,
+  Reiseflugzeug. Mietende = landen und aussteigen. Fliegen ab Rang 3.
+- **Ganz Mönchengladbach** (`tools/gebiete.py`, `tools/gebiete.js`, `tools/gebiete_patch.py`): 46 Gebiete (Kern 2,6 × 2,3 km,
+  300 m Überlappung), immer eines geladen; am Rand wird das Nachbargebiet nachgeladen (Position, Fahrzeug, Flughöhe bleiben).
+  Freischalten mit Raster (25 m) aus `freischaltgebiete.geojson`: Phase 2 nach drei Hauptmissionen, Phase 3 nach allen
+  Hauptmissionen in Rheydt, Phase 4 zusätzlich Rang 3, Phase 5 zusätzlich Rang 4. Gesperrtes und die Stadtgrenze sind nicht
+  befahrbar (Hinweis), auf der Minikarte abgedunkelt. Freischaltungen in `save.phases`.
+- **Noch offen:** eigene Missionen in den Phasen 2–5 (laut Kartenauftrag: Diagonalen-, Vermessungs-, Entfernungs-Mission);
+  bis dahin schalten Fortschritt und Rang frei. Gebietswechsel lädt die Seite neu (ca. 2–4 s). Nicht auf echtem iPad getestet.
+
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
   Idle/Walk/Run mit Überblendung, Blick in Laufrichtung, Füße am Boden (Standfuß beim Gehen 0 cm, beim Laufen 0,2–0,4 cm pro Bild).

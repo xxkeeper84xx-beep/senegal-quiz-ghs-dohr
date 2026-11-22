@@ -1,8 +1,3 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Pythagoras City</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,800;0,900;1,800;1,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -710,14 +705,15 @@ button:disabled{opacity:.5}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="mg-echt.js"></script>
+<script src="gebiete/index.js"></script>
+<script>(function(){var r="rheydt";try{var m=/[#&]go=([^&]*)/.exec(location.hash);if(m){var h=JSON.parse(decodeURIComponent(m[1]));if(h&&/^g_-?\d+_-?\d+$/.test(h.region))r=h.region;window.__GO=h}}catch(e){}document.write('<script src="'+(r==="rheydt"?"mg-echt.js":"gebiete/"+r+".js")+'"><\/script>')})()</script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
 if(!window.THREE||typeof MG==="undefined"){$("loadMsg").textContent=!window.THREE?"Die 3D-Grafik konnte nicht geladen werden.":"Die Kartendaten (mg-data.js) fehlen.";$("loadSub").textContent="Bitte Internetverbindung prüfen und die Seite neu laden.";throw new Error("Abhängigkeit fehlt")}
 
 /* ================= Grundlagen ================= */
-const HX=MG.half[0], HY=MG.half[1];
+const HX=MG.half[0], HY=MG.half[1], RX=(MG.center||[0,0])[0], RY=(MG.center||[0,0])[1];
 const rnd=(a,b)=>a+Math.random()*(b-a), ri=(a,b)=>Math.floor(rnd(a,b+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -743,7 +739,7 @@ const carEdges=edges.filter(e=>e.r.c&&!e.r.tu), walkEdges=edges.filter(e=>!e.r.t
 function edgePos(e,s,o){s=clamp(s,0,e.len);let j=1;while(j<e.cum.length-1&&e.cum[j]<s)j++;const s0=e.cum[j-1],L=(e.cum[j]-s0)||1e-6,t=(s-s0)/L,x0=e.pts[2*j-2],y0=e.pts[2*j-1],x1=e.pts[2*j],y1=e.pts[2*j+1];o.x=x0+(x1-x0)*t;o.y=y0+(y1-y0)*t;o.dx=(x1-x0)/L;o.dy=(y1-y0)/L;return o}
 // Raster für schnelle Suche "nächste Straße"
 const SG=40, sgW=Math.ceil(2*HX/SG)+2, sgH=Math.ceil(2*HY/SG)+2, segGrid=new Array(sgW*sgH);
-const cellOf=(x,y)=>[clamp(Math.floor((x+HX)/SG),0,sgW-1),clamp(Math.floor((y+HY)/SG),0,sgH-1)];
+const cellOf=(x,y)=>[clamp(Math.floor((x-RX+HX)/SG),0,sgW-1),clamp(Math.floor((y-RY+HY)/SG),0,sgH-1)];
 for(const e of edges)for(let j=1;j<e.cum.length;j++){
   const x0=e.pts[2*j-2],y0=e.pts[2*j-1],x1=e.pts[2*j],y1=e.pts[2*j+1];
   const [a0,b0]=cellOf(Math.min(x0,x1),Math.min(y0,y1)),[a1,b1]=cellOf(Math.max(x0,x1),Math.max(y0,y1));
@@ -764,17 +760,17 @@ const hgt=new Uint8Array(GW*GH), surf=new Uint8Array(GW*GH), solid=new Uint8Arra
 const ROAD_Y=.12, SIDE_Y=.27, BASE_Y=.06;
 function rasterize(){
   const c=document.createElement("canvas");c.width=GW;c.height=GH;const g=c.getContext("2d");
-  const path=p=>{g.beginPath();g.moveTo(p[0]+HX,p[1]+HY);for(let i=2;i<p.length;i+=2)g.lineTo(p[i]+HX,p[i+1]+HY);g.closePath()};
+  const path=p=>{g.beginPath();g.moveTo(p[0]-RX+HX,p[1]-RY+HY);for(let i=2;i<p.length;i+=2)g.lineTo(p[i]-RX+HX,p[i+1]-RY+HY);g.closePath()};
   g.fillStyle="#000";g.fillRect(0,0,GW,GH);g.globalCompositeOperation="lighter";
   for(const a of MG.areas){const col={park:"#ff0000",grass:"#ff0000",wood:"#ff0000",pitch:"#ff0000",cemetery:"#ff0000",water:"#00ff00"}[a.t];if(!col)continue;g.fillStyle=col;path(a.p);g.fill()}
   g.globalCompositeOperation="source-over";
   // Straßen überdecken Grün/Wasser (Brücken, Wege im Park)
   g.lineCap=g.lineJoin="round";
-  for(const r of roads){if(r.tu)continue;g.strokeStyle=r.b?"#0000ff":"rgb(0,0,255)";g.lineWidth=r.w+1;g.beginPath();r.i.forEach((n,k)=>{const x=nx(n)+HX,y=ny(n)+HY;k?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
+  for(const r of roads){if(r.tu)continue;g.strokeStyle=r.b?"#0000ff":"rgb(0,0,255)";g.lineWidth=r.w+1;g.beginPath();r.i.forEach((n,k)=>{const x=nx(n)-RX+HX,y=ny(n)-RY+HY;k?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
   let d=g.getImageData(0,0,GW,GH).data;
   for(let i=0,n=GW*GH;i<n;i++){const r=d[i*4],gg=d[i*4+1],b=d[i*4+2];surf[i]=(b>110?4:((r>110?1:0)|(gg>110?2:0)))}
   g.fillStyle="#000";g.fillRect(0,0,GW,GH);g.strokeStyle="#fff";
-  for(const r of roads){if(r.tu||!r.c||r.h==="service")continue;g.lineWidth=r.w+5;g.beginPath();r.i.forEach((n,k)=>{const x=nx(n)+HX,y=ny(n)+HY;k?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
+  for(const r of roads){if(r.tu||!r.c||r.h==="service")continue;g.lineWidth=r.w+5;g.beginPath();r.i.forEach((n,k)=>{const x=nx(n)-RX+HX,y=ny(n)-RY+HY;k?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
   d=g.getImageData(0,0,GW,GH).data;
   for(let i=0,n=GW*GH;i<n;i++)if(d[i*4]>110&&!(surf[i]&4))surf[i]|=8;
   g.fillStyle="#000";g.fillRect(0,0,GW,GH);g.globalCompositeOperation="lighten";
@@ -783,7 +779,7 @@ function rasterize(){
   for(let i=0,n=GW*GH;i<n;i++){hgt[i]=d[i*4]>1?d[i*4]:0;solid[i]=d[i*4+1]>70?1:0}
   c.width=c.height=1;
 }
-const gi=(x,y)=>{const ix=Math.floor(x+HX),iy=Math.floor(y+HY);return (ix<0||iy<0||ix>=GW||iy>=GH)?-1:iy*GW+ix};
+const gi=(x,y)=>{const ix=Math.floor(x-RX+HX),iy=Math.floor(y-RY+HY);return (ix<0||iy<0||ix>=GW||iy>=GH)?-1:iy*GW+ix};
 const heightAt=(x,y)=>{const i=gi(x,y);return i<0?250:hgt[i]};
 const isWater=(x,y)=>{const i=gi(x,y);return i>=0&&(surf[i]&6)===2};
 const isGrass=(x,y)=>{const i=gi(x,y);return i>=0&&surf[i]===1};
@@ -982,7 +978,7 @@ function makeTask(g){
   if(g.id==="taxi"){
     const slow=["walk","scoot","bike"].includes(save.veh);
     const opts=[];const sc=slow?[50,100]:[100,150,200];
-    for(const k of sc)for(const tr of [[3,4],[4,3],[6,8],[8,6],[5,12],[12,5]]){const ex=tr[0]*k,ny_=tr[1]*k;if(Math.hypot(ex,ny_)>(slow?700:1800)||(L===1&&tr[0]+tr[1]!==7))continue;for(const sx of [1,-1])for(const sy of [1,-1]){const tx=g.x+sx*ex,ty=g.y-sy*ny_;if(Math.abs(tx)<HX-60&&Math.abs(ty)<HY-60)opts.push({ex,ny:ny_,sx,sy,tx,ty})}}
+    for(const k of sc)for(const tr of [[3,4],[4,3],[6,8],[8,6],[5,12],[12,5]]){const ex=tr[0]*k,ny_=tr[1]*k;if(Math.hypot(ex,ny_)>(slow?700:1800)||(L===1&&tr[0]+tr[1]!==7))continue;for(const sx of [1,-1])for(const sy of [1,-1]){const tx=g.x+sx*ex,ty=g.y-sy*ny_;if(Math.abs(tx-RX)<HX-60&&Math.abs(ty-RY)<HY-60&&phaseOK(tx,ty))opts.push({ex,ny:ny_,sx,sy,tx,ty})}}
     let o=null; for(let tries=0;tries<30&&opts.length;tries++){const c=pick(opts);const r=nearestRoad(c.tx,c.ty,45);if(r){o=c;o.spot=spotNear(c.tx,c.ty);break}}
     if(!o){o={ex:300,ny:400,sx:-1,sy:1};o.spot=spotNear(g.x-300,g.y-400)}
     const a=o.ny,b=o.ex,c=Math.hypot(a,b);
@@ -1201,7 +1197,7 @@ function updateHud(){
 
 /* ================= Physik ================= */
 function carHits(x,y){if(blockedGround(x,y))return true;for(let i=0;i<8;i++){const a=i*Math.PI/4;if(blockedGround(x+Math.cos(a)*car.r,y+Math.sin(a)*car.r))return true}return false}
-function airHits(x,y){const r=car.r;for(let i=0;i<9;i++){const a=i*Math.PI/4,px=i<8?x+Math.cos(a)*r:x,py=i<8?y+Math.sin(a)*r:y;if(Math.abs(px)>HX-5||Math.abs(py)>HY-5)return true;if(heightAt(px,py)>car.alt-.6)return true}return false}
+function airHits(x,y){const r=car.r;for(let i=0;i<9;i++){const a=i*Math.PI/4,px=i<8?x+Math.cos(a)*r:x,py=i<8?y+Math.sin(a)*r:y;if(Math.abs(px-RX)>HX-5||Math.abs(py-RY)>HY-5||!phaseOK(px,py))return true;if(heightAt(px,py)>car.alt-.6)return true}return false}
 function update(dt){
   if(state.horn>0)state.horn-=dt; // ruhige Tageslichtszene: die Uhr bleibt am Nachmittag stehen
   const VH=V();
@@ -1355,8 +1351,8 @@ const LANDMARKS=[];
 function buildCity(){
   // Boden
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(2*HX+800,2*HY+800),new THREE.MeshLambertMaterial({color:0xb5b2a8,map:(()=>{const t=texPave.clone();t.needsUpdate=true;t.repeat.set((2*HX+800)/4,(2*HY+800)/4);return t})()}));
-  ground.rotation.x=-Math.PI/2; ground.position.y=BASE_Y-.03; ground.receiveShadow=true; ground.renderOrder=-6; scene.add(ground);
-  const far=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),new THREE.MeshLambertMaterial({color:0x6a8a4e}));far.rotation.x=-Math.PI/2;far.position.y=-.3;scene.add(far);
+  ground.rotation.x=-Math.PI/2; ground.position.y=BASE_Y-.03;ground.position.x=RX;ground.position.z=RY; ground.receiveShadow=true; ground.renderOrder=-6; scene.add(ground);
+  const far=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),new THREE.MeshLambertMaterial({color:0x6a8a4e}));far.rotation.x=-Math.PI/2;far.position.set(RX,-.3,RY);scene.add(far);
   // Flächen
   const AG={},ACOL={park:"#5f8f45",grass:"#6b9a4c",pitch:"#4f9a52",wood:"#3f6c35",cemetery:"#5d8649",water:"#2f6f9c",plaza:"#c2b9a8",rail:"#7d7369",platform:"#a9a69f"};
   const AY={plaza:.03,rail:.035,park:.04,grass:.04,cemetery:.04,wood:.045,pitch:.05,water:.06,platform:.9};
@@ -1637,8 +1633,8 @@ function render3D(dt,now){
 const MM=$("mm"), mctx=MM.getContext("2d");
 const MMS=.6, mmBase=document.createElement("canvas"); mmBase.width=Math.ceil(2*HX*MMS); mmBase.height=Math.ceil(2*HY*MMS);
 function buildMinimap(){
-  const c=mmBase.getContext("2d");c.scale(MMS,MMS);c.translate(HX,HY);
-  c.fillStyle="#262b40";c.fillRect(-HX,-HY,2*HX,2*HY);
+  const c=mmBase.getContext("2d");c.scale(MMS,MMS);c.translate(HX-RX,HY-RY);
+  c.fillStyle="#262b40";c.fillRect(RX-HX,RY-HY,2*HX,2*HY);
   const path=p=>{c.beginPath();c.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)c.lineTo(p[i],p[i+1]);c.closePath()};
   const AC={park:"#2f6b3a",grass:"#3a7341",pitch:"#2f7a3e",wood:"#25552d",cemetery:"#355f37",water:"#1f5f9e",plaza:"#4b4a52",rail:"#3d3a3a"};
   for(const a of MG.areas){if(!AC[a.t])continue;c.fillStyle=AC[a.t];path(a.p);c.fill()}
@@ -1653,7 +1649,7 @@ function drawMinimap(){
   mctx.fillStyle="#0a0d1a";mctx.fillRect(0,0,S,S);
   mctx.translate(S/2,S/2);mctx.rotate(rot);
   const W=(x,y)=>[(x-car.x)*ppm,(y-car.y)*ppm];
-  mctx.save();mctx.scale(sc,sc);mctx.drawImage(mmBase,-(car.x+HX)*MMS,-(car.y+HY)*MMS);mctx.restore();
+  mctx.save();mctx.scale(sc,sc);mctx.drawImage(mmBase,-(car.x-RX+HX)*MMS,-(car.y-RY+HY)*MMS);mctx.restore();
   const edge=(p,q)=>{const d=Math.hypot(p,q),lim=S/2-16;return d>lim?[p/d*lim,q/d*lim]:[p,q]};
   for(const g of GIVERS){if(state.task&&g.id!=="shop")continue;const[p,q]=edge(...W(g.x,g.y));mctx.save();mctx.translate(p,q);mctx.rotate(up);mctx.fillStyle=g.col;mctx.beginPath();mctx.arc(0,0,13,0,7);mctx.fill();mctx.font="15px sans-serif";mctx.textAlign="center";mctx.textBaseline="middle";mctx.fillText(g.icon,0,1);mctx.restore()}
   if(state.task){const[p0,q0]=W(state.task.x,state.task.y);const[p,q]=edge(p0,q0);
@@ -1872,7 +1868,7 @@ $("mapClose").onclick=closeMap;
 function drawBigMap(){
   const c=$("bigmap"),g=c.getContext("2d"),k=c.width/(2*HX);c.height=Math.round(2*HY*k);
   g.drawImage(mmBase,0,0,c.width,c.height);
-  const P=(x,y)=>[(x+HX)*k,(y+HY)*k];
+  const P=(x,y)=>[(x-RX+HX)*k,(y-RY+HY)*k];
   g.textAlign="center";g.textBaseline="middle";
   for(const d of DISTRICTS){const b=d.b,[x,y]=P((b[0]+b[2])/2,b[1]+14);g.font="bold 22px Rubik,sans-serif";g.lineWidth=5;g.strokeStyle="rgba(10,14,32,.85)";g.strokeText(d.n,x,y);g.fillStyle="#ffc933";g.fillText(d.n,x,y)}
   const dot=(x,y,col,ic)=>{const[p,q]=P(x,y);g.fillStyle=col;g.beginPath();g.arc(p,q,13,0,7);g.fill();g.font="15px sans-serif";g.fillStyle="#000";g.fillText(ic,p,q+1)};
@@ -2909,7 +2905,7 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 function taxiTask(g,d){
   const slow=["walk","scoot","bike"].includes(save.veh),opts=[],sc=slow?[30,50]:[50,100];
   for(const k of sc)for(const tr of [[3,4],[4,3],[6,8],[8,6],[5,12],[12,5]]){const ex=tr[0]*k,ny_=tr[1]*k;if(Math.hypot(ex,ny_)>(slow?450:700))continue;
-    for(const sx of [1,-1])for(const sy of [1,-1]){const tx=g.x+sx*ex,ty=g.y-sy*ny_;if(Math.abs(tx)<HX-40&&Math.abs(ty)<HY-40)opts.push({ex,ny:ny_,sx,sy,tx,ty})}}
+    for(const sx of [1,-1])for(const sy of [1,-1]){const tx=g.x+sx*ex,ty=g.y-sy*ny_;if(Math.abs(tx-RX)<HX-40&&Math.abs(ty-RY)<HY-40&&phaseOK(tx,ty))opts.push({ex,ny:ny_,sx,sy,tx,ty})}}
   let o=null;for(let t=0;t<40&&opts.length;t++){const c=pick(opts);const r=nearestRoad(c.tx,c.ty,30);if(r){o=c;o.spot=spotNear(c.tx,c.ty);break}}
   if(!o){o={ex:120,ny:160,sx:-1,sy:1};o.spot=spotNear(g.x-120,g.y-160)}
   const a=o.ny,b=o.ex,c=Math.hypot(a,b),dir=(o.sy>0?"Norden":"Süden"),dir2=(o.sx>0?"Osten":"Westen");
@@ -3385,7 +3381,7 @@ function freeSpot(x,y,side){for(let r=0;r<45;r+=.75){const n=Math.max(1,Math.rou
   if(blockedGround(px+1.2,py)||blockedGround(px-1.2,py)||blockedGround(px,py+1.2)||blockedGround(px,py-1.2))continue;return {x:px,y:py}}}
   return side?freeSpot(x,y,false):{x,y}}
 function randSpot(x,y,lo,hi){for(let k=0;k<40;k++){const a=Math.random()*Math.PI*2,d=lo+Math.random()*(hi-lo),tx=x+Math.cos(a)*d,ty=y+Math.sin(a)*d;
-  if(Math.abs(tx)>HX-30||Math.abs(ty)>HY-30)continue;const s=spotNear(tx,ty);if(s&&!blockedGround(s.x,s.y)&&!inSchool(s.x,s.y,2)&&Math.hypot(s.x-x,s.y-y)>lo*.6)return {x:s.x,y:s.y}}
+  if(Math.abs(tx-RX)>HX-30||Math.abs(ty-RY)>HY-30||!phaseOK(tx,ty))continue;const s=spotNear(tx,ty);if(s&&!blockedGround(s.x,s.y)&&!inSchool(s.x,s.y,2)&&Math.hypot(s.x-x,s.y-y)>lo*.6)return {x:s.x,y:s.y}}
   const s=spotNear(x+lo,y);return {x:s.x,y:s.y}}
 function xMarker(col){const m=new THREE.Mesh(new THREE.OctahedronGeometry(.36,0),xbasic(col,{fog:false}));m.scale.y=1.6;scene.add(m);return m}
 
@@ -3829,7 +3825,7 @@ function startDuo(partner){DUO.on=true;DUO.partner=partner;DUO.turn=0;DUO.m=null
   else{scene.remove(DUO.mesh);DUO.mesh=personFrom(Object.assign({},LOOK_DEF,partner.look||{}));DUO.mesh.scale.setScalar(.092);footShadow(DUO.mesh.userData.hu,.9);scene.add(DUO.mesh)}
   DUO.p.x=car.x+1.2;DUO.p.y=car.y;sms(partner.name,`Bin dabei, ${pName()}! Lass uns als Team losziehen 🤝`)}
 function endDuo(){if(DUO.m)stopDuoMission();DUO.on=false;DUO.partner=null;if(DUO.mesh)DUO.mesh.visible=false}
-function duoSpot(x,y,dx,dy){const tx=x+dx,ty=y+dy;if(Math.abs(tx)>HX-30||Math.abs(ty)>HY-30)return null;if(blockedGround(tx,ty)||inSchool(tx,ty,1))return null;
+function duoSpot(x,y,dx,dy){const tx=x+dx,ty=y+dy;if(Math.abs(tx-RX)>HX-30||Math.abs(ty-RY)>HY-30||!phaseOK(tx,ty))return null;if(blockedGround(tx,ty)||inSchool(tx,ty,1))return null;
   for(const [ox,oy] of [[1,0],[-1,0],[0,1],[0,-1]])if(blockedGround(tx+ox,ty+oy))return null;return {x:tx,y:ty}}
 function startDuoMission(id){if(activeJob()||state.task){PH.duoErr="Erledige erst deinen laufenden Auftrag.";return false}
   const st=[],x0=car.x,y0=car.y;
@@ -9015,6 +9011,500 @@ function kowalskiJob(){const [a,b]=pick(STW),c=Math.hypot(a,b);GR.job={a,b,c};
   startDig(A,B,n,D=>{GR.jobSegs=D.segs;const pay=Math.round(25+J.c*3);save.money+=pay;save.xp+=10;save.solved=(save.solved||0);persist();updateHud();checkLevel();
     missionBanner("ok","Graben fertig!",`Stadtwerke: ${fmt(J.c)} m Graben`,`+${pay} $ · +10 XP · Herr Kowalski hat bald wieder Arbeit für dich`)},"Graben für die Stadtwerke")}}
 
+/* ================= Sporthalle der GHS Dohr (begehbar) =================
+   Nach den Fotos vom 19.11.: Halle mit Holzverkleidung, dunkler Prallschutz unten, hohe Fenster, Rasterdecke mit Leuchtbändern,
+   Basketballkörbe mit aufgemaltem Tor an den Stirnwänden, Sprossenwand mit Weichbodenmatte, Turnringe, Langbank, Geräteraum mit Kasten.
+   Betreten durch die Tür am Umkleidetrakt (E / Tippen), drinnen ist die Halle frei begehbar.
+   Hauptmission „Der Diagonal-Sprint“ bei Frau Albers (Sportlehrerin): Spielfeld 15 m × 8 m vermessen, Diagonale berechnen (17 m),
+   Zusatzfrage zur Weichbodenmatte an der Sprossenwand, Anzahl der Diagonalen für 100 m – dann den Sprint selbst laufen.
+   Alle Maße in Spielkarten-Koordinaten der Schule (x nach Osten, z nach Süden); fx_pass.js setzt sie auf das echte Grundstück. */
+const HALL={x0:-289.6,x1:-268.4,z0:-147.6,z1:-132.4,h:6.8,ex:[-290,-268,-148,-132],
+  doorOut:[-277.5,-124.6],doorIn:[-277.5,-133.4],field:{x0:-286.5,x1:-271.5,z0:-144,z1:-136},chimney:[-270,-269.2,-133.4,-132.6]};
+const hallR=(x,z)=>MG.FX?MG.FX(x,z):[x,z];
+function hallL(x,y){const S=MG.XF&&MG.XF.find(c=>c.id==="S");if(!S)return [x,y];const dx=x-S.t[0],dy=y-S.t[1],co=Math.cos(S.r),si=Math.sin(S.r);
+  return [S.f[0]+dx*co+dy*si,S.f[1]-dx*si+dy*co]}
+const hallRot=()=>{const S=MG.XF&&MG.XF.find(c=>c.id==="S");return S?S.r:0};
+function inHall(x,y,m=0){const [lx,lz]=hallL(x,y);return lx>HALL.x0-m&&lx<HALL.x1+m&&lz>HALL.z0-m&&lz<HALL.z1+m}
+
+/* ---------- Mission ---------- */
+QUESTS.push({id:"sporthalle",district:"Dohr/Torfbend",title:"Der Diagonal-Sprint",
+  giver:{x:-283,y:-134.6,name:"Frau Albers",role:"Sportlehrerin an der GHS Dohr",shirt:"#1e88e5"},
+  intro:"„Hallo! Ich bin Frau Albers, ich unterrichte Sport. Heute laufen wir den Diagonal-Sprint: quer über das grüne Spielfeld, von einer Ecke bis zur gegenüberliegenden Ecke. Miss bitte die Länge und die Breite des Spielfelds und rechne aus, wie lang die Sprintstrecke ist. Danach läufst du sie selbst!“",
+  measures:[{id:"a",label:"Länge des Spielfelds",short:"Länge",val:15,x:-279,y:-144.6,where:"an der langen grünen Linie",line:[-286.5,.05,-144,-271.5,.05,-144]},
+            {id:"b",label:"Breite des Spielfelds",short:"Breite",val:8,x:-270.9,y:-140,where:"an der kurzen grünen Linie",line:[-271.5,.05,-144,-271.5,.05,-136]}],
+  lab:{a:"Länge",b:"Breite",c:"Diagonale"},ans:17,unit:"m",
+  ask:"Wie lang ist der Diagonal-Sprint von Ecke zu Ecke?",
+  extra:{q:"Die Weichbodenmatte ist 2,5 m lang und lehnt an der Sprossenwand. Unten steht sie 0,7 m von der Wand weg. Wie hoch reicht sie an der Wand?",ans:2.4,unit:"m",
+    steps:`√(2,5² − 0,7²) = √(6,25 − 0,49) = √5,76 = <span class="hl">2,4 m</span>`,tip:"Die Matte ist die Hypotenuse. Gesucht ist eine Kathete: Hypotenuse² minus die andere Kathete²."},
+  choice:{q:"Jeder soll mindestens 100 m sprinten. Wie viele Diagonalen muss man mindestens laufen?",opts:[{v:5,t:"5 Diagonalen"},{v:6,t:"6 Diagonalen"},{v:7,t:"7 Diagonalen"}],ok:6,
+    fb:v=>v<6?"Zu wenig: 5 · 17 m = 85 m. Das sind noch keine 100 m.":v>6?"Das reicht, aber 6 · 17 m = 102 m genügen schon.":"Genau: 6 · 17 m = 102 m – mindestens 100 m. Jetzt lauf die erste Diagonale!"},
+  doneText:"Frau Albers stoppt deine Zeit und trägt sie ins Sportheft ein. Der Diagonal-Sprint ist ab jetzt fester Teil des Sportunterrichts.",xp:45,money:120});
+{const i=MAIN.indexOf("schulhof");MAIN.splice(i>=0?i+1:MAIN.length,0,"sporthalle")}
+if(typeof STAND_MODEL!=="undefined")STAND_MODEL["Frau Albers"]="06_Joggerin";
+
+/* ---------- Innenraum ---------- */
+function buildHall(){
+  const B0=BASE_Y,{x0,x1,z0,z1,h}=HALL,W=x1-x0,D=z1-z0,cx=(x0+x1)/2,cz=(z0+z1)/2,G=new THREE.Group();G.name="sporthalle";
+  const lit=(map,k=.55,o={})=>new THREE.MeshLambertMaterial(Object.assign({map,emissive:0xffffff,emissiveMap:map,emissiveIntensity:k},o));
+  const col=(c,k=.5)=>new THREE.MeshLambertMaterial({color:c,emissive:c,emissiveIntensity:k});
+  const add=(geo,mat,x,y,z,ry=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.y=ry;G.add(m);return m};
+  const box=(mat,x,y,z,sx,sy,sz,ry=0)=>add(new THREE.BoxGeometry(sx,sy,sz),mat,x,y,z,ry);
+  const plane=(mat,x,y,z,w,hh,ry)=>add(new THREE.PlaneGeometry(w,hh),mat,x,y,z,ry);
+
+  /* Boden: hellgrauer Sportboden mit Linien, das grüne Spielfeld 15 m × 8 m für die Mission */
+  const PX=64,fw=Math.round(W*PX),fd=Math.round(D*PX);
+  const floorT=canvasTex(fw,fd,(g)=>{g.fillStyle="#a3ada6";g.fillRect(0,0,fw,fd);noise(g,fw,fd,26000,["rgba(0,0,0,.035)","rgba(255,255,255,.07)"],2);
+    for(let i=0;i<9;i++){const gr=g.createRadialGradient(fw*(i+.5)/9,fd*.5,10,fw*(i+.5)/9,fd*.5,fd*.45);gr.addColorStop(0,"rgba(255,255,255,.16)");gr.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=gr;g.fillRect(0,0,fw,fd)}
+    const P=(x,z)=>[(x-x0)*PX,(z-z0)*PX],line=(c,w,pts,dash)=>{g.strokeStyle=c;g.lineWidth=w*PX;g.setLineDash(dash?dash.map(d=>d*PX):[]);g.beginPath();pts.forEach((p,k)=>{const q=P(...p);k?g.lineTo(...q):g.moveTo(...q)});g.stroke();g.setLineDash([])};
+    const arc=(c,w,x,z,r,a0,a1)=>{g.strokeStyle=c;g.lineWidth=w*PX;g.beginPath();g.arc(...P(x,z),r*PX,a0,a1);g.stroke()};
+    // Basketball (schwarz): Mittelkreis, Zonen, Dreierlinien
+    arc("#1d1f22",.06,cx,cz,1.8,0,7);line("#1d1f22",.06,[[cx,z0+.6],[cx,z1-.6]]);
+    for(const s of [1,-1]){const bx=s>0?x0+.6:x1-.6;line("#1d1f22",.06,[[bx,cz-2.45],[bx+s*5.2,cz-2.45],[bx+s*5.2,cz+2.45],[bx,cz+2.45]]);arc("#1d1f22",.06,bx+s*5.2,cz,1.8,s>0?-Math.PI/2:Math.PI/2,s>0?Math.PI/2:Math.PI*1.5);
+      arc("#1d1f22",.06,bx+s*1.2,cz,6.2,s>0?-1.25:Math.PI-1.25,s>0?1.25:Math.PI+1.25)}
+    // Handball / Volleyball (rot gestrichelt, gelb)
+    line("#c8323a",.05,[[x0+.4,z0+1.2],[x1-.4,z0+1.2]],[.3,.3]);line("#c8323a",.05,[[x0+.4,z1-1.2],[x1-.4,z1-1.2]],[.3,.3]);
+    line("#e3b21e",.05,[[x0+.25,z0+.25],[x0+.25,z1-.25]]);line("#e3b21e",.05,[[x1-.25,z0+.25],[x1-.25,z1-.25]]);line("#e3b21e",.05,[[cx-4.5,z0+.3],[cx-4.5,z1-.3]]);
+    // grünes Spielfeld (Mission)
+    const F=HALL.field;line("#16a34a",.1,[[F.x0,F.z0],[F.x1,F.z0],[F.x1,F.z1],[F.x0,F.z1],[F.x0,F.z0]]);line("#16a34a",.06,[[(F.x0+F.x1)/2,F.z0],[(F.x0+F.x1)/2,F.z1]])});
+  const flM=lit(floorT,.1,{color:0x8e9791,polygonOffset:true,polygonOffsetFactor:-8,polygonOffsetUnits:-8});const fl=plane(flM,cx,B0+.05,cz,W,D,0);fl.rotation.x=-Math.PI/2;fl.renderOrder=2;
+
+  /* Wände: unten dunkler Prallschutz, darüber senkrechte Holzpaneele */
+  const woodT=canvasTex(512,512,(g)=>{for(let x=0;x<512;x+=16){const v=Math.random()*18;g.fillStyle=`rgb(${150+v},${92+v*.7},${48+v*.4})`;g.fillRect(x,0,16,512);g.fillStyle="rgba(60,30,10,.55)";g.fillRect(x,0,1.5,512)}
+    noise(g,512,512,9000,["rgba(90,45,15,.18)","rgba(255,220,170,.08)"],2);for(let i=0;i<60;i++){g.strokeStyle="rgba(100,50,20,.18)";g.lineWidth=1;g.beginPath();const x=Math.random()*512;g.moveTo(x,0);g.bezierCurveTo(x+6,170,x-6,340,x+3,512);g.stroke()}});
+  const panelT=canvasTex(256,256,(g)=>{g.fillStyle="#4a3426";g.fillRect(0,0,256,256);noise(g,256,256,4000,["rgba(0,0,0,.12)","rgba(255,255,255,.04)"],2);for(let x=0;x<256;x+=64){g.fillStyle="rgba(0,0,0,.35)";g.fillRect(x,0,2,256)}});
+  const lowH=2.3,walls=[[cx,z0,W,0],[cx,z1,W,Math.PI],[x0,cz,D,Math.PI/2],[x1,cz,D,-Math.PI/2]];
+  for(const [px,pz,len,ry] of walls){
+    const up=woodT.clone();up.needsUpdate=true;up.repeat.set(len/4,(h-lowH)/4);const lo=panelT.clone();lo.needsUpdate=true;lo.repeat.set(len/4,1);
+    plane(lit(up,.5),px,B0+lowH+(h-lowH)/2,pz,len,h-lowH,ry);plane(lit(lo,.45),px,B0+lowH/2,pz,len,lowH,ry);
+    const nx=Math.sin(ry),nz=Math.cos(ry);box(col("#3a2a1f",.3),px+nx*.02,B0+lowH,pz+nz*.02,ry%Math.PI?.05:len,.06,ry%Math.PI?len:.05)}
+  // weiße Pfeiler zwischen den Paneelen (wie auf den Fotos)
+  for(const x of [-284,-276])for(const [z,s] of [[z0,1],[z1,-1]])box(col("#e8e6df",.5),x,B0+lowH+(h-lowH)/2,z+s*.08,.7,h-lowH,.14);
+
+  /* hohe Fenster (Tageslicht) */
+  const glassM=new THREE.MeshBasicMaterial({color:0xe9f3ff});const frameM=col("#cfcfcf",.4);
+  const win=(x,z,w,y0,y1,ry)=>{const p=plane(glassM,x,B0+(y0+y1)/2,z,w,y1-y0,ry);const nx=Math.sin(ry)*.03,nz=Math.cos(ry)*.03;p.position.x+=nx;p.position.z+=nz;
+    const hor=Math.abs(Math.sin(ry))<.5;for(let k=1;k<4;k++){const t=-w/2+w*k/4;box(frameM,x+(hor?t:0)+nx,B0+(y0+y1)/2,z+(hor?0:t)+nz,hor?.05:.06,y1-y0,hor?.06:.05)}
+    box(frameM,x+nx,B0+(y0+y1)/2,z+nz,hor?w:.06,.06,hor?.06:w)};
+  for(const x of [-286,-282,-274])win(x,z1,1.6,4.6,6.2,Math.PI);for(const x of [-286,-280,-274])win(x,z0,1.6,4.6,6.2,0);
+  for(const z of [-144,-136]){win(x0,z,1.3,4.2,5.8,Math.PI/2);win(x1,z,1.3,4.2,5.8,-Math.PI/2)}
+
+  /* Decke: Rasterplatten, Leuchtbänder, Lüftungsgitter */
+  const ceilT=canvasTex(256,256,(g)=>{g.fillStyle="#eeeeea";g.fillRect(0,0,256,256);noise(g,256,256,3000,["rgba(0,0,0,.05)","rgba(255,255,255,.2)"],1);g.fillStyle="rgba(120,120,115,.55)";for(let k=0;k<=256;k+=64){g.fillRect(k-1,0,2,256);g.fillRect(0,k-1,256,2)}});
+  ceilT.repeat.set(W/2.4,D/2.4);const ce=plane(lit(ceilT,.55),cx,B0+h,cz,W,D,0);ce.rotation.x=Math.PI/2;
+  const lamp=new THREE.MeshBasicMaterial({color:0xffffff}),vent=col("#2b2d30",.2);
+  for(let x=x0+2.5;x<x1-1;x+=3.4)for(const z of [cz-4.5,cz,cz+4.5]){const m=box(lamp,x,B0+h-.04,z,.22,.06,2.4)}
+  for(const [x,z] of [[cx-6,cz-2],[cx+3,cz+3],[cx-1,cz-5.5],[cx+7,cz-1]])box(vent,x,B0+h-.03,z,1.2,.05,.7);
+  // Heizkörper über den Türen
+  for(const x of [-287,-281])box(col("#e4e4e0",.45),x,B0+3.1,z1-.1,2.6,.55,.1);
+
+  /* Stirnwände: Basketballkorb mit Brett, darunter aufgemaltes Tor */
+  const white=col("#ffffff",.55),orange=col("#e2611b",.4);
+  for(const [wx,s] of [[x0,1],[x1,-1]]){
+    box(white,wx+s*.35,B0+3.55,cz,.05,1.05,1.8);box(col("#222",.2),wx+s*.38,B0+3.35,cz,.02,.45,.59);box(col("#999",.3),wx+s*.18,B0+3.55,cz,.36,.08,.08);
+    const ring=add(new THREE.TorusGeometry(.23,.018,6,20),orange,wx+s*.66,B0+3.05,cz);ring.rotation.x=Math.PI/2;
+    const net=add(new THREE.CylinderGeometry(.22,.14,.4,12,1,true),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.7}),wx+s*.66,B0+2.84,cz);
+    // Tor (aufgemalt) 3 m × 2 m
+    for(const [dz,y,sy,sz] of [[-1.5,1,2,.08],[1.5,1,2,.08],[0,2,.08,3.08]])box(white,wx+s*.015,B0+y,cz+dz,.02,sy,sz)}
+
+  /* Sprossenwand mit lehnender Weichbodenmatte (für die Zusatzfrage) */
+  const holz=col("#b9874f",.45),blue=col("#2563c9",.45),grey=col("#aeb2b8",.18);
+  for(let k=0;k<3;k++){const sx=-271.8+k*.95;for(const dx of [-.42,.42])box(holz,sx+dx,B0+1.6,z0+.12,.08,3.2,.08);for(let y=.25;y<3.2;y+=.28)box(holz,sx,B0+y,z0+.12,.84,.04,.04)}
+  {const L=2.5,off=.7,top=Math.sqrt(L*L-off*off),a=Math.asin(off/L),m=new THREE.Group();
+    const b=new THREE.Mesh(new THREE.BoxGeometry(2.0,L,.3),blue);b.position.y=L/2;m.add(b);const f=new THREE.Mesh(new THREE.BoxGeometry(2.02,L,.02),grey);f.position.set(0,L/2,.16);m.add(f);
+    m.rotation.x=-a;m.position.set(-270.85,B0,z0+.27+off);G.add(m);HALL.matTop=top}
+  /* Turnringe an der Decke */
+  for(const dx of [-.25,.25]){const x=cx-1.5+dx,z=cz-.5;box(col("#d8d1c4",.4),x,B0+(h+2.6)/2,z,.03,h-2.6,.03);const r=add(new THREE.TorusGeometry(.1,.018,6,16),col("#a07040",.4),x,B0+2.5,z);r.rotation.y=Math.PI/2}
+  box(col("#8a8f96",.4),cx-1.5,B0+h-.05,cz-.5,1.4,.08,.08);
+  /* Langbank */
+  {const bx=-286,bz=z1-.7;box(holz,bx,B0+.33,bz,3.6,.05,.24);box(holz,bx,B0+.12,bz,3.5,.05,.08);for(const d of [-1.5,1.5])box(holz,bx+d,B0+.18,bz,.06,.32,.38)}
+  /* Geräteraum (Öffnung in der Nordwand) mit Kasten und Bock */
+  {const gx=-280,brickT=canvasTex(256,256,(g)=>{g.fillStyle="#5c4a40";g.fillRect(0,0,256,256);for(let r=0;r<16;r++)for(let k=-1;k<5;k++){const v=Math.random()*20;g.fillStyle=`rgb(${110+v},${52+v*.5},${42+v*.4})`;g.fillRect(k*64+(r%2)*32+2,r*16+2,60,12)}});
+    brickT.repeat.set(1.4,1);plane(lit(brickT,.3),gx,B0+1.2,z0+.015,2.8,2.4,0);
+    for(const d of [-1.45,1.45])box(col("#6b4a2e",.35),gx+d,B0+1.2,z0+.04,.1,2.4,.08);box(col("#6b4a2e",.35),gx,B0+2.43,z0+.04,3.0,.08,.08);
+    for(let i=0;i<5;i++)box(col(i?"#b07f4a":"#e6dccb",.42),gx-.4,B0+.12+i*.22,z0+.55,1.2-(i?0:.04),.2,.5);
+    const bock=col("#8a5a32",.4);box(bock,gx+.75,B0+.95,z0+.5,.9,.32,.35);for(const [dx,dz] of [[-.3,-.12],[.3,-.12],[-.3,.12],[.3,.12]])box(col("#6d4526",.4),gx+.75+dx,B0+.4,z0+.5+dz,.06,.8,.06)}
+  /* Eingangstür (Doppeltür, geöffnet) in der Südwand */
+  {const dx=HALL.doorIn[0];plane(col("#7a4a32",.25),dx,B0+1.25,z1-.01,2.0,2.5,Math.PI);
+    for(const s of [-1,1]){const d=box(col("#c08a4e",.45),dx+s*1.0,B0+1.25,z1-.5,.05,2.5,.95)}box(col("#3a2a1f",.3),dx,B0+2.55,z1-.04,2.2,.1,.08);
+    const exitT=canvasTex(128,48,(g)=>{g.fillStyle="#14a44d";g.fillRect(0,0,128,48);g.fillStyle="#fff";g.font="bold 26px sans-serif";g.fillText("🚶 →",30,34)});box(new THREE.MeshBasicMaterial({map:exitT}),dx,B0+2.85,z1-.06,.6,.22,.03)}
+  /* Hütchen an den Ecken des grünen Spielfelds */
+  {const F=HALL.field,cone=new THREE.ConeGeometry(.16,.4,12),cm=col("#ff7b00",.45);for(const [x,z] of [[F.x0,F.z1],[F.x1,F.z0],[F.x0,F.z0],[F.x1,F.z1]])add(cone,cm,x,B0+.2,z)}
+  G.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false}});scene.add(G);HALL.group=G}
+
+/* Kollisionsraster: Innenraum begehbar machen, Wände als Ring stehen lassen, Kamera-Höhenraster innen frei */
+function hallGrid(){const pts=HALL.ex,c=[[pts[0],pts[2]],[pts[1],pts[2]],[pts[0],pts[3]],[pts[1],pts[3]]].map(p=>hallR(...p));
+  const xs=c.map(p=>p[0]),ys=c.map(p=>p[1]),C=HALL.chimney;
+  for(let x=Math.floor(Math.min(...xs))-2;x<=Math.max(...xs)+2;x++)for(let y=Math.floor(Math.min(...ys))-2;y<=Math.max(...ys)+2;y++){const i=gi(x+.5,y+.5);if(i<0)continue;
+    const [lx,lz]=hallL(x+.5,y+.5),inner=lx>HALL.x0+.35&&lx<HALL.x1-.35&&lz>HALL.z0+.35&&lz<HALL.z1-.35,outer=lx>HALL.ex[0]-.6&&lx<HALL.ex[1]+.6&&lz>HALL.ex[2]-.6&&lz<HALL.ex[3]+.6;
+    const chim=lx>C[0]-.4&&lx<C[1]+.4&&lz>C[2]-.4&&lz<C[3]+.4;
+    if(inner&&!chim){solid[i]=0;hgt[i]=0}else if(outer&&!(lz>HALL.ex[3]+.1)){solid[i]=1;hgt[i]=Math.max(hgt[i],8)}}}
+{const base=buildSchool;buildSchool=function(){base();buildHall();try{hallGrid()}catch(e){console.warn("Sporthalle Raster",e)}}}
+
+/* ---------- Betreten und Verlassen ---------- */
+function hallTeleport(inside){fade(()=>{const r=hallRot(),p=inside?hallR(HALL.doorIn[0],HALL.doorIn[1]-1.2):hallR(...HALL.doorOut),a=inside?-Math.PI/2+r:Math.PI/2+r;
+  car.x=p[0];car.y=p[1];car.a=a;car.v=0;camYaw=a;camPos.set(car.x-Math.cos(a)*3.5,car.alt+2.4,car.y-Math.sin(a)*3.5);
+  if(inside)toast("🏀 Sporthalle der GHS Dohr",QUESTS.find(q=>q.id==="sporthalle")&&!qs(QUESTS.find(q=>q.id==="sporthalle")).done?"Frau Albers wartet am Spielfeld.":"Zum Verlassen zur Doppeltür gehen.","#e2611b")})}
+{const base=interactables;interactables=function(VH){const L=base(VH);if(VH.id!=="walk")return L;
+  const o=hallR(...HALL.doorOut),i=hallR(...HALL.doorIn);
+  if(inHall(car.x,car.y))L.push({x:i[0],y:i[1],r:2.2,label:"🚪 Sporthalle verlassen",act:()=>hallTeleport(false)});
+  else L.push({x:o[0],y:o[1],r:2.6,label:"🏀 Sporthalle betreten",act:()=>hallTeleport(true)});
+  if(SPR.phase===1){const A=SPR.A;L.push({x:A[0],y:A[1],r:1.6,label:"🏁 Sprint starten",act:sprintGo})}
+  return L}}
+/* Navigation: Ziel in der Halle, Spieler draußen (oder umgekehrt) → zuerst zur Tür */
+{const base=navTarget;navTarget=function(){const t=base();if(!t)return t;const ti=inHall(t.x,t.y),pi=inHall(car.x,car.y);
+  if(ti&&!pi){const o=hallR(...HALL.doorOut);return {x:o[0],y:o[1]}}if(!ti&&pi){const i=hallR(...HALL.doorIn);return {x:i[0],y:i[1]}}return t}}
+/* Kamera bleibt in der Halle */
+{const base=updateCamera;updateCamera=function(dt,VH){base(dt,VH);if(!inHall(car.x,car.y))return;
+  const p=camera.position,[lx,lz]=hallL(p.x,p.z),cl=(v,a,b)=>Math.min(b,Math.max(a,v));
+  const nx=cl(lx,HALL.x0+.3,HALL.x1-.3),nz=cl(lz,HALL.z0+.3,HALL.z1-.3),ny=Math.min(p.y,BASE_Y+HALL.h-.3);
+  if(nx!==lx||nz!==lz||ny!==p.y){const r=hallR(nx,nz);p.set(r[0],ny,r[1]);camPos.copy(p);camera.lookAt(car.x,car.alt+1.3,car.y)}}}
+/* Passanten laufen nicht durch die Halle (nur ausgeblendet, ihre Wege bleiben) */
+{const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);const o=hallR(-279,-140);if(Math.hypot(car.x-o[0],car.y-o[1])>120)return;
+  for(const p of peds){if(!p.det||p.x===undefined)continue;const hide=inHall(p.x,p.y,.6);if(p.glb)p.glb.obj.visible=!hide;if(hide&&p.mesh)p.mesh.visible=false;if(hide&&p.dogM)p.dogM.visible=false}}}
+/* Sicherheitsnetz: drinnen nie durch die Wand */
+{const base=update;update=function(dt){base(dt);if(V().id!=="walk")return;const [lx,lz]=hallL(car.x,car.y);
+  if(lx>HALL.x0-.2&&lx<HALL.x1+.2&&lz>HALL.z0-.2&&lz<HALL.z1+.2){const cl=(v,a,b)=>Math.min(b,Math.max(a,v)),nx=cl(lx,HALL.x0+.4,HALL.x1-.4),nz=cl(lz,HALL.z0+.4,HALL.z1-.4);
+    if(nx!==lx||nz!==lz){const r=hallR(nx,nz);car.x=r[0];car.y=r[1]}}
+  sprintUpdate(dt)}}
+
+/* ---------- Der Sprint ---------- */
+const SPR={phase:0};
+QUESTS.find(q=>q.id==="sporthalle").transport=true;
+{const base=startTransport;startTransport=function(q,pick){if(q.id!=="sporthalle")return base(q,pick);
+  const F=HALL.field;SPR.q=q;SPR.A=hallR(F.x0,F.z1);SPR.B=hallR(F.x1,F.z0);SPR.phase=1;if(!SPR.mark)SPR.mark=xMarker("#16a34a");SPR.mark.visible=true;
+  toast("🏁 Diagonal-Sprint",`Stell dich ans Start-Hütchen (grüner Pfeil) und starte mit ${isTouch?"Tippen":"E"}.`,"#16a34a")}}
+function sprintGo(){if(SPR.phase!==1)return;SPR.phase=2;SPR.t=3;car.v=0;beep(440,.15,"square",.06);toast("3","Gleich geht's los …","#16a34a")}
+function sprintUpdate(dt){if(!SPR.phase)return;const m=SPR.mark,tgt=SPR.phase===3?SPR.B:SPR.A;
+  if(m){m.position.set(tgt[0],BASE_Y+1.5+Math.sin(performance.now()/250)*.15,tgt[1]);m.rotation.y+=dt*2}
+  if(SPR.phase===2){const o=Math.ceil(SPR.t);SPR.t-=dt;car.v=0;const n=Math.ceil(SPR.t);if(n!==o&&n>0){beep(440,.15,"square",.06);toast(String(n),"Gleich geht's los …","#16a34a")}
+    if(SPR.t<=0){SPR.phase=3;SPR.run=0;beep(880,.3,"square",.07);toast("LOS!","Lauf diagonal zum Hütchen in der gegenüberliegenden Ecke!","#16a34a")}return}
+  if(SPR.phase===3){SPR.run+=dt;if(!inHall(car.x,car.y)){SPR.phase=1;toast("Sprint abgebrochen","Zurück in die Halle und noch einmal starten.","#ff5d6c");return}
+    if(Math.hypot(car.x-SPR.B[0],car.y-SPR.B[1])<1.3){const q=SPR.q,tm=SPR.run;SPR.phase=0;if(m)m.visible=false;jingle();
+      const s=qs(q);s.sprint=+tm.toFixed(1);persist();finishQuest(q);
+      toast("Auftrag erledigt!",`17 m in ${fmt(tm)} s – ${q.choice.fb(s.pick)}`.replace(" Jetzt lauf die erste Diagonale!",""),"#3ddc84")}}}
+
+/* ================= Läden: Fahrradladen, Autohaus, Sportflughafen =================
+   - Fahrradladen „Radwerk Rheydt“ an der Hauptstraße: verschiedene E-Scooter und Fahrräder ausgestellt, kaufen.
+   - Autohaus „An der Gracht“: verschiedene Autos (und Motorroller) ausgestellt, kaufen.
+   - Sportflughafen (Felder im Südosten von Mülfort; der echte Flughafen Mönchengladbach liegt außerhalb des Kartenausschnitts):
+     Hubschrauber und Flugzeuge mieten – pro Flug, Mietende beim Aussteigen nach der Landung.
+   Die Läden sind begehbar (automatische Schiebetür, drinnen frei laufen). Gekaufte Fahrzeuge stehen danach vor dem Laden.
+   Modelle sind Varianten der vorhandenen Fahrzeugtypen (eigene Farbe, Ausstattung, Fahrwerte und Preise).
+   Grundstücke frei auf der echten Karte gesucht (keine Gebäude, Straßen, Wasser, Wald oder Parks). */
+
+/* ---------- Modelle (Varianten) ---------- */
+const VARS=[
+  // Fahrradladen
+  {id:"sc_city",base:"scoot",shop:"rad",name:"City-Roller",icon:"🛴",price:115,paint:"#1b1b1b",st:{max:7.0},def:true,desc:"Leicht und günstig für kurze Wege."},
+  {id:"sc_komfort",base:"scoot",shop:"rad",name:"Komfort-Roller",icon:"🛴",price:135,paint:"#e9e9e9",st:{max:7.5,turn:2.9},x:["korb"],desc:"Breites Trittbrett und Korb für die Schultasche."},
+  {id:"sc_sport",base:"scoot",shop:"rad",name:"Sport-Roller",icon:"🛴",price:160,paint:"#d81e2c",st:{max:7.5,acc:6.5,turn:3.2},x:["streifen"],desc:"Zieht am schnellsten an – aber auch er fährt nur so schnell, wie erlaubt."},
+  {id:"bk_stadt",base:"bike",shop:"rad",name:"Stadtrad",icon:"🚲",price:190,paint:"#22a39a",st:{},x:["korb"],def:true,desc:"Mit Korb und bequemem Sattel für jeden Tag."},
+  {id:"bk_mtb",base:"bike",shop:"rad",name:"Mountainbike",icon:"🚵",price:225,paint:"#e8742a",st:{max:9,grassF:.95},desc:"Kommt auch über Wiesen und Feldwege gut voran."},
+  {id:"bk_renn",base:"bike",shop:"rad",name:"Rennrad",icon:"🚴",price:265,paint:"#f2f2f2",st:{max:11,grassF:.45,turn:2.7},x:["streifen"],desc:"Am schnellsten auf Asphalt, auf der Wiese eher nicht."},
+  {id:"bk_ebike",base:"bike",shop:"rad",name:"E-Bike",icon:"🔋",price:340,paint:"#1b2f6b",st:{max:10.5,acc:7},x:["akku"],desc:"Der Motor hilft beim Anfahren. Ideal für weite Wege."},
+  // Autohaus
+  {id:"mo_roller",base:"moped",shop:"auto",name:"Roller Classic",icon:"🛵",price:440,paint:"#e2523a",st:{},def:true,desc:"Flott durch die Stadt, mit Licht für die Nacht."},
+  {id:"mo_sport",base:"moped",shop:"auto",name:"Motorrad Sport",icon:"🏍️",price:520,paint:"#1b1b1b",st:{max:15,acc:7},x:["streifen"],desc:"Mehr Leistung für lange Strecken."},
+  {id:"ca_smart",base:"smart",shop:"auto",name:"Smart",icon:"🚙",price:690,paint:"#9ccc2e",st:{},def:true,desc:"Winzig und wendig, passt in jede Lücke."},
+  {id:"ca_kompakt",base:"auto",shop:"auto",name:"Kompaktwagen",icon:"🚘",price:890,paint:"#4a5d73",st:{},def:true,desc:"Der Alltagswagen: sparsam und zuverlässig."},
+  {id:"ca_sport",base:"auto",shop:"auto",name:"Kompakt Sport",icon:"🚘",price:1050,paint:"#d81e2c",st:{max:23,acc:8.5},x:["streifen","spoiler"],desc:"Sportfahrwerk, Spoiler und Rennstreifen."},
+  {id:"ca_elektro",base:"auto",shop:"auto",name:"Elektro-Kompakt",icon:"⚡",price:1180,paint:"#3fa7d6",st:{max:21,acc:9},desc:"Leise, elektrisch und spritzig beim Anfahren."},
+  {id:"ca_van",base:"van",shop:"auto",name:"Transporter",icon:"🚐",price:1090,paint:"#f2f2f2",st:{},def:true,desc:"Viel Laderaum: jede Lieferung bringt 50 % mehr Geld."},
+  {id:"ca_prius",base:"prius",shop:"auto",name:"Toyota Prius",icon:"🚗",price:1390,paint:"#a9bccd",st:{},def:true,desc:"Leiser Hybrid mit mehr Tempo für weite Lieferungen."},
+  {id:"ca_aston",base:"aston",shop:"auto",name:"Aston Martin",icon:"🏎️",price:2590,paint:"#1f5c4a",st:{},def:true,desc:"Britischer Sportwagen mit langer Motorhaube."},
+  {id:"ca_maser",base:"maser",shop:"auto",name:"Maserati",icon:"🏁",price:3990,paint:"#1b2f6b",st:{},def:true,desc:"Der schnellste Wagen der Stadt."},
+  // Sportflughafen (Miete pro Flug)
+  {id:"he_rund",base:"heli",shop:"flug",rent:true,name:"Rundflug-Hubschrauber",icon:"🚁",price:250,paint:"#d7262e",st:{},def:true,desc:"Für einen Rundflug über Rheydt und Mülfort."},
+  {id:"he_xl",base:"heli",shop:"flug",rent:true,name:"Hubschrauber XL",icon:"🚁",price:400,paint:"#1b2f6b",st:{max:46,acc:10},x:["streifen"],desc:"Größer und schneller – für weite Luftlinien."},
+  {id:"pl_ul",base:"plane",shop:"flug",rent:true,name:"Ultraleichtflieger",icon:"🛩️",price:180,paint:"#f2b81f",st:{max:50,acc:6},desc:"Leicht und gutmütig: ideal für den ersten Flug."},
+  {id:"pl_sport",base:"plane",shop:"flug",rent:true,name:"Sportflugzeug",icon:"🛩️",price:320,paint:"#f2efe6",st:{},def:true,desc:"Der Klassiker vom Sportflughafen."},
+  {id:"pl_reise",base:"plane",shop:"flug",rent:true,name:"Reiseflugzeug",icon:"✈️",price:560,paint:"#1b2f6b",st:{max:70,acc:7},x:["streifen"],desc:"Schnell und weit – für die ganz großen Strecken."}];
+const VAR=Object.fromEntries(VARS.map(v=>[v.id,v]));
+const VKEYS=["max","acc","turn","grassF"],VBASE0={};for(const v of VEHICLES)VBASE0[v.id]=Object.fromEntries(VKEYS.map(k=>[k,v[k]]).concat([["name",v.name],["icon",v.icon],["desc",v.desc]]));
+const RENT_REQ=3;
+save.vown=save.vown||[];save.vsel=save.vsel||{};
+function varMigrate(){save.vown=save.vown||[];save.vsel=save.vsel||{};
+  for(const b of save.owned){if(b==="walk"||(save.rent&&save.rent.base===b&&!save.rent.own))continue;if(!VARS.some(v=>v.base===b&&save.vown.includes(v.id))){const d=VARS.find(v=>v.base===b&&v.def);if(d)save.vown.push(d.id)}}
+  for(const b in save.vsel)if(!VAR[save.vsel[b]])delete save.vsel[b]}
+function applyVariant(vid,quiet){const v=VAR[vid];if(!v)return;const b=VEH[v.base];if(!b)return;
+  Object.assign(b,VBASE0[v.base]);Object.assign(b,v.st||{});b.name=v.name;b.icon=v.icon;b.desc=v.desc;
+  save.vsel[v.base]=vid;save.paint[v.base]=v.paint;if(typeof applyPaint==="function")try{applyPaint(v.base)}catch(e){}
+  if(typeof vehMeshes!=="undefined"&&vehMeshes[v.base])setExtras(vehMeshes[v.base],v.x||[]);if(!quiet)persist()}
+function applyAllVariants(){varMigrate();for(const b in save.vsel)applyVariant(save.vsel[b],true)}
+
+/* Zubehör je Modell (Korb, Akku, Rennstreifen, Spoiler) – passend zur Größe des Fahrzeugs */
+function localBox(m){const p=m.position.clone(),r=m.rotation.clone(),vis=m.visible,rd=m.userData.rider;m.position.set(0,0,0);m.rotation.set(0,0,0);
+  const old=m.getObjectByName("vx");if(old)old.visible=false;if(rd)rd.visible=false;m.visible=true;m.updateMatrixWorld(true);
+  const b=new THREE.Box3();m.traverse(o=>{if(o.isMesh&&o.visible&&o.name!=="vx"){o.geometry.computeBoundingBox&&!o.geometry.boundingBox&&o.geometry.computeBoundingBox();const bb=o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);b.union(bb)}});
+  m.position.copy(p);m.rotation.copy(r);m.visible=vis;if(old)old.visible=true;m.updateMatrixWorld(true);return b}
+function setExtras(m,list){if(!m)return;const old=m.getObjectByName("vx");if(old)m.remove(old);if(!list||!list.length)return;
+  const b=localBox(m);if(b.isEmpty())return;const g=new THREE.Group();g.name="vx";const L=b.max.x-b.min.x,Wd=b.max.z-b.min.z,Hh=b.max.y-b.min.y,s=1/(m.scale.x||1);
+  const bx=(c,x,y,z,sx,sy,sz)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(sx*s,sy*s,sz*s),new THREE.MeshLambertMaterial({color:c}));o.position.set(x*s,y*s,z*s);o.name="vx";g.add(o)};
+  const small=L<2.6;
+  for(const k of list){
+    if(k==="korb"){bx("#2b2b2b",b.max.x-.1,b.min.y+Hh*.8,(b.min.z+b.max.z)/2,.26,.16,.3)}
+    if(k==="akku"){bx("#222831",(b.min.x+b.max.x)/2-.05,b.min.y+Hh*.5,(b.min.z+b.max.z)/2,.38,.11,.11);bx("#3ddc84",(b.min.x+b.max.x)/2+.1,b.min.y+Hh*.5+.06,(b.min.z+b.max.z)/2,.05,.02,.04)}
+    if(k==="streifen"&&!small){for(const dz of [-.18,.18])bx("#ffffff",(b.min.x+b.max.x)/2,b.max.y+.008,(b.min.z+b.max.z)/2+dz*Math.min(1,Wd/1.8),L*.92,.015,.13)}
+    if(k==="spoiler"){const zc=(b.min.z+b.max.z)/2;bx("#111",b.min.x+.18,b.min.y+Hh*.86,zc,.22,.04,Wd*.9);for(const dz of [-.4,.4])bx("#111",b.min.x+.2,b.min.y+Hh*.8,zc+dz*Wd/2,.06,.12,.05)}}
+  g.traverse(o=>{if(o.isMesh)o.castShadow=true});m.add(g)}
+
+/* ---------- Gebäude (begehbar) ---------- */
+const ROOMS=[];
+function mkRoom(o){const R=Object.assign({door:3,H:4.5,glassSides:0},o);R.co=Math.cos(R.ang);R.si=Math.sin(R.ang);ROOMS.push(R);return R}
+const rL=(R,x,y)=>{const dx=x-R.cx,dy=y-R.cy;return [dx*R.co+dy*R.si,-dx*R.si+dy*R.co]};
+const rW=(R,X,Z)=>[R.cx+X*R.co-Z*R.si,R.cy+X*R.si+Z*R.co];
+const inRoom=(x,y,m=-.2)=>ROOMS.find(R=>R.door&&!R.solid&&(()=>{const [X,Z]=rL(R,x,y);return Math.abs(X)<R.D/2+m&&Math.abs(Z)<R.W/2+m})());
+const RAD=mkRoom({id:"rad",name:"Radwerk Rheydt",sub:"Fahrräder · E-Scooter",cx:-462.3,cy:-853.8,ang:-1.7788,W:16,D:12,H:4.6,col:"#2f9e5b",wall:"#efe9df",shop:"rad"});
+const AUT=mkRoom({id:"auto",name:"Autohaus an der Gracht",sub:"Neuwagen · Motorroller",cx:-299.8,cy:-726.8,ang:1.6116,W:30,D:22,H:6.2,col:"#1f3b66",wall:"#3b4048",shop:"auto",glassSides:.55,door:4});
+/* Sportflughafen: Bahn 300 m × 30 m, Vorfeld, Terminal (begehbar), Hangar, Tower, Hubschrauberlandeplatz */
+/* Flughafen Mönchengladbach (echte Lage, Phase 4 „Nord und Ost“): Bahn 13/31, Vorfeld und Gebäude aus den OSM-Daten des Gebiets.
+   Flugschule & Verleih westlich des Terminals am Rand des Vorfelds; Mietflugzeuge auf freien Stellplätzen des Vorfelds. */
+const FLUG={a:40.6*Math.PI/180,room:[3614,-7434],spots:[[3630,-7458],[3654,-7470],[3600,-7464],[3636,-7494],[3678,-7458]],planeStart:[3390,-7971],heliStart:[3666,-7494],sock:null};
+const TER=mkRoom({id:"flug",name:"Flugschule & Verleih",sub:"Flughafen Mönchengladbach · Rundflüge",cx:FLUG.room[0],cy:FLUG.room[1],ang:FLUG.a-Math.PI/2,W:18,D:12,H:4.4,col:"#1e6fd9",wall:"#f4f4f2",shop:"flug"});
+
+/* Raster: Gebäude fest, Innenraum und Tür frei; Bäume nicht im Laden, nicht auf der Bahn */
+function roomCells(R,fn){const ext=Math.hypot(R.W,R.D)/2+2;for(let x=Math.floor(R.cx-ext);x<=R.cx+ext;x++)for(let y=Math.floor(R.cy-ext);y<=R.cy+ext;y++){const i=gi(x+.5,y+.5);if(i<0)continue;const [X,Z]=rL(R,x+.5,y+.5);fn(i,X,Z)}}
+function stripCells(cx,cy,ang,L,Bw,fn){const u=[Math.cos(ang),Math.sin(ang)],ext=Math.hypot(L,Bw)/2+2;for(let x=Math.floor(cx-ext);x<=cx+ext;x++)for(let y=Math.floor(cy-ext);y<=cy+ext;y++){const dx=x+.5-cx,dy=y+.5-cy,a=dx*u[0]+dy*u[1],b=-dx*u[1]+dy*u[0];if(Math.abs(a)<L/2&&Math.abs(b)<Bw/2){const i=gi(x+.5,y+.5);if(i>=0)fn(i)}}}
+function roomGrid(){for(const R of ROOMS)roomCells(R,(i,X,Z)=>{if(Math.abs(X)>R.D/2+.35||Math.abs(Z)>R.W/2+.35)return;
+  const inner=!R.solid&&Math.abs(X)<R.D/2-.5&&Math.abs(Z)<R.W/2-.5,door=R.door&&X>R.D/2-1.2&&Math.abs(Z)<R.door/2-.15;
+  if(inner||door){solid[i]=0;hgt[i]=0;surf[i]&=~6}else{solid[i]=1;hgt[i]=Math.max(hgt[i],Math.min(250,Math.round(R.H)))}})}
+{const base=rasterize;rasterize=function(){base();try{roomGrid()}catch(e){console.warn("Läden Raster",e)}}}
+{const base=buildTrees;buildTrees=function(){const tmp=[];const mark=i=>{if(!hgt[i]){hgt[i]=1;tmp.push(i)}};
+  for(const R of ROOMS)roomCells(R,(i,X,Z)=>{if(Math.abs(X)<R.D/2+3&&Math.abs(Z)<R.W/2+3)mark(i)});
+  if(MG.aero){for(const r of MG.aero.runways.concat(MG.aero.taxi)){const p=r.p;for(let k=2;k<p.length;k+=2){const ax=p[k-2],ay=p[k-1],bx=p[k],by=p[k+1];stripCells((ax+bx)/2,(ay+by)/2,Math.atan2(by-ay,bx-ax),Math.hypot(bx-ax,by-ay)+8,r.w+16,mark)}}
+    for(const q of MG.aero.aprons){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(let k=0;k<q.length;k+=2){x0=Math.min(x0,q[k]);x1=Math.max(x1,q[k]);y0=Math.min(y0,q[k+1]);y1=Math.max(y1,q[k+1])}
+      for(let x=Math.floor(x0);x<=x1;x+=1)for(let y=Math.floor(y0);y<=y1;y+=1)if(inPoly(x+.5,y+.5,q)){const i=gi(x+.5,y+.5);if(i>=0)mark(i)}}}
+  base();for(const i of tmp)hgt[i]=0}}
+
+/* ---------- Aussehen ---------- */
+const lmat=(o)=>new THREE.MeshLambertMaterial(o);
+const litM=(map,k=.5,o={})=>new THREE.MeshLambertMaterial(Object.assign({map,emissive:0xffffff,emissiveMap:map,emissiveIntensity:k},o));
+const colM=(c,k=.45)=>new THREE.MeshLambertMaterial({color:c,emissive:c,emissiveIntensity:k});
+function signTex(R){return canvasTex(1024,160,(g)=>{g.fillStyle=R.col;g.fillRect(0,0,1024,160);g.fillStyle="rgba(255,255,255,.12)";g.fillRect(0,0,1024,8);
+  g.fillStyle="#fff";g.textBaseline="middle";const ic={rad:"🚲",auto:"🚘",flug:"🛩️"}[R.id]||"",tx=ic+"  "+R.name.toUpperCase();let fs=64;g.font=`bold ${fs}px sans-serif`;while(g.measureText(tx).width>950&&fs>30){fs-=2;g.font=`bold ${fs}px sans-serif`}g.fillText(tx,36,62);
+  g.font="32px sans-serif";g.fillStyle="rgba(255,255,255,.85)";g.fillText(R.sub||"",40,124)})}
+function buildRoom(R){const G=new THREE.Group(),B0=BASE_Y,{W,D,H}=R;G.position.set(R.cx,0,R.cy);G.rotation.y=-R.ang;
+  const add=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);G.add(m);return m};
+  const box=(mat,x,y,z,sx,sy,sz)=>add(new THREE.BoxGeometry(sx,sy,sz),mat,x,y,z);
+  const plaster=canvasTex(256,256,(g)=>{g.fillStyle=R.wall;g.fillRect(0,0,256,256);noise(g,256,256,4000,["rgba(0,0,0,.05)","rgba(255,255,255,.08)"],2);if(R.hangar)for(let x=0;x<256;x+=16){g.fillStyle="rgba(0,0,0,.16)";g.fillRect(x,0,3,256)}});
+  plaster.repeat.set(2,2);const wallM=lmat({map:plaster}),band=lmat({color:R.col}),dark=lmat({color:"#2b2f36"}),glass=new THREE.MeshLambertMaterial({color:0x9fc4dc,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide});
+  const t=.3;
+  if(R.tower){box(wallM,0,B0+H/2-1.5,0,3,H-3,3);box(dark,0,B0+H-1.5,0,5,.3,5);box(glass,0,B0+H-.3,0,4.6,2.1,4.6);box(band,0,B0+H+.8,0,5.2,.3,5.2);
+    const m=add(new THREE.CylinderGeometry(.04,.04,3,6),dark,1.5,B0+H+2.3,1.5);scene.add(G);G.traverse(o=>{if(o.isMesh)o.castShadow=o.receiveShadow=true});return G}
+  // Außenwände
+  box(wallM,-D/2,B0+H/2,0,t,H,W);
+  const gs=R.glassSides?D*R.glassSides:0;
+  for(const s of [-1,1]){if(gs){box(wallM,-D/2+(D-gs)/2,B0+H/2,s*W/2,D-gs,H,t);box(glass,D/2-gs/2,B0+H/2,s*W/2,gs,H-.3,.06);for(let x=D/2-gs;x<=D/2+.01;x+=gs/3)box(dark,x,B0+H/2,s*W/2,.12,H,.14)}else box(wallM,0,B0+H/2,s*W/2,D,H,t)}
+  if(R.hangar){box(wallM,D/2,B0+H*.85,0,t,H*.3,W);const door=canvasTex(256,256,(g)=>{g.fillStyle="#6d7682";g.fillRect(0,0,256,256);for(let y=0;y<256;y+=12){g.fillStyle="rgba(0,0,0,.25)";g.fillRect(0,y,256,2)}});door.repeat.set(3,1);
+    box(lmat({map:door}),D/2,B0+H*.35,0,.2,H*.7,W-1);box(band,D/2+.12,B0+H*.92,0,.05,.8,W*.5)}
+  else{const dw=R.door;// Glasfront mit Schiebetür
+    for(const s of [-1,1]){const zc=s*(dw/2+(W/2-dw/2)/2),w=W/2-dw/2;box(glass,D/2,B0+(H-.6)/2,zc,.06,H-.6,w);for(let z=dw/2;z<=W/2+.01;z+=w/3)box(dark,D/2,B0+(H-.6)/2,s*z,.14,H-.6,.12)}
+    box(dark,D/2,B0+H-.3,0,.3,.6,W);box(glass,D/2-.15,B0+1.25,dw/2+.6,.04,2.5,1.2);box(glass,D/2-.15,B0+1.25,-dw/2-.6,.04,2.5,1.2);box(dark,D/2,B0+2.55,0,.2,.1,dw)}
+  // Dach, Attika, Schild
+  box(dark,0,B0+H+.15,0,D+.5,.3,W+.5);box(band,D/2+.26,B0+H+.15,0,.04,.32,W+.5);
+  const sm=new THREE.MeshBasicMaterial({map:signTex(R)});const sg=new THREE.PlaneGeometry(Math.min(W*.8,13),Math.min(W*.8,13)*160/1024);sg.rotateY(Math.PI/2);
+  const sign=add(sg,sm,D/2+.2,B0+H-(R.hangar?1.4:.95),0);if(R.hangar)sign.position.y=B0+H*.75;
+  if(R.id==="auto")for(const z of [-W/2-3,-W/2-6,W/2+3])for(const fy of [0]){const p=add(new THREE.CylinderGeometry(.06,.06,8,6),lmat({color:"#c9ccd2"}),D/2+3,B0+4,z);const f=add(new THREE.PlaneGeometry(1.6,1),colM(z>0?"#d81e2c":"#1f3b66",.3),D/2+3,B0+7.2,z+.82);f.rotation.y=Math.PI/2;f.material.side=THREE.DoubleSide}
+  G.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  if(R.solid){scene.add(G);R.group=G;return G}
+  // Innenraum
+  const I=new THREE.Group();G.add(I);const ia=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);I.add(m);return m};
+  const tiles=canvasTex(512,512,(g)=>{const c=R.id==="auto"?["#d9dadc","#cfd0d3"]:R.id==="rad"?["#c9c3b6","#beb8ab"]:["#d6d8db","#cacdd1"];for(let y=0;y<4;y++)for(let x=0;x<4;x++){g.fillStyle=c[(x+y)%2];g.fillRect(x*128,y*128,128,128);g.fillStyle="rgba(0,0,0,.18)";g.fillRect(x*128,y*128,128,2);g.fillRect(x*128,y*128,2,128)}noise(g,512,512,6000,["rgba(0,0,0,.04)","rgba(255,255,255,.08)"],2)});
+  tiles.repeat.set(D/4,W/4);const fl=ia(new THREE.PlaneGeometry(D-.4,W-.4),litM(tiles,.2,{polygonOffset:true,polygonOffsetFactor:-8,polygonOffsetUnits:-8}),0,B0+.05,0);fl.rotation.x=-Math.PI/2;fl.renderOrder=2;
+  const inner=canvasTex(256,256,(g)=>{g.fillStyle=R.id==="auto"?"#e9ebee":"#f3efe7";g.fillRect(0,0,256,256);noise(g,256,256,2500,["rgba(0,0,0,.04)","rgba(255,255,255,.1)"],2)});
+  const wl=(x,z,w,ry,gl)=>{const p=ia(new THREE.PlaneGeometry(w,H-.1),litM(inner,.45),x,B0+(H-.1)/2,z);p.rotation.y=ry;return p};
+  wl(-D/2+.17,0,W-.4,Math.PI/2);for(const s of [-1,1]){const len=D-.4-gs;if(len>0){const p=wl(-D/2+.2+len/2,s*(W/2-.17),len,s>0?Math.PI:0)}}
+  {const c=ia(new THREE.PlaneGeometry(D-.4,W-.4),litM(inner,.5),0,B0+H-.05,0);c.rotation.x=Math.PI/2}
+  const lamp=new THREE.MeshBasicMaterial({color:0xffffff});for(let x=-D/2+2;x<D/2-1;x+=3)ia(new THREE.BoxGeometry(.25,.05,W*.7),lamp,x,B0+H-.09,0);
+  // Wandbild: großes Logo an der Rückwand
+  {const p=ia(new THREE.PlaneGeometry(Math.min(W*.6,10),Math.min(W*.6,10)*160/1024),new THREE.MeshBasicMaterial({map:signTex(R)}),-D/2+.2,B0+H*.68,0);p.rotation.y=Math.PI/2}
+  // Tresen
+  {const cx=-D/2+1.6;ia(new THREE.BoxGeometry(.8,1.05,3.2),colM(R.col,.35),cx,B0+.53,0);ia(new THREE.BoxGeometry(.95,.06,3.35),colM("#f5f5f5",.4),cx,B0+1.08,0);
+    const sc=ia(new THREE.BoxGeometry(.05,.35,.55),colM("#1d2230",.3),cx-.1,B0+1.32,.6);R.counter=rW(R,cx+1.4,0)}
+  // Podeste / Teppiche unter den Fahrzeugen
+  R.inner=I;scene.add(G);R.group=G;R.displays=[];return G}
+
+/* Flughafen: echte Bahn, Rollwege und Vorfelder aus den Kartendaten; Windsack am Verleih */
+function buildAero(){const A=MG.aero;if(!A||!(A.runways.length+A.taxi.length+A.aprons.length))return;const B0=BASE_Y;
+  const pm=(o)=>new THREE.MeshLambertMaterial(Object.assign({polygonOffset:true,polygonOffsetFactor:-6,polygonOffsetUnits:-6},o));
+  const rwT=canvasTex(256,64,(g)=>{g.fillStyle="#3a3d42";g.fillRect(0,0,256,64);noise(g,256,64,2500,["rgba(0,0,0,.12)","rgba(255,255,255,.05)"],2);g.fillStyle="#f2f2f2";g.fillRect(40,29,110,6);g.fillRect(0,2,256,2);g.fillRect(0,60,256,2)});
+  const twT=canvasTex(128,32,(g)=>{g.fillStyle="#4d5157";g.fillRect(0,0,128,32);noise(g,128,32,600,["rgba(0,0,0,.1)","rgba(255,255,255,.05)"],2);g.fillStyle="#e8c32a";g.fillRect(0,14,128,4)});
+  const strip=(p,w,tex,y,rep)=>{for(let k=2;k<p.length;k+=2){const ax=p[k-2],ay=p[k-1],bx=p[k],by=p[k+1],L=Math.hypot(bx-ax,by-ay);if(L<.5)continue;const t=tex.clone();t.needsUpdate=true;t.repeat.set(L/rep,1);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(L+w*.2,w),pm({map:t}));m.rotation.order="YXZ";m.rotation.set(-Math.PI/2,-Math.atan2(by-ay,bx-ax),0);m.position.set((ax+bx)/2,B0+y,(ay+by)/2);m.receiveShadow=true;scene.add(m)}};
+  const apM=pm({color:0x5d6168});
+  for(const q of A.aprons){const sh=new THREE.Shape();for(let k=0;k<q.length;k+=2)k?sh.lineTo(q[k],-q[k+1]):sh.moveTo(q[k],-q[k+1]);const g=new THREE.ShapeGeometry(sh);g.rotateX(-Math.PI/2);const m=new THREE.Mesh(g,apM);m.position.y=B0+.03;m.receiveShadow=true;scene.add(m)}
+  for(const r of A.taxi)strip(r.p,Math.max(8,r.w),twT,.035,16);for(const r of A.runways)strip(r.p,r.w,rwT,.045,60);
+  const R=TER,p=rW(R,R.D/2+6,R.W/2+6);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,6,6),lmat({color:"#c9ccd2"}));pole.position.set(p[0],B0+3,p[1]);scene.add(pole);
+  const sock=new THREE.Mesh(new THREE.CylinderGeometry(.35,.15,2,10,1,true),lmat({color:"#ff7b00",side:THREE.DoubleSide}));sock.rotation.z=Math.PI/2;const sg=new THREE.Group();sg.position.set(p[0],B0+5.8,p[1]);sock.position.x=1;sg.add(sock);scene.add(sg);FLUG.sock=sg}
+
+/* ---------- Ausstellungsstücke ---------- */
+const SHOWS={rad:[],auto:[],flug:[]};
+{const R=RAD;const sc=VARS.filter(v=>v.base==="scoot"),bk=VARS.filter(v=>v.base==="bike");
+  sc.forEach((v,i)=>SHOWS.rad.push({v,room:R,X:2.6-i*2.6,Z:-5.6,h:Math.PI/2}));bk.forEach((v,i)=>SHOWS.rad.push({v,room:R,X:3.2-i*2.2,Z:4.4,h:-Math.PI/2+.25}))}
+{const R=AUT,cars=VARS.filter(v=>v.shop==="auto"&&!/moped/.test(v.base));const slots=[[5.2,-10.5],[5.2,-3.5],[5.2,3.5],[5.2,10.5],[-2.4,-10.5],[-2.4,-3.5],[-2.4,3.5],[-2.4,10.5]];
+  cars.forEach((v,i)=>{const s=slots[i];if(s)SHOWS.auto.push({v,room:R,X:s[0],Z:s[1],h:Math.PI/2+(i%2?.55:-.55)})});
+  VARS.filter(v=>v.base==="moped").forEach((v,i)=>SHOWS.auto.push({v,room:R,X:-8,Z:(i?1:-1)*8,h:Math.PI/2}))}
+{const air=VARS.filter(v=>v.base==="plane").concat(VARS.filter(v=>v.base==="heli"));air.forEach((v,i)=>{const p=FLUG.spots[i];if(p)SHOWS.flug.push({v,x:p[0],y:p[1],a:FLUG.a})})}
+for(const k in SHOWS)for(const S of SHOWS[k])if(S.room){const p=rW(S.room,S.X,S.Z);S.x=p[0];S.y=p[1];S.a=S.room.ang+S.h}
+function showClone(S){const src=vehMeshes[S.v.base];if(!src)return null;const ud=src.userData,rd=ud.rider,rp=rd&&rd.parent;if(rp)rp.remove(rd);const ox=src.getObjectByName("vx");if(ox)src.remove(ox);
+  const bi=ud.body?src.children.indexOf(ud.body):-1;src.userData={};let c;try{c=src.clone(true)}finally{src.userData=ud;if(rp)rp.add(rd);if(ox)src.add(ox)}
+  c.userData={body:bi>=0?c.children[bi]:null};const pm=ud.paint,nm=pm?pm.clone():null;if(nm){nm.color.set(S.v.paint);if(window.__lin)nm.color.convertSRGBToLinear()}
+  const kill=[];c.traverse(o=>{if(o.isLight||o.isSkinnedMesh||(o.userData&&o.userData.isRider))kill.push(o);if(o.isMesh&&nm){if(o.material===pm)o.material=nm;else if(Array.isArray(o.material))o.material=o.material.map(m=>m===pm?nm:m)}});
+  for(const o of kill)o.parent&&o.parent.remove(o);  c.visible=true;c.position.set(S.x,BASE_Y+(S.room?.05:0),S.y);c.rotation.set(0,-S.a,0);if(c.userData.body)c.userData.body.rotation.set(0,0,0);
+  setExtras(c,S.v.x||[]);scene.add(c);return c}
+function refreshShows(force){for(const k in SHOWS)for(const S of SHOWS[k]){const src=vehMeshes&&vehMeshes[S.v.base];if(!src)continue;
+  if(!force&&S.src===src&&S.mesh)continue;if(Math.hypot(S.x-car.x,S.y-car.y)>220&&!force)continue;if(S.mesh)scene.remove(S.mesh);S.mesh=showClone(S);S.src=src}}
+
+/* ---------- Kaufen, Nehmen, Mieten ---------- */
+const owns=id=>save.vown.includes(id);
+function parkOutside(R,base){const VH=VEH[base];for(const [X,Z] of [[R.D/2+3.2,R.W/2-2.5],[R.D/2+3.2,-R.W/2+2.5],[R.D/2+5,0],[R.D/2+6.5,R.W/2]]){const p=rW(R,X,Z);if(!blockedGround(p[0],p[1])){save.left={id:base,x:p[0],y:p[1],a:R.ang+Math.PI/2};return p}}
+  const s=spotNear(...rW(R,R.D/2+4,0));save.left={id:base,x:s.x,y:s.y,a:R.ang+Math.PI/2};return [s.x,s.y]}
+function buyVar(vid){const v=VAR[vid];if(!v||v.rent)return;if(owns(vid)){useVar(vid);return}
+  const req=VEH[v.base].req||1;if(lvl()<req){toast("🔒 Noch gesperrt",`Ab Rang ${req}: ${RANKS[req-1][1]}`,"#ff5d6c");return}
+  if(save.money<v.price){toast("Zu teuer",`Dir fehlen noch $${(v.price-save.money).toLocaleString("de-DE")}`,"#ff5d6c");return}
+  save.money-=v.price;save.vown.push(vid);if(!save.owned.includes(v.base))save.owned.push(v.base);applyVariant(vid,true);
+  const R=ROOMS.find(r=>r.shop===v.shop);parkOutside(R,v.base);persist();updateHud();jingle();
+  toast(`${v.icon} ${v.name} gekauft!`,`Für $${v.price.toLocaleString("de-DE")}. Er steht vor dem Laden – geh hin und steig ein (${isTouch?"Tippen":"E"}).`,"#3ddc84");if(state.mode==="shop")renderShop()}
+function useVar(vid){const v=VAR[vid];if(!owns(vid))return;if(inRoom(car.x,car.y)&&v.base!=="walk"){applyVariant(vid);const R=ROOMS.find(r=>r.shop===v.shop)||inRoom(car.x,car.y);parkOutside(inRoom(car.x,car.y)||R,v.base);persist();
+    toast(`${v.icon} ${v.name}`,"Steht vor der Tür bereit.","#3ddc84");if(state.mode==="shop")renderShop();return}
+  applyVariant(vid);setVehicle(v.base);if(state.mode==="shop")renderShop()}
+function rentVar(vid){const v=VAR[vid];if(!v||!v.rent)return;
+  if(lvl()<RENT_REQ){toast("🔒 Noch gesperrt",`Fliegen ab Rang ${RENT_REQ}: ${RANKS[RENT_REQ-1][1]}`,"#ff5d6c");return}
+  if(save.rent){toast("Du hast schon gemietet","Erst landen und aussteigen, dann kannst du neu mieten.","#ffc933");return}
+  if(save.money<v.price){toast("Zu teuer",`Ein Flug kostet $${v.price}. Dir fehlen noch $${(v.price-save.money).toLocaleString("de-DE")}`,"#ff5d6c");return}
+  save.money-=v.price;const own=save.owned.includes(v.base);save.rent={base:v.base,v:vid,own,prev:save.vsel[v.base]||null};if(!own)save.owned.push(v.base);applyVariant(vid,true);
+  if(state.mode==="shop")closeShop();
+  fade(()=>{const p=v.base==="plane"?FLUG.planeStart:FLUG.heliStart;car.x=p[0];car.y=p[1];car.a=FLUG.a;car.v=0;car.alt=BASE_Y;if(save.left&&save.left.id===v.base)save.left=null;setVehicle(v.base);camYaw=car.a;
+    camPos.set(car.x-Math.cos(car.a)*14,8,car.y-Math.sin(car.a)*14);persist();updateHud();
+    toast(`${v.icon} ${v.name} gemietet`,v.base==="plane"?"Gas geben, ab 18 m/s mit R abheben. Zum Beenden landen und aussteigen.":"Mit R steigen, mit F sinken. Zum Beenden landen und aussteigen.","#7fd3ff")})}
+function endRent(){const r=save.rent;if(!r)return;save.rent=null;if(save.left&&save.left.id===r.base)save.left=null;
+  if(!r.own)save.owned=save.owned.filter(b=>b!==r.base);if(r.prev)applyVariant(r.prev,true);persist();toast("🛬 Mietflug beendet","Danke, dass du mit uns geflogen bist!","#7fd3ff")}
+{const base=setVehicle;setVehicle=function(id){const r=save.rent;base(id);if(r&&id!==r.base)endRent()}}
+{const base=applySave;applySave=function(d){const r=base(d);try{applyAllVariants()}catch(e){}return r}}
+
+/* ---------- Ladenfenster (Dialog) ---------- */
+const SHOP_T={rad:["Fahrradladen","Radwerk Rheydt"],auto:["Autohaus","Autohaus an der Gracht"],flug:["Sportflughafen","Flugzeug- und Hubschrauberverleih"]};
+renderShop=function(){const cat=typeof shopAt==="string"?shopAt:shopAt?"auto":null;
+  $("shopTag").textContent=cat?SHOP_T[cat][0]:"Garage";$("shopTitle").textContent=cat?SHOP_T[cat][1]:"Deine Garage";
+  $("shopInfo").innerHTML=`Kontostand: <b>$${save.money.toLocaleString("de-DE")}</b> · Rang ${lvl()} (${RANKS[lvl()-1][1]}). `+(cat==="flug"?`Gemietet wird pro Flug. Zum Beenden landest du und steigst aus. Fliegen ab Rang ${RENT_REQ}.`:cat?"Gekaufte Fahrzeuge stehen danach vor dem Laden. Wechseln und umlackieren kannst du in der Garage (Taste G).":"Fahrräder und E-Scooter gibt es im Fahrradladen 🚲, Autos im Autohaus 🚘, Hubschrauber und Flugzeuge zum Mieten am Flughafen Mönchengladbach 🛩️ (ab Phase 4 „Nord und Ost“).");
+  const list=cat?VARS.filter(v=>v.shop===cat):[{id:"walk",base:"walk",name:"Zu Fuß",icon:"🚶",desc:VEH.walk.desc,price:0}].concat(VARS.filter(v=>owns(v.id)&&!v.rent));
+  const bar=(v,k,m)=>{const b=Object.assign({},VBASE0[v.base]||{},v.st||{});return `<div class="vstat">${k}<span class="vbar"><i style="width:${Math.min(100,(b[m]||0)/(m==="max"?72:3.4)*100)}%"></i></span></div>`};
+  $("vgrid").innerHTML=list.map(v=>{const act=v.base==="walk"?save.veh==="walk":save.veh===v.base&&save.vsel[v.base]===v.id,own=v.base==="walk"||owns(v.id);let btn,why="",cls="";
+    const req=v.rent?RENT_REQ:(VEH[v.base]&&VEH[v.base].req)||1;
+    if(act){btn=`<button type="button" disabled>✓ Unterwegs damit</button>`;cls="active"}
+    else if(v.rent){if(lvl()<req){btn=`<button type="button" disabled>🔒 Gesperrt</button>`;why=`Ab Rang ${req}: ${RANKS[req-1][1]}`;cls="locked"}
+      else if(save.rent){btn=`<button type="button" disabled>Schon gemietet</button>`;why="Erst landen und aussteigen";cls="locked"}
+      else if(save.money<v.price){btn=`<button type="button" disabled>Zu teuer</button>`;why=`Dir fehlen noch $${(v.price-save.money).toLocaleString("de-DE")}`;cls="locked"}
+      else btn=`<button class="primary" type="button" data-vrent="${v.id}">Mieten</button>`}
+    else if(own)btn=v.base==="walk"?`<button class="primary" type="button" data-vwalk="1">Nehmen</button>`:`<button class="primary" type="button" data-vuse="${v.id}">Nehmen</button>`;
+    else{cls="locked";if(lvl()<req){btn=`<button type="button" disabled>🔒 Gesperrt</button>`;why=`Ab Rang ${req}: ${RANKS[req-1][1]}`}
+      else if(save.money<v.price){btn=`<button type="button" disabled>Zu teuer</button>`;why=`Dir fehlen noch $${(v.price-save.money).toLocaleString("de-DE")}`}
+      else{btn=`<button class="primary" type="button" data-vbuy="${v.id}">Kaufen</button>`;cls=""}}
+    const sw=!cat&&own&&v.base!=="walk"&&save.vsel[v.base]===v.id?`<div class="swatches" aria-label="Farbe">${PAINTS.map(c=>`<button type="button" data-paint="${v.base}" data-col="${c}" style="background:${c}" aria-label="Farbe ${c}" aria-pressed="${(save.paint[v.base]||v.paint)===c}"></button>`).join("")}</div>`:"";
+    const price=v.base==="walk"?"gratis":v.rent?`$${v.price} pro Flug`:own?"gehört dir":"$"+v.price.toLocaleString("de-DE");
+    return `<div class="vcard ${cls}"><div class="vicon" style="background:${v.paint||"#2b2f3d"}">${v.icon}</div><div class="vname">${v.name}</div>
+      ${v.base==="walk"?"":bar(v,"Tempo","max")+bar(v,"Wendig","turn")}<p>${v.desc}</p><div class="vprice">${price}</div>${sw}${btn}${why?`<small>${why}</small>`:""}</div>`}).join("")};
+$("vgrid").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.vbuy){e.stopImmediatePropagation();buyVar(b.dataset.vbuy)}
+  else if(b.dataset.vuse){e.stopImmediatePropagation();useVar(b.dataset.vuse);closeShop()}
+  else if(b.dataset.vrent){e.stopImmediatePropagation();rentVar(b.dataset.vrent)}
+  else if(b.dataset.vwalk){e.stopImmediatePropagation();if(save.veh!=="walk"&&!inRoom(car.x,car.y))exitVehicle();closeShop()}},true);
+{const base=openShop;openShop=function(at){if(at===true)at="auto";return base(at)}}
+
+/* ---------- Karte: Läden als Orte ---------- */
+{const S=GIVERS.find(g=>g.id==="shop"),door=R=>rW(R,R.D/2+2.5,0);
+  if(S){const d=door(AUT);S.x=d[0];S.y=d[1];S.poiName="Gracht";S.about="Autos und Motorroller kaufen";S.store=AUT}
+  GIVERS.push({id:"rad",name:"Fahrradladen",icon:"🚲",col:"#3ddc84",about:"E-Scooter und Fahrräder kaufen",poiName:"Hauptstraße",x:door(RAD)[0],y:door(RAD)[1],store:RAD});
+  GIVERS.push({id:"flug",name:"Sportflughafen",icon:"🛩️",col:"#7fd3ff",about:"Hubschrauber und Flugzeuge mieten",poiName:"Flughafen Mönchengladbach (ab Phase 4)",x:door(TER)[0],y:door(TER)[1],store:TER})}
+{const base=openMission;openMission=function(g){if(g&&g.store){toast(`${g.icon} ${g.store.name}`,"Geh durch die Glastür hinein.","#3ddc84");return}return base(g)}}
+
+/* ---------- Spielwelt: bauen, betreten, Kamera, Interaktion ---------- */
+{const base=buildQuestWorld;buildQuestWorld=function(){base();try{for(const R of ROOMS)if(Math.abs(R.cx-RX)<HX+150&&Math.abs(R.cy-RY)<HY+150)buildRoom(R);buildAero()}catch(e){console.warn("Läden",e)}}}
+{const base=carHits;carHits=function(x,y){if(base(x,y))return true;if(V().id==="walk")return false;
+  for(const R of ROOMS){const [X,Z]=rL(R,x,y);if(Math.abs(X)<R.D/2+.8&&Math.abs(Z)<R.W/2+.8)return true}return false}}
+{const base=interactables;interactables=function(VH){let L=base(VH);
+  L=L.filter(it=>!GIVERS.some(g=>g.store&&Math.abs(it.x-g.x)<.01&&Math.abs(it.y-g.y)<.01));
+  if(VH.id==="walk"){const R=inRoom(car.x,car.y);
+    for(const k in SHOWS)for(const S of SHOWS[k]){if(Math.abs(S.x-car.x)>8||Math.abs(S.y-car.y)>8)continue;const v=S.v,r=v.base==="plane"?5:v.base==="heli"?4.5:/scoot|bike/.test(v.base)?1.6:/moped/.test(v.base)?1.9:2.8;
+      const lab=v.rent?`${v.icon} ${v.name} mieten · $${v.price}`:owns(v.id)?`${v.icon} ${v.name} · gehört dir – nehmen`:`${v.icon} ${v.name} kaufen · $${v.price.toLocaleString("de-DE")}`;
+      L.push({x:S.x,y:S.y,r,label:lab,act:()=>v.rent?rentVar(v.id):owns(v.id)?useVar(v.id):buyVar(v.id)})}
+    for(const Rm of ROOMS)if(Rm.counter&&R===Rm)L.push({x:Rm.counter[0],y:Rm.counter[1],r:2.2,label:`🧾 Beratung am Tresen – alle Modelle`,act:()=>openShop(Rm.shop)})}
+  return L}}
+{const base=updateCamera;updateCamera=function(dt,VH){base(dt,VH);const R=inRoom(car.x,car.y,-.3);if(!R)return;const p=camera.position,[X,Z]=rL(R,p.x,p.z),cl=(v,a,b)=>Math.min(b,Math.max(a,v));
+  const nX=cl(X,-R.D/2+.35,R.D/2-.35),nZ=cl(Z,-R.W/2+.35,R.W/2-.35),ny=Math.min(p.y,BASE_Y+R.H-.3);if(nX!==X||nZ!==Z||ny!==p.y){const w=rW(R,nX,nZ);p.set(w[0],ny,w[1]);camPos.copy(p);camera.lookAt(car.x,car.alt+1.3,car.y)}}}
+{const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);if(!ROOMS.some(R=>Math.hypot(R.cx-car.x,R.cy-car.y)<140))return;
+  for(const p of peds){if(!p.det||p.x===undefined)continue;const hide=ROOMS.some(R=>{const [X,Z]=rL(R,p.x,p.y);return Math.abs(X)<R.D/2+.8&&Math.abs(Z)<R.W/2+.8});if(hide){if(p.glb)p.glb.obj.visible=false;if(p.mesh)p.mesh.visible=false;if(p.dogM)p.dogM.visible=false}}}}
+{let t=0,shown=new Set();const base=update;update=function(dt){base(dt);t-=dt;if(t<=0){t=.5;refreshShows(false)}
+  if(FLUG.sock)FLUG.sock.rotation.y=-FLUG.a+Math.sin(performance.now()/1400)*.25;
+  const R=inRoom(car.x,car.y);if(R&&!shown.has(R.id)){shown.add(R.id);toast(`${{rad:"🚲",auto:"🚘",flug:"🛩️"}[R.id]} ${R.name}`,R.shop==="flug"?"Geh zu einem Flugzeug oder Hubschrauber draußen – oder an den Tresen.":"Geh zu einem Modell oder an den Tresen.","#3ddc84")}if(!R)shown.clear()}}
+/* GLB-Fahrzeuge kommen später: Zubehör erneut anbringen, Ausstellung neu aufbauen */
+{const base=vehSwap;vehSwap=function(id,g){base(id,g);const v=VAR[save.vsel[id]];if(v)setExtras(vehMeshes[id],v.x||[]);for(const k in SHOWS)for(const S of SHOWS[k])if(S.v.base===id)S.src=null}}
+applyAllVariants();
+
+/* ================= Ganz Mönchengladbach: Gebiete und Freischalten =================
+   - Die Stadt ist in 46 Gebiete zerlegt (tools/gebiete.py); geladen ist immer nur eines (iPad-Leistung).
+     Am Rand eines Gebiets lädt das Spiel das Nachbargebiet nach – Noah steht danach an derselben echten Stelle.
+   - Freischalten nach grenzen/freischaltgebiete.geojson (Raster 25 m): gesperrte Phasen und die Stadtgrenze sind nicht befahrbar.
+     Phase 1 Rheydt und Schulumfeld – sofort
+     Phase 2 Rheydter Süden        – drei Hauptmissionen erledigt
+     Phase 3 Gladbach und Innenstadt – alle Hauptmissionen in Rheydt erledigt
+     Phase 4 Nord und Ost (Flughafen) – Phase 3 und Rang 3 (Hypotenusen-Held)
+     Phase 5 West (Borussia-Park)  – Phase 4 und Rang 4 (Wurzel-Profi)
+   Freischaltungen stehen im Spielstand (save.phases) und gehen nie wieder verloren. */
+const PHR=(()=>{const R=GEB.raster,v=new Uint8Array(R.w*R.h);let k=0;for(const t of R.rle.split(",")){const val=+t[0],n=parseInt(t.slice(1),36);v.fill(val,k,k+n);k+=n}return {R,v}})();
+function phaseAt(x,y){const R=PHR.R,i=Math.floor((x-R.x0)/R.c),j=Math.floor((y-R.y0)/R.c);return i<0||j<0||i>=R.w||j>=R.h?0:PHR.v[j*R.w+i]}
+const mainDone=()=>MAIN.filter(id=>id!=="intro"&&(()=>{const q=questById(id);return q&&qs(q).done})()).length;
+const PHASE_REQ={
+  2:{t:"Erledige drei Hauptmissionen.",ok:()=>mainDone()>=3},
+  3:{t:"Erledige alle Hauptmissionen in Rheydt.",ok:()=>mainDone()>=MAIN.filter(id=>id!=="intro").length},
+  4:{t:"Schalte Gladbach frei und erreiche Rang 3 (Hypotenusen-Held).",ok:()=>lvl()>=3},
+  5:{t:"Schalte Nord und Ost frei und erreiche Rang 4 (Wurzel-Profi).",ok:()=>lvl()>=4}};
+const phaseName=p=>(GEB.phasen.find(q=>q.p===p)||{}).n||("Phase "+p);
+function phaseUnlocked(p){return p===1||((save.phases||[]).includes(p))}
+function phaseOK(x,y){const p=phaseAt(x,y);return p>0&&phaseUnlocked(p)}
+function checkPhases(quiet){save.phases=save.phases||[];let any=false;
+  for(let p=2;p<=5;p++){if(phaseUnlocked(p))continue;if(!phaseUnlocked(p-1)||!PHASE_REQ[p].ok())break;save.phases.push(p);any=true;
+    if(!quiet){jingle();toast(`🗺️ ${phaseName(p)} freigeschaltet`,p===4?"Dort liegt auch der Flughafen Mönchengladbach mit Flugschule und Verleih.":"Auf der Karte ist das Gebiet jetzt offen.","#ffc933")}}
+  if(any){persist();try{buildMinimap()}catch(e){}}}
+/* gesperrt: nicht hineinfahren, Hinweis zeigen */
+let lockHint=0;
+function lockToast(x,y){const now=performance.now();if(now-lockHint<3500)return;lockHint=now;const p=phaseAt(x,y);
+  if(!p)toast("🚧 Stadtgrenze","Hier endet Mönchengladbach.","#ff5d6c");else toast(`🔒 ${phaseName(p)} – noch gesperrt`,PHASE_REQ[p]?PHASE_REQ[p].t:"","#ff5d6c")}
+{const base=carHits;carHits=function(x,y){if(!phaseOK(x,y)){lockToast(x,y);return true}return base(x,y)}}
+{const base=airHits;airHits=function(x,y){if(!phaseOK(x,y)){lockToast(x,y);return true}return base(x,y)}}
+
+/* ---------- Gebietswechsel ---------- */
+const REG=(()=>{const id=MG.region||"rheydt",key=id==="rheydt"?"0_0":id.slice(2),c=GEB.cells[key]||{ext:[RX-HX,RX+HX,RY-HY,RY+HY]};
+  const [k,m]=key.split("_").map(Number);return {id,key,ext:c.ext,core:[GEB.x0+k*GEB.cw,GEB.x0+(k+1)*GEB.cw,GEB.y0+m*GEB.ch,GEB.y0+(m+1)*GEB.ch]}})();
+const cellKey=(x,y)=>Math.floor((x-GEB.x0)/GEB.cw)+"_"+Math.floor((y-GEB.y0)/GEB.ch);
+let SWITCH=false;
+function goRegion(key){if(SWITCH||!GEB.cells[key])return;SWITCH=true;const region=key==="0_0"?"rheydt":"g_"+key;
+  const h={region,prof:typeof PROF!=="undefined"&&PROF?PROF.id:null,x:+car.x.toFixed(2),y:+car.y.toFixed(2),a:+car.a.toFixed(3),alt:+(car.alt||0).toFixed(2),v:+(car.v||0).toFixed(2),veh:save.veh,t:state.time};
+  try{persist()}catch(e){}
+  const f=$("fadeBlk");if(f){f.hidden=false;f.style.opacity=1;f.innerHTML=`<div style="position:absolute;inset:0;display:grid;place-items:center;color:#fff;font:600 22px Rubik,sans-serif;text-align:center">🗺️ ${phaseName(phaseAt(car.x,car.y))}<br><small style="font-weight:400;opacity:.8">Gebiet wird geladen …</small></div>`}
+  setTimeout(()=>{try{location.hash="go="+encodeURIComponent(JSON.stringify(h))}catch(e){}location.reload()},300)}
+{const base=update;update=function(dt){base(dt);if(SWITCH||state.mode!=="play")return;
+  const E=REG.ext,C=REG.core,x=car.x,y=car.y,dEdge=Math.min(x-E[0],E[1]-x,y-E[2],E[3]-y);const key=cellKey(x,y);let target=null;
+  if(key!==REG.key){const out=Math.max(C[0]-x,x-C[1],C[2]-y,y-C[3]);if(out>150||dEdge<70)target=key}
+  else if(dEdge<70){const n=[[x-E[0],-1,0],[E[1]-x,1,0],[y-E[2],0,-1],[E[3]-y,0,1]].sort((a,b)=>a[0]-b[0])[0];target=cellKey(x+n[1]*90,y+n[2]*90)}
+  if(target&&target!==REG.key&&GEB.cells[target])goRegion(target)}}
+/* nach dem Nachladen: Profil wählen, Titel überspringen, an dieselbe Stelle setzen */
+(function resume(){const h=window.__GO;if(!h)return;if(!window.__ready){setTimeout(resume,100);return}
+  try{if(h.prof){const p=(PROFS.list||[]).find(q=>q.id===h.prof);if(p)selectProfile(p)}}catch(e){console.warn("Gebietswechsel Profil",e)}
+  if(h.veh&&VEH[h.veh]&&(save.owned.includes(h.veh)||h.veh==="walk"))setVehicle(h.veh);
+  car.x=h.x;car.y=h.y;car.a=h.a;car.v=h.v||0;car.alt=h.alt||0;car.vy=0;if(typeof h.t==="number")state.time=h.t;
+  if(V().fly&&car.alt>1){car.rotor=1;if(V().id==="plane")VEH.plane.fly=true}
+  camYaw=car.a;camPos.set(car.x-Math.cos(car.a)*8,car.alt+4,car.y-Math.sin(car.a)*8);
+  hideTitle();try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  setTimeout(()=>toast(`🗺️ ${phaseName(phaseAt(car.x,car.y))}`,(MG.districts&&MG.districts.length?"":"")+"Weiter geht's!","#ffc933"),900)})();
+
+/* Fortschritt prüfen (Freischalten), Minikarte: gesperrte Flächen abdunkeln */
+{let t=0;const base=update;update=function(dt){base(dt);t-=dt;if(t<=0){t=1;if(state.mode==="play")checkPhases(false)}}}
+{const base=buildMinimap;buildMinimap=function(){try{mmBase.getContext("2d").setTransform(1,0,0,1,0,0)}catch(e){}base();try{const c=mmBase.getContext("2d");c.save();c.setTransform(1,0,0,1,0,0);c.scale(MMS,MMS);c.translate(HX-RX,HY-RY);
+  const R=PHR.R;c.fillStyle="rgba(8,10,20,.62)";for(let y=RY-HY;y<RY+HY;y+=R.c)for(let x=RX-HX;x<RX+HX;x+=R.c){if(!phaseOK(x+R.c/2,y+R.c/2))c.fillRect(x,y,R.c+.5,R.c+.5)}c.restore()}catch(e){console.warn("Minikarte Sperre",e)}}}
+save.phases=save.phases||[];
+{const base=applySave;applySave=function(d){const r=base(d);save.phases=save.phases||[];checkPhases(true);try{buildMinimap()}catch(e){}return r}}
+
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){
   const FX=MG.FX,P=o=>{const p=FX(o.x,o.y);o.x=p[0];o.y=p[1]};
@@ -9051,4 +9541,3 @@ function boot(){
 }
 boot();
 </script>
-</html>
