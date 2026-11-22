@@ -107,6 +107,15 @@ Nicht übernommen: geparkte Autos, Schilder und Zebrastreifen der alten Spielkar
   Passant Stadt, Kinder Schule. Kurieraufträge nehmen oft das Thema der Figur, MPT-Übungen immer.
 - **Kinder** kaufen und fahren nur Fahrräder und E-Scooter (Läden, Garage, Einsteigen, Mieten gesperrt).
 
+## Vorgemerkt: verkaufbare Fassung (noch NICHT umsetzen, erst auf Wunsch)
+Falls das Spiel verkauft werden soll, vorher:
+1. Echte Namen der Lehrkräfte und MPT-Kräfte durch erfundene ersetzen; Einstellung „Schulfassung“ schaltet die echten Namen wieder ein.
+   (Alternativ schriftliche Zustimmung aller Personen.)
+2. Automarken (Toyota Prius, Aston Martin, Maserati) durch erfundene Modellnamen ersetzen.
+3. Offen beim Lehrer zu klären: Zustimmung Schulleitung/Schulträger (Name GHS Dohr, Gebäude, Fotos), Lizenzen der gelieferten
+   GLB-Modelle, der Musik „Rheydt bei Nacht“ und des Martinshorns (bei KI-Diensten deren Nutzungsbedingungen),
+   Nebentätigkeit (Bezirksregierung Düsseldorf), kein „GTA“ in der Werbung, keine Werbung/Käufe im Spiel für Kinder.
+
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
   Idle/Walk/Run mit Überblendung, Blick in Laufrichtung, Füße am Boden (Standfuß beim Gehen 0 cm, beim Laufen 0,2–0,4 cm pro Bild).
