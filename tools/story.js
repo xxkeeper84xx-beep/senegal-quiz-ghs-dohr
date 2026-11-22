@@ -104,7 +104,7 @@ $("talkClose").onclick=()=>{if(talkSeq){if(talkSeq.i<talkSeq.pages.length-1){tal
       `Hallo ${N}! Willkommen an der GHS Dohr. Ich bin Herr Dittmann, dein Klassenlehrer in der 9c.`,
       `Diese Woche lernen wir den Satz des Pythagoras – nicht nur im Heft, sondern draußen in Mönchengladbach. Überall stecken rechtwinklige Dreiecke.`,
       `Zwei Regeln, bevor du losziehst: Auf dem Schulgelände wird nicht gefahren. Und mit dem E-Scooter gehörst du auf die Straße, nicht auf den Gehweg. Wer sich nicht daran hält, ist sein Fahrzeug schnell los!`,
-      `Deine erste Hauptmission: Herr Maaß, unser Sportlehrer, wartet am Werkhof gleich um die Ecke. Hier hast du 50 $ Taschengeld für den Anfang.`],
+      `Deine erste Hauptmission: Herr Ballhorn, unser Hausmeister, wartet am Werkhof gleich um die Ecke. Hier hast du 50 $ Taschengeld für den Anfang.`],
       ()=>{save.introDone=true;save.money+=50;save.xp+=10;persist();updateHud();refreshQuestWorld();jingle();
         missionBanner("new","Neue Hauptmission",mainTitle(),"Folge dem Ziel oben auf dem Bildschirm")});return}
   base(t);const s=t.say[t.i];

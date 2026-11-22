@@ -7,7 +7,7 @@ const CHARS={
   sport:{icon:"🏃",name:"Sportass",look:{jacket:"#1f8a4c",jeans:"#f2f2f2",bagCol:"#ffffff"},head:"band",bandCol:"#ffffff",need:()=>!!(save.jobs&&save.jobs.sprint&&save.jobs.sprint.done),how:"Schaffe den Sprint von Herrn Maaß."},
   koch:{icon:"👨‍🍳",name:"Backstuben-Profi",look:{jacket:"#f4f4f4",jeans:"#3a3a3a",bagCol:"#b5793a"},head:"chef",need:()=>!!(save.jobs&&save.jobs.bread&&save.jobs.bread.done),how:"Hilf Bäcker Hennes in der Innenstadt."},
   feuer:{icon:"🧑‍🚒",name:"Feuerwehr-Azubi",look:{jacket:"#1b2a4a",jeans:"#1b2a4a",bagCol:"#d81e2c"},head:"helmet",need:()=>save.delivered>=5,how:"Schaffe 5 Kurier-Lieferungen."},
-  hausm:{icon:"🧰",name:"Hausmeister-Azubi",look:{jacket:"#2b5ea8",jeans:"#2b5ea8",bagCol:"#55606e"},head:"bluecap",need:()=>qsx("schulhof").done,how:"Löse die Hauptmission von Herrn Ballhorn."},
+  hausm:{icon:"🧰",name:"Hausmeister-Azubi",look:{jacket:"#2b5ea8",jeans:"#2b5ea8",bagCol:"#55606e"},head:"bluecap",need:()=>qsx("werkhof").done,how:"Löse die Hauptmission von Herrn Ballhorn am Werkhof."},
   detektiv:{icon:"🕵️",name:"Detektiv",look:{jacket:"#b8956a",jeans:"#4a3a2a",bagCol:"#6b4226"},head:"hat",need:()=>(save.ducks||[]).length>=3,how:"Finde 3 Quietscheentchen."},
   kapitaen:{icon:"🤝",name:"Teamkapitän",look:{jacket:"#e8742a",jeans:"#1f2633",bagCol:"#1f2633"},head:"band",bandCol:"#1f2633",need:()=>save.duoDone>=1,how:"Schaffe eine Duo-Mission zu zweit."},
   astro:{icon:"🧑‍🚀",name:"Astronaut",look:{jacket:"#e9ecef",jeans:"#e9ecef",bagCol:"#c0c6cc"},head:"space",need:()=>(save.secrets||[]).includes("ufo"),how:"Finde das Geheimnis über dem Mülforter Bruch."},
@@ -34,11 +34,12 @@ function checkUnlocks(){ms();for(const id in CHARS){if(id==="self"||save.chars.i
 /* ---- Smartphone ---- */
 const CONTACTS=[
   {id:"mats",name:"Mats",role:"Mitschüler, 9c",icon:"🧢",col:"#3fd8ff",known:true},
-  {id:"ditt",name:"Herr Dittmann",role:"Klassenlehrer",icon:"👨‍🏫",col:"#ffc933",known:true},
+  {id:"ditt",name:"Herr Dittmann",role:"Klassenlehrer der 9c",icon:"👨‍🏫",col:"#ffc933",known:true},
   {id:"maass",name:"Herr Maaß",role:"Sportlehrer",icon:"⚽",col:"#3ddc84",known:true},
-  {id:"ziemer",name:"Frau Ziemer",role:"Lehrerin",icon:"📐",col:"#e05a8c",known:true},
+  {id:"jessen",name:"Herr Jessen",role:"Deutschlehrer",icon:"📖",col:"#5b6bb0",known:true},
+  {id:"ziemer",name:"Frau Ziemer",role:"Klassenlehrerin der 9a",icon:"📐",col:"#e05a8c",known:true},
   {id:"ballhorn",name:"Herr Ballhorn",role:"Hausmeister",icon:"🔑",col:"#7b8cff",known:true},
-  {id:"krahe",name:"Frau Krahe",role:"Lehrerin",icon:"🍎",col:"#ff8a3d",known:true},
+  {id:"krahe",name:"Frau Krahe",role:"Klassenlehrerin der 10b",icon:"🍎",col:"#ff8a3d",known:true},
   {id:"taxi",name:"Taxi Mönchengladbach",role:"Bringt dich überallhin",icon:"🚕",col:"#f2c230",known:true},
   {id:"yilmaz",name:"Herr Yilmaz",role:"Büdchen am Torfbend",icon:"🥤",col:"#2e8b57",job:"kiosk"},
   {id:"jana",name:"Jana",role:"Speiche & Kette",icon:"🚲",col:"#17a2b8",job:"bike"},
@@ -80,9 +81,10 @@ function callLines(id){const N=pName(),q=mainQuest(),dq=DUCKS.map((d,i)=>i).find
     case "mats":{const secret=!(save.secrets||[]).includes("ufo")?"Mein Onkel schwört, dass über dem Mülforter Bruch manchmal was Komisches fliegt. Aber nur ganz hoch oben …":!(save.secrets||[]).includes("seil")?"Im Mülforter Bruch liegt ein altes Seil mit Knoten im Gras. Total seltsam, schau mal hin!":!(save.secrets||[]).includes("film")?"Hast du schon mal ganz oft auf die Uhr getippt? 😏":"Du hast echt alles gefunden. Respekt!";
       return dq!==undefined?`Hey ${N}! Ich hab ein gelbes Quietscheentchen gesehen – ${DUCKS[dq][2]}! Sammelst du die nicht?`:`Hey ${N}! ${secret}`}
     case "ditt":return !save.introDone?`Hallo ${N}, komm doch mal vor dem Haupteingang vorbei, ich warte auf dich!`:q?`Hallo ${N}! Deine nächste Hauptmission: „${q.title}“. ${q.giver.name.replace(/^Herr /,"Herrn ")} findest du in ${q.district}. ${tip}`:`${N}, du hast alle Hauptmissionen geschafft. Ich bin richtig stolz auf dich!`;
-    case "maass":return save.jobs&&save.jobs.sprint&&save.jobs.sprint.done?`Na, ${N}, läufst du noch mit den Turbo-Turnschuhen? Bewegung ist das halbe Leben!`:qsx("werkhof").done?`${N}! Komm mal zum Werkhof, ich hab eine sportliche Herausforderung für dich.`:`Hallo ${N}, ich bin am Werkhof um die Ecke und brauche jemanden, der rechnen kann.`;
+    case "maass":return save.jobs&&save.jobs.sprint&&save.jobs.sprint.done?`Na, ${N}, läufst du noch mit den Turbo-Turnschuhen? Bewegung ist das halbe Leben!`:qsx("sporthalle").done?`${N}! Komm mal in die Sporthalle, ich hab noch eine sportliche Herausforderung für dich.`:`Hallo ${N}, hier ist Herr Maaß. Wenn du so weit bist: In der Sporthalle wartet der Diagonal-Sprint auf dich!`;
     case "ziemer":return `Hallo ${N}! ${qsx("treppe").done?"Der neue Handlauf ist super geworden, danke!":"Die Außentreppe braucht einen neuen Handlauf. Schau mal bei mir vorbei, wenn du so weit bist."} ${tip}`;
-    case "ballhorn":return `Ballhorn hier. ${N}, ich sag’s nur einmal: Auf dem Schulgelände wird nicht gefahren! ${save.fines?`Du hast schon ${save.fines} Fahrzeug${save.fines>1?"e":""} bei mir abgeben müssen.`:"Bisher hast du dich gut gehalten."}`;
+    case "ballhorn":return `Ballhorn hier. ${qsx("werkhof").done?"Das Licht im Werkhof brennt, danke nochmal!":"Am Werkhof brauche ich deine Hilfe – ich warte dort."} ${N}, ich sag’s nur einmal: Auf dem Schulgelände wird nicht gefahren! ${save.fines?`Du hast schon ${save.fines} Fahrzeug${save.fines>1?"e":""} bei mir abgeben müssen.`:"Bisher hast du dich gut gehalten."}`;
+    case "jessen":return `Hallo ${N}, hier ist Herr Jessen. ${qsx("schulhof").done?"Der Sponsorenlauf war ein Erfolg – danke für die Strecke!":"Für den Sponsorenlauf brauche ich dich auf dem Schulhof."} Und denk dran: Satzanfänge schreibt man groß – auch in Mathe-Antworten! 😉`;
     case "krahe":return `Hallo ${N}! ${qsx("markt").done?"Unsere Marktstände stehen perfekt. Danke!":"Auf dem Rheydter Markt bauen wir bald die Stände auf – dafür brauche ich dich."}`;
     case "kruemel":return `Wuff! Wuff wuff! 🐾 (Krümel rennt sofort zu dir.)`;
     default:{const c=CONTACTS.find(c=>c.id===id),J=c&&c.job;const G=J&&jobGiver(J),j=G&&giverJob(G);

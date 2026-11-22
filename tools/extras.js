@@ -13,7 +13,7 @@ const ITEMS={
   gold:{icon:"🥇",name:"Gold-Lack",desc:"Neue Lackfarbe für alle Fahrzeuge in der Garage.",hint:"Kalle hat nach der Rampe noch eine Testfahrt."},
   glasses:{icon:"🕶️",name:"Sonnenbrille",eq:true,desc:"Cool bleiben, auch bei schweren Aufgaben.",hint:"Ein Eiscafé in Rheydt braucht einen schnellen Boten."},
   cap:{icon:"🧢",name:"Basecap",eq:true,desc:"Eine rote Kappe von der Backstube.",hint:"Eine Bäckerei in der Innenstadt."},
-  shoes:{icon:"👟",name:"Turbo-Turnschuhe",eq:true,desc:"Zu Fuß 20 % schneller.",hint:"Herr Maaß hat nach dem Werkhof eine sportliche Herausforderung."},
+  shoes:{icon:"👟",name:"Turbo-Turnschuhe",eq:true,desc:"Zu Fuß 20 % schneller.",hint:"Herr Maaß hat in der Sporthalle eine sportliche Herausforderung."},
   balloon:{icon:"🎈",name:"Luftballon",eq:true,desc:"Schwebt immer über dir.",hint:"Ein Kind auf dem Spielplatz hat ein Problem mit einem Drachen."},
   fanfare:{icon:"📯",name:"Stadion-Fanfare",eq:"horn",desc:"Neue Hupe (Taste Q oder 📯).",hint:"Der Platzwart im Mülforter Bruch vermisst etwas."},
   dog:{icon:"🐕",name:"Hund Krümel",eq:true,desc:"Läuft überall mit dir mit.",hint:"Manche Passanten mit ❓ brauchen Hilfe beim Gassigehen."},
@@ -45,7 +45,7 @@ const XG=[
   {id:"hennes",name:"Bäcker Hennes",role:"Backstube Hennes",at:[-430,-935],shirt:"#f2f2f2",booth:["#b5793a","🥨 Backstube Hennes"],jobs:["bread"]},
   {id:"elif",talk:"Elif",jobs:["kite"]},
   {id:"tarik",talk:"Tarik",jobs:["ball"]},
-  {id:"maass",quest:"werkhof",jobs:["sprint"]},
+  {id:"maass",quest:"sporthalle",jobs:["sprint"]},
 ];
 const d_=()=>AU.diff();
 const JOBDEF={
@@ -84,10 +84,10 @@ const JOBDEF={
     thanks:N=>`Super, ${N}! Hier ist die Fanfare. Drück Q oder die Hupe – das ganze Viertel hört dich!`},
   sprint:{title:"Sprint zur Haltestelle",reward:"shoes",xp:20,money:0,walk:true,
     pages:N=>[`Gut, dass du da bist, ${N}! Als Sportlehrer will ich sehen, wie fit du bist.`,`Sprint zu Fuß bis zur Bushaltestelle „Schule Torfbend“ und zurück zu mir. Schaffst du die Zeit, bekommst du meine Turbo-Turnschuhe!`],
-    steps:[{t:"race",fixed:[-322,-56.2],time:24,txt:"Sprinte zur Bushaltestelle",icon:"🏃"},{t:"return",txt:"Zurück zu Herrn Maaß",race:true,time:24}],
+    steps:[{t:"race",fixed:[-322,-56.2],time:34,txt:"Sprinte zur Bushaltestelle",icon:"🏃"},{t:"return",txt:"Zurück zu Herrn Maaß in die Sporthalle",race:true,time:34}],
     thanks:N=>`Stark, ${N}! Die Turnschuhe gehören dir. Du bist jetzt zu Fuß richtig schnell.`},
 };
-const JOB_NEED={trial:()=>xs().jobs.ramp&&save.jobs.ramp.done,sprint:()=>qsx("werkhof").done};
+const JOB_NEED={trial:()=>xs().jobs.ramp&&save.jobs.ramp.done,sprint:()=>qsx("sporthalle").done};
 function giverPos(G){if(G.talk){const t=TALK.find(t=>t.name===G.talk);return t?{x:t.x,y:t.y,name:t.name,role:t.role}:null}
   if(G.quest){const q=questById(G.quest);return q?{x:q.giver.x,y:q.giver.y,name:q.giver.name,role:q.giver.role}:null}return G.pos}
 function giverJob(G){xs();for(const id of G.jobs){const s=save.jobs[id];if(s&&s.done)continue;if(JOB_NEED[id]&&!JOB_NEED[id]())return null;return id}return null}

@@ -96,6 +96,16 @@ Nicht übernommen: geparkte Autos, Schilder und Zebrastreifen der alten Spielkar
 - **Noch offen:** eigene Missionen in den Phasen 2–5 (laut Kartenauftrag: Diagonalen-, Vermessungs-, Entfernungs-Mission);
   bis dahin schalten Fortschritt und Rang frei. Gebietswechsel lädt die Seite neu (ca. 2–4 s). Nicht auf echtem iPad getestet.
 
+## Lehrerrollen und Aufgaben je Figur (22.11.)
+- **Rollen:** Herr Dittmann Klassenlehrer 9c · Herr Maaß Sportlehrer (Diagonal-Sprint in der Sporthalle, dort auch sein Sprint-Nebenjob) ·
+  Herr Jessen Deutschlehrer (Sponsorenlauf „Quer über den Schulhof“) · Frau Krahe Klassenlehrerin 10b (Markt) · Frau Ziemer Klassenlehrerin 9a (Außentreppe) ·
+  Frau Costantino Englischlehrerin und Verkehrsbeauftragte (Aufgaben auf Englisch, auch der Verkehrsunterricht) · Herr Ballhorn Hausmeister (jetzt „Licht für den Werkhof“) ·
+  MPT Herr Aktas, Frau Colonna, Frau Brand: Tipps und Übungsaufgaben (`tools/rollen.js`).
+- **Aufgaben je Figur:** Kinder (Noah, Schülerin, Klassisch) leichter, Herr Dittmann immer Stufe 3 (Raumdiagonale, Dachsparren mit Überstand,
+  Koordinaten, Kommazahlen). Themen: Straßenbauer Baustelle/Mauern, Joggerin und Fußballfan Sport, Geschäftsfrau Büro, Seniorin/Senior Garten und Rampen,
+  Passant Stadt, Kinder Schule. Kurieraufträge nehmen oft das Thema der Figur, MPT-Übungen immer.
+- **Kinder** kaufen und fahren nur Fahrräder und E-Scooter (Läden, Garage, Einsteigen, Mieten gesperrt).
+
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
   Idle/Walk/Run mit Überblendung, Blick in Laufrichtung, Füße am Boden (Standfuß beim Gehen 0 cm, beim Laufen 0,2–0,4 cm pro Bild).

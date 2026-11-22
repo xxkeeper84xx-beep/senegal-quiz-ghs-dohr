@@ -121,7 +121,7 @@ function tunedCheck(dt){VK.scootCool-=dt;const VH=V();VEH.scoot.max=save.scootTu
   else setTimeout(()=>sms(who.n,`Deinen getunten E-Scooter habe ich eingezogen. Sicherheit geht vor – auch nach der Schule. 🛑`),2600)}
 
 /* ---------- Frau Costantino: Kontakt im Smartphone ---------- */
-if(typeof CONTACTS!=="undefined"){CONTACTS.splice(6,0,{id:"costantino",name:"Frau Costantino",role:"Lehrerin · Verkehrsbeauftragte",icon:"🚦",col:"#ff2a85",known:true});CONTACTS.push({id:"mama",name:"Mama",role:"Familie",icon:"👪",col:"#ffb3c7",known:true})}
+if(typeof CONTACTS!=="undefined"){CONTACTS.splice(6,0,{id:"costantino",name:"Frau Costantino",role:"Englischlehrerin · Verkehrsbeauftragte",icon:"🚦",col:"#ff2a85",known:true});CONTACTS.push({id:"mama",name:"Mama",role:"Familie",icon:"👪",col:"#ffb3c7",known:true})}
 {const base=callLines;callLines=function(id){const N=pName();
   if(id==="costantino")return save.elternbrief?`Hallo ${N}! Ich habe von deinen Eltern gehört. Komm zu mir an den Eingang der Schule, wir machen kurz Verkehrsunterricht.`:`Hallo ${N}! Denk dran: An der Ampel wartest du auf Grün. Und schräg über die Kreuzung ist die längste Strecke – das kannst du mit Pythagoras ausrechnen!`;
   if(id==="mama")return save.elternbrief?`${N}, wir reden heute Abend. Und vorher gehst du zu Frau Costantino!`:`Hallo Schatz! Pass auf dich auf und sei pünktlich zum Abendessen. 😘`;

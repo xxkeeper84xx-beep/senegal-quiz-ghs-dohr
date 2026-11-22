@@ -7,8 +7,8 @@ save.q=save.q||{};
 const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,done:false,pick:null,tries:0});
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
-  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
-  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Ballhorn",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
+  intro:"„Gut, dass du da bist! Ich bin Herr Ballhorn, der Hausmeister der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn Herr Maaß mit den Klassen zum Laufen geht. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
@@ -17,7 +17,7 @@ if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfb
     fb:v=>v<10?"Zu kurz: 9 m < 10 m. Dieses Kabel reicht nicht bis zum Anschluss.":v>10?"Das Kabel reicht zwar, aber 2 m bleiben übrig. Es gibt ein kürzeres, das passt.":"Passt genau: 10 m reichen und nichts bleibt übrig."},
   doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit den Kleingärten.",xp:40,money:120})}
 if(QD.markt){const m=QD.markt,z=m.zone;QUESTS.push({id:"markt",district:"Rheydt",title:"Quer über den Markt",
-  giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Lehrerin an der GHS Dohr, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
+  giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Klassenlehrerin der 10b, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
   intro:"„Hallo, ich bin Frau Krahe! Unsere Schule baut heute neue Marktstände auf. Das Material liegt an der einen Ecke der weiß markierten Zone und muss zur gegenüberliegenden Ecke. Die Zone ist frei, du darfst also auch quer hindurch. Miss Breite und Länge und rechne aus, wie viel kürzer der direkte Weg ist.“",
   measures:[{id:"a",label:"Breite der Zone",short:"Breite",val:9,x:z[0]-1.2,y:z[3],where:"am Eckpfosten unten links der weißen Zone",line:[z[0],.35,z[1],z[0],.35,z[3]]},
             {id:"b",label:"Länge der Zone",short:"Länge",val:12,x:z[2],y:z[1]-1.2,where:"am Eckpfosten oben rechts der weißen Zone",line:[z[0],.35,z[1],z[2],.35,z[1]]}],

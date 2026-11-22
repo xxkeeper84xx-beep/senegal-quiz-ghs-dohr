@@ -68,11 +68,13 @@ MG.givers={
 const RT=s=>s.replace(/zur Dohrer Straße/g,"zu den Kleingärten").replace(/Dohrer Straße/g,"Straße an den Kleingärten").replace(/Nordpark/g,"Mülforter Bruch");
 const OVR={Elif:{at:[600,612],role:"in der Grünanlage",say:["Quer über die Wiese ist kürzer als außen herum. Warum eigentlich? Frag mal den Park-Kurier.","Zum Rheydter Markt? Am schnellsten mit dem Taxi oder mit dem Rad über die Hauptstraße."]},
   "Frau Okafor":{at:[-458,-812],say:["Der Turm da drüben gehört zur Evangelischen Hauptkirche Rheydt. Den sieht man schon von der Hauptstraße aus.","Vom Markt zum Rathaus sind es nur ein paar Schritte. Diagonal über den Platz ist es noch kürzer."]},
-  Tarik:{at:[388,400],role:"Platzwart im Mülforter Bruch"}};
-MG.talk=F.talk.map(t=>{const o=OVR[t.name]||{},r=Object.assign({},t,o);const p=o.at?free(...o.at):FX(t.x,t.y);r.x=p[0];r.y=p[1];delete r.at;r.say=r.say.map(RT);r.role=RT(r.role);return r});
+  Tarik:{at:[388,400],role:"Platzwart im Mülforter Bruch"},
+  Mats:{say:["Neu hier? Am Werkhof gleich um die Ecke sucht unser Hausmeister Herr Ballhorn jemanden, der rechnen kann.","Herr Maaß, unser Sportlehrer, ist meistens in der Sporthalle hinten auf dem Schulhof."]},
+  "Herr Dittmann":{role:"Klassenlehrer der 9c",say:["Willkommen an der GHS Dohr! Frau Ziemer, Klassenlehrerin der 9a, und Herr Jessen suchen hinten auf dem Schulhof Hilfe beim Messen.","Merk dir: Die Hypotenuse liegt immer dem rechten Winkel gegenüber und ist die längste Seite."]}};
+MG.talk=F.talk.filter(t=>t.name!=="Herr Jessen").map(t=>{const o=OVR[t.name]||{},r=Object.assign({},t,o);const p=o.at?free(...o.at):FX(t.x,t.y);r.x=p[0];r.y=p[1];delete r.at;r.say=r.say.map(RT);r.role=RT(r.role);return r});
 /* Frau Costantino: Lehrerin und Verkehrsbeauftragte, am Gehweg vor dem Schuleingang */
-{const p=free(...FX(-304,-58.6));MG.talk.push({x:p[0],y:p[1],name:"Frau Costantino",role:"Lehrerin für Mathe und Deutsch · Verkehrsbeauftragte der GHS Dohr",shirt:"#b03060",
-  say:["Hallo! Ich bin Frau Costantino. An der Ampel gilt: Erst bei Grün gehen – auch wenn gerade kein Auto kommt.","Schräg über die Kreuzung ist die längste Strecke auf der Fahrbahn. Das kannst du mit Pythagoras ausrechnen!","Ein E-Scooter darf höchstens 20 km/h fahren. Getunte Roller kassieren wir ein."]})}
+{const p=free(...FX(-304,-58.6));MG.talk.push({x:p[0],y:p[1],name:"Frau Costantino",role:"Englischlehrerin · Verkehrsbeauftragte der GHS Dohr",shirt:"#b03060",
+  say:["Hello! I'm Mrs Costantino, your English teacher. (Ich bin Frau Costantino, eure Englischlehrerin.) Ask me for an English task!","Traffic lights: wait for green – even if there is no car. (An der Ampel erst bei Grün gehen.)","The hypotenuse is the longest side of a right-angled triangle. (Die Hypotenuse ist die längste Seite.)"]})}
 MG.parked=[];MG.signs=[];MG.zebra=[];MG.decals=[];
 MG.spielkarte=false;
 })();

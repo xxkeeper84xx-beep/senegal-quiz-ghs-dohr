@@ -266,7 +266,7 @@ function refreshHunt(){const f=save.hunt||[];huntMeshes.forEach((h,i)=>{h.m.mate
 /* ================= Messaufträge auf dem Schulgelände ================= */
 {
 QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die Außentreppe",
-  giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Lehrerin an der GHS Dohr",shirt:"#c0392b"},
+  giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Klassenlehrerin der 9a",shirt:"#c0392b"},
   intro:"„Die Außentreppe am Erweiterungsbau bekommt einen neuen Handlauf. Er soll genau so lang sein wie die Treppe schräg von unten bis zum Podest. Miss bitte die Höhe des Podests und wie weit die Treppe waagerecht reicht.“",
   measures:[{id:"a",label:"Höhe des Podests",short:"Podesthöhe",val:3.9,x:-293.4,y:-112.9,where:"am Podest oben an der Außentreppe",line:[-292.1,0,-111.6,-292.1,3.9,-111.6]},
             {id:"b",label:"Waagerechte Länge der Treppe",short:"Treppenlänge",val:5.5,x:-286.4,y:-112.9,where:"am unteren Ende der Außentreppe",line:[-286.5,.35,-111.9,-292,.35,-111.9]}],
@@ -276,14 +276,14 @@ QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die A
     fb:v=>v<7?"Zu kurz: 6 m < 6,7 m. Der Handlauf würde nicht bis zum Podest reichen.":v>7?"Das geht, aber ein ganzer Meter wäre übrig. Es gibt einen kürzeren, der reicht.":"Richtig: 7 m ist der kürzeste Handlauf, der reicht."},
   doneText:"Der neue Handlauf ist bestellt. Frau Ziemer bedankt sich.",xp:40,money:110});
 QUESTS.push({id:"schulhof",district:"Dohr/Torfbend",title:"Quer über den Schulhof",
-  giver:{x:-312,y:-100,name:"Herr Ballhorn",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
-  intro:"„Für den Sponsorenlauf brauchen wir die längste gerade Strecke auf dem Schulhof: von der Ecke am Gartenhaus quer bis zur Ecke an der Einfahrt. Miss die Breite und die Länge des Hofs entlang der Zäune.“",
+  giver:{x:-312,y:-100,name:"Herr Jessen",role:"Deutschlehrer an der GHS Dohr, hat Pausenaufsicht",shirt:"#5b6bb0"},
+  intro:"„Hallo, ich bin Herr Jessen, ich unterrichte Deutsch und habe heute Pausenaufsicht. Für den Sponsorenlauf brauchen wir die längste gerade Strecke auf dem Schulhof: von der Ecke am Gartenhaus quer bis zur Ecke an der Einfahrt. Miss die Breite und die Länge des Hofs entlang der Zäune.“",
   measures:[{id:"a",label:"Länge des Hofs (Nord–Süd)",short:"Hoflänge",val:86,x:-263.5,y:-120,where:"an der weißen Hofmauer zur Feuerwehrzufahrt",line:[-262.2,.35,-149.6,-262.2,.35,-63.6]},
             {id:"b",label:"Breite des Hofs (Ost–West)",short:"Hofbreite",val:72,x:-300,y:-148.3,where:"am hinteren Zaun beim Basketballkorb",line:[-334,.35,-149.4,-262,.35,-149.4]}],
   lab:{a:"Länge",b:"Breite",c:"Diagonale"},ans:Math.hypot(86,72),unit:"m",
   ask:"Wie lang ist die Strecke quer über den Hof (die Diagonale)?",
   extra:{q:"Am Zaun entlang wären es 86 m + 72 m = 158 m. Wie viele Meter ist die Diagonale kürzer?",ans:158-Math.hypot(86,72),unit:"m",steps:`Unterschied: 158 m − 112,2 m ≈ <span class="hl">45,8 m</span>`,tip:"Ziehe die Diagonale vom Weg am Zaun ab: 158 m − 112,2 m."},
-  choice:{q:"Welche Strecke nimmt Herr Ballhorn für den Sprint?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
+  choice:{q:"Welche Strecke nehmen wir für den Sponsorenlauf?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
     fb:v=>v==="diag"?"Die Diagonale ist die längste gerade Strecke auf dem Hof.":"Am Zaun ist es länger, aber nicht gerade: Es gibt eine Ecke."},
   doneText:"Die Laufstrecke ist abgesteckt. Beim Sponsorenlauf rennen alle quer über den Hof.",xp:40,money:110});
 }

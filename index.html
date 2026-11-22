@@ -544,7 +544,7 @@ button:disabled{opacity:.5}
   <div class="card">
     <span class="tag">3D-Open-World · Mönchengladbach · Mathe Klasse 9</span>
     <h1 style="margin-top:12px">Pythagoras City</h1>
-    <p style="font-size:17px;margin-top:12px">Du startest in <b>Dohr</b> auf dem Gehweg vor der <b>GHS Dohr</b> am Torfbend. Du entscheidest selbst: die Gegend erkunden oder zum <b>Werkhof</b> um die Ecke gehen, wo Sportlehrer Herr Maaß deine Hilfe braucht. Für Aufträge nimmst du Maße an den 📏-Punkten auf und rechnest mit Pythagoras. Gelöste Aufträge verändern die Stadt. Mit verdientem Geld kaufst du im <b>Autohaus 🚘</b> Fahrzeuge, vom E-Scooter bis zum Hubschrauber.</p>
+    <p style="font-size:17px;margin-top:12px">Du startest in <b>Dohr</b> auf dem Gehweg vor der <b>GHS Dohr</b> am Torfbend. Du entscheidest selbst: die Gegend erkunden oder zum <b>Werkhof</b> um die Ecke gehen, wo Hausmeister Herr Ballhorn deine Hilfe braucht. Für Aufträge nimmst du Maße an den 📏-Punkten auf und rechnest mit Pythagoras. Gelöste Aufträge verändern die Stadt. Mit verdientem Geld kaufst du im <b>Autohaus 🚘</b> Fahrzeuge, vom E-Scooter bis zum Hubschrauber.</p>
     <div class="formula">a² + b² = c²</div>
     <div class="cols" style="margin-top:10px">
       <div>
@@ -1690,8 +1690,8 @@ save.q=save.q||{};
 const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,done:false,pick:null,tries:0});
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
-  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
-  intro:"„Gut, dass du da bist! Ich bin Herr Maaß, Sportlehrer an der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn wir mit der Klasse zum Laufen gehen. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  giver:{x:w.giver[0],y:w.giver[1],name:"Herr Ballhorn",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
+  intro:"„Gut, dass du da bist! Ich bin Herr Ballhorn, der Hausmeister der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn Herr Maaß mit den Klassen zum Laufen geht. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
@@ -1700,7 +1700,7 @@ if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfb
     fb:v=>v<10?"Zu kurz: 9 m < 10 m. Dieses Kabel reicht nicht bis zum Anschluss.":v>10?"Das Kabel reicht zwar, aber 2 m bleiben übrig. Es gibt ein kürzeres, das passt.":"Passt genau: 10 m reichen und nichts bleibt übrig."},
   doneText:"Das Licht am Werkhof brennt und das Tor ist offen. Der Werkhof-Durchgang verbindet jetzt Am Torfbend direkt mit den Kleingärten.",xp:40,money:120})}
 if(QD.markt){const m=QD.markt,z=m.zone;QUESTS.push({id:"markt",district:"Rheydt",title:"Quer über den Markt",
-  giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Lehrerin an der GHS Dohr, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
+  giver:{x:m.giver[0],y:m.giver[1],name:"Frau Krahe",role:"Klassenlehrerin der 10b, betreut den Schulstand auf dem Rheydter Markt",shirt:"#2f8f5b"},
   intro:"„Hallo, ich bin Frau Krahe! Unsere Schule baut heute neue Marktstände auf. Das Material liegt an der einen Ecke der weiß markierten Zone und muss zur gegenüberliegenden Ecke. Die Zone ist frei, du darfst also auch quer hindurch. Miss Breite und Länge und rechne aus, wie viel kürzer der direkte Weg ist.“",
   measures:[{id:"a",label:"Breite der Zone",short:"Breite",val:9,x:z[0]-1.2,y:z[3],where:"am Eckpfosten unten links der weißen Zone",line:[z[0],.35,z[1],z[0],.35,z[3]]},
             {id:"b",label:"Länge der Zone",short:"Länge",val:12,x:z[2],y:z[1]-1.2,where:"am Eckpfosten oben rechts der weißen Zone",line:[z[0],.35,z[1],z[2],.35,z[1]]}],
@@ -3022,7 +3022,7 @@ function refreshHunt(){const f=save.hunt||[];huntMeshes.forEach((h,i)=>{h.m.mate
 /* ================= Messaufträge auf dem Schulgelände ================= */
 {
 QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die Außentreppe",
-  giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Lehrerin an der GHS Dohr",shirt:"#c0392b"},
+  giver:{x:-278.5,y:-115.5,name:"Frau Ziemer",role:"Klassenlehrerin der 9a",shirt:"#c0392b"},
   intro:"„Die Außentreppe am Erweiterungsbau bekommt einen neuen Handlauf. Er soll genau so lang sein wie die Treppe schräg von unten bis zum Podest. Miss bitte die Höhe des Podests und wie weit die Treppe waagerecht reicht.“",
   measures:[{id:"a",label:"Höhe des Podests",short:"Podesthöhe",val:3.9,x:-293.4,y:-112.9,where:"am Podest oben an der Außentreppe",line:[-292.1,0,-111.6,-292.1,3.9,-111.6]},
             {id:"b",label:"Waagerechte Länge der Treppe",short:"Treppenlänge",val:5.5,x:-286.4,y:-112.9,where:"am unteren Ende der Außentreppe",line:[-286.5,.35,-111.9,-292,.35,-111.9]}],
@@ -3032,14 +3032,14 @@ QUESTS.push({id:"treppe",district:"Dohr/Torfbend",title:"Ein Handlauf für die A
     fb:v=>v<7?"Zu kurz: 6 m < 6,7 m. Der Handlauf würde nicht bis zum Podest reichen.":v>7?"Das geht, aber ein ganzer Meter wäre übrig. Es gibt einen kürzeren, der reicht.":"Richtig: 7 m ist der kürzeste Handlauf, der reicht."},
   doneText:"Der neue Handlauf ist bestellt. Frau Ziemer bedankt sich.",xp:40,money:110});
 QUESTS.push({id:"schulhof",district:"Dohr/Torfbend",title:"Quer über den Schulhof",
-  giver:{x:-312,y:-100,name:"Herr Ballhorn",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
-  intro:"„Für den Sponsorenlauf brauchen wir die längste gerade Strecke auf dem Schulhof: von der Ecke am Gartenhaus quer bis zur Ecke an der Einfahrt. Miss die Breite und die Länge des Hofs entlang der Zäune.“",
+  giver:{x:-312,y:-100,name:"Herr Jessen",role:"Deutschlehrer an der GHS Dohr, hat Pausenaufsicht",shirt:"#5b6bb0"},
+  intro:"„Hallo, ich bin Herr Jessen, ich unterrichte Deutsch und habe heute Pausenaufsicht. Für den Sponsorenlauf brauchen wir die längste gerade Strecke auf dem Schulhof: von der Ecke am Gartenhaus quer bis zur Ecke an der Einfahrt. Miss die Breite und die Länge des Hofs entlang der Zäune.“",
   measures:[{id:"a",label:"Länge des Hofs (Nord–Süd)",short:"Hoflänge",val:86,x:-263.5,y:-120,where:"an der weißen Hofmauer zur Feuerwehrzufahrt",line:[-262.2,.35,-149.6,-262.2,.35,-63.6]},
             {id:"b",label:"Breite des Hofs (Ost–West)",short:"Hofbreite",val:72,x:-300,y:-148.3,where:"am hinteren Zaun beim Basketballkorb",line:[-334,.35,-149.4,-262,.35,-149.4]}],
   lab:{a:"Länge",b:"Breite",c:"Diagonale"},ans:Math.hypot(86,72),unit:"m",
   ask:"Wie lang ist die Strecke quer über den Hof (die Diagonale)?",
   extra:{q:"Am Zaun entlang wären es 86 m + 72 m = 158 m. Wie viele Meter ist die Diagonale kürzer?",ans:158-Math.hypot(86,72),unit:"m",steps:`Unterschied: 158 m − 112,2 m ≈ <span class="hl">45,8 m</span>`,tip:"Ziehe die Diagonale vom Weg am Zaun ab: 158 m − 112,2 m."},
-  choice:{q:"Welche Strecke nimmt Herr Ballhorn für den Sprint?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
+  choice:{q:"Welche Strecke nehmen wir für den Sponsorenlauf?",opts:[{v:"diag",t:"Quer über den Hof (ca. 112 m)"},{v:"rand",t:"Am Zaun entlang (158 m)"}],any:true,
     fb:v=>v==="diag"?"Die Diagonale ist die längste gerade Strecke auf dem Hof.":"Am Zaun ist es länger, aber nicht gerade: Es gibt eine Ecke."},
   doneText:"Die Laufstrecke ist abgesteckt. Beim Sponsorenlauf rennen alle quer über den Hof.",xp:40,money:110});
 }
@@ -3150,7 +3150,7 @@ $("talkClose").onclick=()=>{if(talkSeq){if(talkSeq.i<talkSeq.pages.length-1){tal
       `Hallo ${N}! Willkommen an der GHS Dohr. Ich bin Herr Dittmann, dein Klassenlehrer in der 9c.`,
       `Diese Woche lernen wir den Satz des Pythagoras – nicht nur im Heft, sondern draußen in Mönchengladbach. Überall stecken rechtwinklige Dreiecke.`,
       `Zwei Regeln, bevor du losziehst: Auf dem Schulgelände wird nicht gefahren. Und mit dem E-Scooter gehörst du auf die Straße, nicht auf den Gehweg. Wer sich nicht daran hält, ist sein Fahrzeug schnell los!`,
-      `Deine erste Hauptmission: Herr Maaß, unser Sportlehrer, wartet am Werkhof gleich um die Ecke. Hier hast du 50 $ Taschengeld für den Anfang.`],
+      `Deine erste Hauptmission: Herr Ballhorn, unser Hausmeister, wartet am Werkhof gleich um die Ecke. Hier hast du 50 $ Taschengeld für den Anfang.`],
       ()=>{save.introDone=true;save.money+=50;save.xp+=10;persist();updateHud();refreshQuestWorld();jingle();
         missionBanner("new","Neue Hauptmission",mainTitle(),"Folge dem Ziel oben auf dem Bildschirm")});return}
   base(t);const s=t.say[t.i];
@@ -3367,7 +3367,7 @@ const ITEMS={
   gold:{icon:"🥇",name:"Gold-Lack",desc:"Neue Lackfarbe für alle Fahrzeuge in der Garage.",hint:"Kalle hat nach der Rampe noch eine Testfahrt."},
   glasses:{icon:"🕶️",name:"Sonnenbrille",eq:true,desc:"Cool bleiben, auch bei schweren Aufgaben.",hint:"Ein Eiscafé in Rheydt braucht einen schnellen Boten."},
   cap:{icon:"🧢",name:"Basecap",eq:true,desc:"Eine rote Kappe von der Backstube.",hint:"Eine Bäckerei in der Innenstadt."},
-  shoes:{icon:"👟",name:"Turbo-Turnschuhe",eq:true,desc:"Zu Fuß 20 % schneller.",hint:"Herr Maaß hat nach dem Werkhof eine sportliche Herausforderung."},
+  shoes:{icon:"👟",name:"Turbo-Turnschuhe",eq:true,desc:"Zu Fuß 20 % schneller.",hint:"Herr Maaß hat in der Sporthalle eine sportliche Herausforderung."},
   balloon:{icon:"🎈",name:"Luftballon",eq:true,desc:"Schwebt immer über dir.",hint:"Ein Kind auf dem Spielplatz hat ein Problem mit einem Drachen."},
   fanfare:{icon:"📯",name:"Stadion-Fanfare",eq:"horn",desc:"Neue Hupe (Taste Q oder 📯).",hint:"Der Platzwart im Mülforter Bruch vermisst etwas."},
   dog:{icon:"🐕",name:"Hund Krümel",eq:true,desc:"Läuft überall mit dir mit.",hint:"Manche Passanten mit ❓ brauchen Hilfe beim Gassigehen."},
@@ -3399,7 +3399,7 @@ const XG=[
   {id:"hennes",name:"Bäcker Hennes",role:"Backstube Hennes",at:[-430,-935],shirt:"#f2f2f2",booth:["#b5793a","🥨 Backstube Hennes"],jobs:["bread"]},
   {id:"elif",talk:"Elif",jobs:["kite"]},
   {id:"tarik",talk:"Tarik",jobs:["ball"]},
-  {id:"maass",quest:"werkhof",jobs:["sprint"]},
+  {id:"maass",quest:"sporthalle",jobs:["sprint"]},
 ];
 const d_=()=>AU.diff();
 const JOBDEF={
@@ -3438,10 +3438,10 @@ const JOBDEF={
     thanks:N=>`Super, ${N}! Hier ist die Fanfare. Drück Q oder die Hupe – das ganze Viertel hört dich!`},
   sprint:{title:"Sprint zur Haltestelle",reward:"shoes",xp:20,money:0,walk:true,
     pages:N=>[`Gut, dass du da bist, ${N}! Als Sportlehrer will ich sehen, wie fit du bist.`,`Sprint zu Fuß bis zur Bushaltestelle „Schule Torfbend“ und zurück zu mir. Schaffst du die Zeit, bekommst du meine Turbo-Turnschuhe!`],
-    steps:[{t:"race",fixed:[-322,-56.2],time:24,txt:"Sprinte zur Bushaltestelle",icon:"🏃"},{t:"return",txt:"Zurück zu Herrn Maaß",race:true,time:24}],
+    steps:[{t:"race",fixed:[-322,-56.2],time:34,txt:"Sprinte zur Bushaltestelle",icon:"🏃"},{t:"return",txt:"Zurück zu Herrn Maaß in die Sporthalle",race:true,time:34}],
     thanks:N=>`Stark, ${N}! Die Turnschuhe gehören dir. Du bist jetzt zu Fuß richtig schnell.`},
 };
-const JOB_NEED={trial:()=>xs().jobs.ramp&&save.jobs.ramp.done,sprint:()=>qsx("werkhof").done};
+const JOB_NEED={trial:()=>xs().jobs.ramp&&save.jobs.ramp.done,sprint:()=>qsx("sporthalle").done};
 function giverPos(G){if(G.talk){const t=TALK.find(t=>t.name===G.talk);return t?{x:t.x,y:t.y,name:t.name,role:t.role}:null}
   if(G.quest){const q=questById(G.quest);return q?{x:q.giver.x,y:q.giver.y,name:q.giver.name,role:q.giver.role}:null}return G.pos}
 function giverJob(G){xs();for(const id of G.jobs){const s=save.jobs[id];if(s&&s.done)continue;if(JOB_NEED[id]&&!JOB_NEED[id]())return null;return id}return null}
@@ -3710,7 +3710,7 @@ const CHARS={
   sport:{icon:"🏃",name:"Sportass",look:{jacket:"#1f8a4c",jeans:"#f2f2f2",bagCol:"#ffffff"},head:"band",bandCol:"#ffffff",need:()=>!!(save.jobs&&save.jobs.sprint&&save.jobs.sprint.done),how:"Schaffe den Sprint von Herrn Maaß."},
   koch:{icon:"👨‍🍳",name:"Backstuben-Profi",look:{jacket:"#f4f4f4",jeans:"#3a3a3a",bagCol:"#b5793a"},head:"chef",need:()=>!!(save.jobs&&save.jobs.bread&&save.jobs.bread.done),how:"Hilf Bäcker Hennes in der Innenstadt."},
   feuer:{icon:"🧑‍🚒",name:"Feuerwehr-Azubi",look:{jacket:"#1b2a4a",jeans:"#1b2a4a",bagCol:"#d81e2c"},head:"helmet",need:()=>save.delivered>=5,how:"Schaffe 5 Kurier-Lieferungen."},
-  hausm:{icon:"🧰",name:"Hausmeister-Azubi",look:{jacket:"#2b5ea8",jeans:"#2b5ea8",bagCol:"#55606e"},head:"bluecap",need:()=>qsx("schulhof").done,how:"Löse die Hauptmission von Herrn Ballhorn."},
+  hausm:{icon:"🧰",name:"Hausmeister-Azubi",look:{jacket:"#2b5ea8",jeans:"#2b5ea8",bagCol:"#55606e"},head:"bluecap",need:()=>qsx("werkhof").done,how:"Löse die Hauptmission von Herrn Ballhorn am Werkhof."},
   detektiv:{icon:"🕵️",name:"Detektiv",look:{jacket:"#b8956a",jeans:"#4a3a2a",bagCol:"#6b4226"},head:"hat",need:()=>(save.ducks||[]).length>=3,how:"Finde 3 Quietscheentchen."},
   kapitaen:{icon:"🤝",name:"Teamkapitän",look:{jacket:"#e8742a",jeans:"#1f2633",bagCol:"#1f2633"},head:"band",bandCol:"#1f2633",need:()=>save.duoDone>=1,how:"Schaffe eine Duo-Mission zu zweit."},
   astro:{icon:"🧑‍🚀",name:"Astronaut",look:{jacket:"#e9ecef",jeans:"#e9ecef",bagCol:"#c0c6cc"},head:"space",need:()=>(save.secrets||[]).includes("ufo"),how:"Finde das Geheimnis über dem Mülforter Bruch."},
@@ -3737,11 +3737,12 @@ function checkUnlocks(){ms();for(const id in CHARS){if(id==="self"||save.chars.i
 /* ---- Smartphone ---- */
 const CONTACTS=[
   {id:"mats",name:"Mats",role:"Mitschüler, 9c",icon:"🧢",col:"#3fd8ff",known:true},
-  {id:"ditt",name:"Herr Dittmann",role:"Klassenlehrer",icon:"👨‍🏫",col:"#ffc933",known:true},
+  {id:"ditt",name:"Herr Dittmann",role:"Klassenlehrer der 9c",icon:"👨‍🏫",col:"#ffc933",known:true},
   {id:"maass",name:"Herr Maaß",role:"Sportlehrer",icon:"⚽",col:"#3ddc84",known:true},
-  {id:"ziemer",name:"Frau Ziemer",role:"Lehrerin",icon:"📐",col:"#e05a8c",known:true},
+  {id:"jessen",name:"Herr Jessen",role:"Deutschlehrer",icon:"📖",col:"#5b6bb0",known:true},
+  {id:"ziemer",name:"Frau Ziemer",role:"Klassenlehrerin der 9a",icon:"📐",col:"#e05a8c",known:true},
   {id:"ballhorn",name:"Herr Ballhorn",role:"Hausmeister",icon:"🔑",col:"#7b8cff",known:true},
-  {id:"krahe",name:"Frau Krahe",role:"Lehrerin",icon:"🍎",col:"#ff8a3d",known:true},
+  {id:"krahe",name:"Frau Krahe",role:"Klassenlehrerin der 10b",icon:"🍎",col:"#ff8a3d",known:true},
   {id:"taxi",name:"Taxi Mönchengladbach",role:"Bringt dich überallhin",icon:"🚕",col:"#f2c230",known:true},
   {id:"yilmaz",name:"Herr Yilmaz",role:"Büdchen am Torfbend",icon:"🥤",col:"#2e8b57",job:"kiosk"},
   {id:"jana",name:"Jana",role:"Speiche & Kette",icon:"🚲",col:"#17a2b8",job:"bike"},
@@ -3783,9 +3784,10 @@ function callLines(id){const N=pName(),q=mainQuest(),dq=DUCKS.map((d,i)=>i).find
     case "mats":{const secret=!(save.secrets||[]).includes("ufo")?"Mein Onkel schwört, dass über dem Mülforter Bruch manchmal was Komisches fliegt. Aber nur ganz hoch oben …":!(save.secrets||[]).includes("seil")?"Im Mülforter Bruch liegt ein altes Seil mit Knoten im Gras. Total seltsam, schau mal hin!":!(save.secrets||[]).includes("film")?"Hast du schon mal ganz oft auf die Uhr getippt? 😏":"Du hast echt alles gefunden. Respekt!";
       return dq!==undefined?`Hey ${N}! Ich hab ein gelbes Quietscheentchen gesehen – ${DUCKS[dq][2]}! Sammelst du die nicht?`:`Hey ${N}! ${secret}`}
     case "ditt":return !save.introDone?`Hallo ${N}, komm doch mal vor dem Haupteingang vorbei, ich warte auf dich!`:q?`Hallo ${N}! Deine nächste Hauptmission: „${q.title}“. ${q.giver.name.replace(/^Herr /,"Herrn ")} findest du in ${q.district}. ${tip}`:`${N}, du hast alle Hauptmissionen geschafft. Ich bin richtig stolz auf dich!`;
-    case "maass":return save.jobs&&save.jobs.sprint&&save.jobs.sprint.done?`Na, ${N}, läufst du noch mit den Turbo-Turnschuhen? Bewegung ist das halbe Leben!`:qsx("werkhof").done?`${N}! Komm mal zum Werkhof, ich hab eine sportliche Herausforderung für dich.`:`Hallo ${N}, ich bin am Werkhof um die Ecke und brauche jemanden, der rechnen kann.`;
+    case "maass":return save.jobs&&save.jobs.sprint&&save.jobs.sprint.done?`Na, ${N}, läufst du noch mit den Turbo-Turnschuhen? Bewegung ist das halbe Leben!`:qsx("sporthalle").done?`${N}! Komm mal in die Sporthalle, ich hab noch eine sportliche Herausforderung für dich.`:`Hallo ${N}, hier ist Herr Maaß. Wenn du so weit bist: In der Sporthalle wartet der Diagonal-Sprint auf dich!`;
     case "ziemer":return `Hallo ${N}! ${qsx("treppe").done?"Der neue Handlauf ist super geworden, danke!":"Die Außentreppe braucht einen neuen Handlauf. Schau mal bei mir vorbei, wenn du so weit bist."} ${tip}`;
-    case "ballhorn":return `Ballhorn hier. ${N}, ich sag’s nur einmal: Auf dem Schulgelände wird nicht gefahren! ${save.fines?`Du hast schon ${save.fines} Fahrzeug${save.fines>1?"e":""} bei mir abgeben müssen.`:"Bisher hast du dich gut gehalten."}`;
+    case "ballhorn":return `Ballhorn hier. ${qsx("werkhof").done?"Das Licht im Werkhof brennt, danke nochmal!":"Am Werkhof brauche ich deine Hilfe – ich warte dort."} ${N}, ich sag’s nur einmal: Auf dem Schulgelände wird nicht gefahren! ${save.fines?`Du hast schon ${save.fines} Fahrzeug${save.fines>1?"e":""} bei mir abgeben müssen.`:"Bisher hast du dich gut gehalten."}`;
+    case "jessen":return `Hallo ${N}, hier ist Herr Jessen. ${qsx("schulhof").done?"Der Sponsorenlauf war ein Erfolg – danke für die Strecke!":"Für den Sponsorenlauf brauche ich dich auf dem Schulhof."} Und denk dran: Satzanfänge schreibt man groß – auch in Mathe-Antworten! 😉`;
     case "krahe":return `Hallo ${N}! ${qsx("markt").done?"Unsere Marktstände stehen perfekt. Danke!":"Auf dem Rheydter Markt bauen wir bald die Stände auf – dafür brauche ich dich."}`;
     case "kruemel":return `Wuff! Wuff wuff! 🐾 (Krümel rennt sofort zu dir.)`;
     default:{const c=CONTACTS.find(c=>c.id===id),J=c&&c.job;const G=J&&jobGiver(J),j=G&&giverJob(G);
@@ -8894,7 +8896,7 @@ function tunedCheck(dt){VK.scootCool-=dt;const VH=V();VEH.scoot.max=save.scootTu
   else setTimeout(()=>sms(who.n,`Deinen getunten E-Scooter habe ich eingezogen. Sicherheit geht vor – auch nach der Schule. 🛑`),2600)}
 
 /* ---------- Frau Costantino: Kontakt im Smartphone ---------- */
-if(typeof CONTACTS!=="undefined"){CONTACTS.splice(6,0,{id:"costantino",name:"Frau Costantino",role:"Lehrerin · Verkehrsbeauftragte",icon:"🚦",col:"#ff2a85",known:true});CONTACTS.push({id:"mama",name:"Mama",role:"Familie",icon:"👪",col:"#ffb3c7",known:true})}
+if(typeof CONTACTS!=="undefined"){CONTACTS.splice(6,0,{id:"costantino",name:"Frau Costantino",role:"Englischlehrerin · Verkehrsbeauftragte",icon:"🚦",col:"#ff2a85",known:true});CONTACTS.push({id:"mama",name:"Mama",role:"Familie",icon:"👪",col:"#ffb3c7",known:true})}
 {const base=callLines;callLines=function(id){const N=pName();
   if(id==="costantino")return save.elternbrief?`Hallo ${N}! Ich habe von deinen Eltern gehört. Komm zu mir an den Eingang der Schule, wir machen kurz Verkehrsunterricht.`:`Hallo ${N}! Denk dran: An der Ampel wartest du auf Grün. Und schräg über die Kreuzung ist die längste Strecke – das kannst du mit Pythagoras ausrechnen!`;
   if(id==="mama")return save.elternbrief?`${N}, wir reden heute Abend. Und vorher gehst du zu Frau Costantino!`:`Hallo Schatz! Pass auf dich auf und sei pünktlich zum Abendessen. 😘`;
@@ -9020,7 +9022,7 @@ function kowalskiJob(){const [a,b]=pick(STW),c=Math.hypot(a,b);GR.job={a,b,c};
    Nach den Fotos vom 19.11.: Halle mit Holzverkleidung, dunkler Prallschutz unten, hohe Fenster, Rasterdecke mit Leuchtbändern,
    Basketballkörbe mit aufgemaltem Tor an den Stirnwänden, Sprossenwand mit Weichbodenmatte, Turnringe, Langbank, Geräteraum mit Kasten.
    Betreten durch die Tür am Umkleidetrakt (E / Tippen), drinnen ist die Halle frei begehbar.
-   Hauptmission „Der Diagonal-Sprint“ bei Frau Albers (Sportlehrerin): Spielfeld 15 m × 8 m vermessen, Diagonale berechnen (17 m),
+   Hauptmission „Der Diagonal-Sprint“ bei Herrn Maaß (Sportlehrer): Spielfeld 15 m × 8 m vermessen, Diagonale berechnen (17 m),
    Zusatzfrage zur Weichbodenmatte an der Sprossenwand, Anzahl der Diagonalen für 100 m – dann den Sprint selbst laufen.
    Alle Maße in Spielkarten-Koordinaten der Schule (x nach Osten, z nach Süden); fx_pass.js setzt sie auf das echte Grundstück. */
 const HALL={x0:-289.6,x1:-268.4,z0:-147.6,z1:-132.4,h:6.8,ex:[-290,-268,-148,-132],
@@ -9033,8 +9035,8 @@ function inHall(x,y,m=0){const [lx,lz]=hallL(x,y);return lx>HALL.x0-m&&lx<HALL.x
 
 /* ---------- Mission ---------- */
 QUESTS.push({id:"sporthalle",district:"Dohr/Torfbend",title:"Der Diagonal-Sprint",
-  giver:{x:-283,y:-134.6,name:"Frau Albers",role:"Sportlehrerin an der GHS Dohr",shirt:"#1e88e5"},
-  intro:"„Hallo! Ich bin Frau Albers, ich unterrichte Sport. Heute laufen wir den Diagonal-Sprint: quer über das grüne Spielfeld, von einer Ecke bis zur gegenüberliegenden Ecke. Miss bitte die Länge und die Breite des Spielfelds und rechne aus, wie lang die Sprintstrecke ist. Danach läufst du sie selbst!“",
+  giver:{x:-283,y:-134.6,name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
+  intro:"„Da bist du ja! Ich bin Herr Maaß, euer Sportlehrer. Heute laufen wir den Diagonal-Sprint: quer über das grüne Spielfeld, von einer Ecke bis zur gegenüberliegenden Ecke. Miss bitte die Länge und die Breite des Spielfelds und rechne aus, wie lang die Sprintstrecke ist. Danach läufst du sie selbst!“",
   measures:[{id:"a",label:"Länge des Spielfelds",short:"Länge",val:15,x:-279,y:-144.6,where:"an der langen grünen Linie",line:[-286.5,.05,-144,-271.5,.05,-144]},
             {id:"b",label:"Breite des Spielfelds",short:"Breite",val:8,x:-270.9,y:-140,where:"an der kurzen grünen Linie",line:[-271.5,.05,-144,-271.5,.05,-136]}],
   lab:{a:"Länge",b:"Breite",c:"Diagonale"},ans:17,unit:"m",
@@ -9043,9 +9045,9 @@ QUESTS.push({id:"sporthalle",district:"Dohr/Torfbend",title:"Der Diagonal-Sprint
     steps:`√(2,5² − 0,7²) = √(6,25 − 0,49) = √5,76 = <span class="hl">2,4 m</span>`,tip:"Die Matte ist die Hypotenuse. Gesucht ist eine Kathete: Hypotenuse² minus die andere Kathete²."},
   choice:{q:"Jeder soll mindestens 100 m sprinten. Wie viele Diagonalen muss man mindestens laufen?",opts:[{v:5,t:"5 Diagonalen"},{v:6,t:"6 Diagonalen"},{v:7,t:"7 Diagonalen"}],ok:6,
     fb:v=>v<6?"Zu wenig: 5 · 17 m = 85 m. Das sind noch keine 100 m.":v>6?"Das reicht, aber 6 · 17 m = 102 m genügen schon.":"Genau: 6 · 17 m = 102 m – mindestens 100 m. Jetzt lauf die erste Diagonale!"},
-  doneText:"Frau Albers stoppt deine Zeit und trägt sie ins Sportheft ein. Der Diagonal-Sprint ist ab jetzt fester Teil des Sportunterrichts.",xp:45,money:120});
+  doneText:"Herr Maaß stoppt deine Zeit und trägt sie ins Sportheft ein. Der Diagonal-Sprint ist ab jetzt fester Teil des Sportunterrichts.",xp:45,money:120});
 {const i=MAIN.indexOf("schulhof");MAIN.splice(i>=0?i+1:MAIN.length,0,"sporthalle")}
-if(typeof STAND_MODEL!=="undefined")STAND_MODEL["Frau Albers"]="06_Joggerin";
+if(typeof STAND_MODEL!=="undefined")STAND_MODEL["Herr Maaß"]="08_Passant";
 
 /* ---------- Innenraum ---------- */
 function buildHall(){
@@ -9148,7 +9150,7 @@ function hallGrid(){const pts=HALL.ex,c=[[pts[0],pts[2]],[pts[1],pts[2]],[pts[0]
 /* ---------- Betreten und Verlassen ---------- */
 function hallTeleport(inside){fade(()=>{const r=hallRot(),p=inside?hallR(HALL.doorIn[0],HALL.doorIn[1]-1.2):hallR(...HALL.doorOut),a=inside?-Math.PI/2+r:Math.PI/2+r;
   car.x=p[0];car.y=p[1];car.a=a;car.v=0;camYaw=a;camPos.set(car.x-Math.cos(a)*3.5,car.alt+2.4,car.y-Math.sin(a)*3.5);
-  if(inside)toast("🏀 Sporthalle der GHS Dohr",QUESTS.find(q=>q.id==="sporthalle")&&!qs(QUESTS.find(q=>q.id==="sporthalle")).done?"Frau Albers wartet am Spielfeld.":"Zum Verlassen zur Doppeltür gehen.","#e2611b")})}
+  if(inside)toast("🏀 Sporthalle der GHS Dohr",QUESTS.find(q=>q.id==="sporthalle")&&!qs(QUESTS.find(q=>q.id==="sporthalle")).done?"Herr Maaß wartet am Spielfeld.":"Zum Verlassen zur Doppeltür gehen.","#e2611b")})}
 {const base=interactables;interactables=function(VH){const L=base(VH);if(VH.id!=="walk")return L;
   const o=hallR(...HALL.doorOut),i=hallR(...HALL.doorIn);
   if(inHall(car.x,car.y))L.push({x:i[0],y:i[1],r:2.2,label:"🚪 Sporthalle verlassen",act:()=>hallTeleport(false)});
@@ -9509,6 +9511,127 @@ function goRegion(key){if(SWITCH||!GEB.cells[key])return;SWITCH=true;const regio
   const R=PHR.R;c.fillStyle="rgba(8,10,20,.62)";for(let y=RY-HY;y<RY+HY;y+=R.c)for(let x=RX-HX;x<RX+HX;x+=R.c){if(!phaseOK(x+R.c/2,y+R.c/2))c.fillRect(x,y,R.c+.5,R.c+.5)}c.restore()}catch(e){console.warn("Minikarte Sperre",e)}}}
 save.phases=save.phases||[];
 {const base=applySave;applySave=function(d){const r=base(d);save.phases=save.phases||[];checkPhases(true);try{buildMinimap()}catch(e){}return r}}
+
+/* ================= Rollen der Lehrkräfte, Aufgaben passend zur Figur =================
+   - Schwierigkeit je Figur: Kinder (Noah, Schülerin, Klassisch) leichter, Erwachsene wie bisher nach Rang,
+     Herr Dittmann (Cap) immer die schwersten Aufgaben (Kommazahlen, mehrschrittig, Raumdiagonale, Koordinaten).
+   - Aufgabenthemen je Figur: Straßenbauer → Baustelle und Mauern vermessen, Joggerin/Fußballfan → Sport,
+     Geschäftsfrau → Büro, Seniorin/Senior → Garten und Rampen, Passant → Stadtwege, Kinder → Schule.
+     Kurieraufträge nehmen oft ein Thema der Figur; Übungsaufgaben der MPT-Kräfte immer.
+   - MPT-Kräfte Herr Aktas, Frau Colonna, Frau Brand: Tipps und Übungsaufgaben zum Lösen.
+   - Frau Costantino (Englischlehrerin): Aufgaben auf Englisch (mit deutscher Hilfe).
+   - Kinder-Figuren dürfen nur Fahrräder und E-Scooter kaufen und fahren. */
+const KIDS=new Set(["Noah_Pythagoras","01_Schuelerin","classic"]);
+const figNow=()=>(typeof PROF!=="undefined"&&PROF&&PROF.look&&PROF.look.model)||(LOOK_DEF&&LOOK_DEF.model)||"Noah_Pythagoras";
+const isKid=()=>KIDS.has(figNow());
+const isProfi=()=>figNow()==="Dittmann_Cap";
+const KID_OK=new Set(["walk","scoot","bike"]);
+const kidBlocked=base=>isKid()&&!KID_OK.has(base);
+
+/* ---------- Schwierigkeit ---------- */
+{const base=AU.diff;AU.diff=function(){if(isProfi())return 3;let d=base();if(isKid()){if(d===3&&(lvl()<5||Math.random()<.6))d=2;if(d===2&&Math.random()<.35)d=1}return d}}
+
+/* ---------- Aufgaben nach Thema ---------- */
+const r1=v=>Math.round(v*10)/10;
+const TH={
+  schule:[
+    d=>{const [a,b]=AU.legsPair(d,20,60);return tHyp({a,b,u:"m",n:["Länge","Breite","Abkürzung"],pic:"🎒",x:{title:"Abkürzung auf dem Schulweg",story:`Die Wiese vor der Schule ist <b>${fmt(a)} m</b> lang und <b>${fmt(b)} m</b> breit. Du gehst schräg hindurch statt außen herum.`,q:"Wie lang ist der Weg schräg über die Wiese?"}})},
+    d=>{const [a,b]=AU.legsPair(d,8,20,10);return tHyp({a,b,u:"cm",n:["Breite","Höhe","Diagonale"],pic:"🧑‍🏫",x:{title:"Die neue Tafel",story:`Die Tafel im Klassenraum ist <b>${fmt(a)} cm</b> breit und <b>${fmt(b)} cm</b> hoch.`,q:"Wie lang ist die Diagonale der Tafel?"}})},
+    d=>{const o=AU.hypLeg(d,10,35);return tLeg({c:o.c,b:o.b,u:"m",n:["Höhe","Abstand","Schnur"],pic:"🪁",x:{title:"Drachen auf dem Schulhof",story:`Die Drachenschnur ist <b>${fmt(o.c)} m</b> lang und straff. Der Drachen steht <b>${fmt(o.b)} m</b> waagerecht von dir entfernt.`,q:"Wie hoch fliegt der Drachen?"}})}],
+  bau:[
+    d=>{const t=pick(d===1?[[3,4,5],[6,8,10]]:[[3,4,5],[6,8,10],[9,12,15],[1.5,2,2.5],[12,16,20]]);const s=Math.random()<.5?t:nearMiss(t);return tCheck({p:s[0],q:s[1],r:s[2],u:"m",pic:"🧱",
+      x:{title:"Mauerecke auf der Baustelle prüfen",story:`Du kontrollierst die neue Mauerecke mit dem Maßband: <b>${AU.f(s[0])} m</b> an der einen Mauer, <b>${AU.f(s[1])} m</b> an der anderen und quer dazwischen <b>${AU.f(s[2])} m</b>.`,q:"Ist die Mauerecke rechtwinklig?"}})},
+    d=>{const [a,b]=AU.legsPair(d,6,16);return tHyp({a,b,u:"m",n:["Länge","Breite","Diagonale"],pic:"🏗️",x:{title:"Bodenplatte vermessen",story:`Die Bodenplatte des Neubaus soll <b>${fmt(a)} m</b> lang und <b>${fmt(b)} m</b> breit sein. Ist sie rechtwinklig, müssen beide Diagonalen genau gleich lang sein.`,q:"Wie lang muss jede Diagonale sein?"}})},
+    d=>{const [a,b]=AU.legsPair(d,2,6);return tHyp({a:Math.max(a,b),b:Math.min(a,b),u:"m",n:["Höhe","Feldbreite","Strebe"],pic:"🪜",x:{title:"Strebe für das Gerüst",story:`Ein Gerüstfeld ist <b>${fmt(Math.max(a,b))} m</b> hoch und <b>${fmt(Math.min(a,b))} m</b> breit. Die Strebe läuft schräg von unten nach oben.`,q:"Wie lang ist die Strebe?"}})},
+    d=>{const o=AU.hypLeg(d,2,6);return tLeg({c:o.c,b:o.b,u:"m",n:["waagerecht","Tiefe","Böschung"],pic:"⛏",x:{title:"Böschung an der Baugrube",story:`Die Baugrube ist <b>${fmt(o.b)} m</b> tief. Die schräge Böschung ist <b>${fmt(o.c)} m</b> lang.`,q:"Wie weit reicht die Böschung waagerecht in den Hof?"}})},
+    d=>{const [a,b]=AU.legsPair(d,4,14);return tHyp({a,b,u:"m",n:["nach Osten","nach Norden","Mauer"],pic:"🧱",x:{title:"Schräge Gartenmauer vermessen",story:`Eine Mauer läuft schräg über das Grundstück: Ihr Ende liegt <b>${fmt(a)} m</b> weiter östlich und <b>${fmt(b)} m</b> weiter nördlich als ihr Anfang.`,q:"Wie lang ist die Mauer?"}})}],
+  sport:[
+    d=>{const [a,b]=AU.legsPair(d,20,70);return tHyp({a:Math.max(a,b),b:Math.min(a,b),u:"m",n:["Länge","Breite","Diagonale"],pic:"⚽",x:{title:"Diagonal über den Platz",story:`Der Fußballplatz im Mülforter Bruch ist <b>${fmt(Math.max(a,b))} m</b> lang und <b>${fmt(Math.min(a,b))} m</b> breit. Beim Aufwärmen läufst du von Eckfahne zu Eckfahne quer über den Platz.`,q:"Wie lang ist die Strecke?"}})},
+    d=>{const [a,b]=AU.legsPair(d,8,30);return tHyp({a,b,u:"m",n:["zur Torlinie","seitlich","Schussweg"],pic:"🥅",x:{title:"Der Torschuss",story:`Du stehst <b>${fmt(a)} m</b> vor der Torlinie und <b>${fmt(b)} m</b> seitlich neben der Tormitte.`,q:"Wie weit fliegt der Ball bis zur Tormitte?"}})},
+    d=>{const [a,b]=AU.legsPair(d,30,120);return tHyp({a,b,u:"m",n:["Länge","Breite","Laufweg"],pic:"🏃",x:{title:"Joggen durch den Park",story:`Die Wiese im Park ist <b>${fmt(a)} m</b> lang und <b>${fmt(b)} m</b> breit. Du joggst quer hinüber statt am Rand entlang.`,q:"Wie lang ist dein Laufweg quer über die Wiese?"}})}],
+  buero:[
+    d=>{const [a,b]=AU.legsPair(d,3,8,10);return tHyp({a:Math.max(a,b),b:Math.min(a,b),u:"cm",n:["Breite","Höhe","Diagonale"],pic:"🖥️",rot:Math.PI/2,x:{title:"Neuer Bildschirm fürs Büro",story:`Der Bildschirm ist <b>${fmt(Math.max(a,b))} cm</b> breit und <b>${fmt(Math.min(a,b))} cm</b> hoch.`,q:"Wie groß ist die Bildschirmdiagonale?"}})},
+    d=>{const o=AU.hypLeg(d,2,6,10);return tLeg({c:o.c,b:o.b,u:"cm",n:["Höhe","Breite","Strebe"],pic:"🗄️",x:{title:"Strebe am Lagerregal",story:`Am Regal im Lager läuft eine Strebe schräg über ein Fach. Die Strebe ist <b>${fmt(o.c)} cm</b> lang, das Fach <b>${fmt(o.b)} cm</b> breit.`,q:"Wie hoch ist das Fach?"}})},
+    d=>{const [a,b]=AU.legsPair(d,3,9);return tHyp({a,b,u:"m",n:["Länge","Breite","Diagonale"],pic:"🏢",x:{title:"Kabel quer durchs Büro",story:`Das Büro ist <b>${fmt(a)} m</b> lang und <b>${fmt(b)} m</b> breit. Ein Netzwerkkabel soll unter dem Teppich von Ecke zu Ecke laufen.`,q:"Wie lang muss das Kabel mindestens sein?"}})}],
+  garten:[
+    d=>{const o=AU.hypLeg(d,1,5);const c=o.c*(d===1?1:1),b=o.b;return tLeg({c:c*.5,b:b*.1,u:"m",n:["waagerecht","Höhe","Rampe"],pic:"🦽",x:{title:"Rampe für den Rollator",story:`Vor der Haustür ist eine Stufe von <b>${fmt(b*.1)} m</b> Höhe. Die Rampe soll <b>${fmt(c*.5)} m</b> lang sein.`,q:"Wie weit reicht die Rampe waagerecht vor die Tür?"}})},
+    d=>{const o=AU.hypLeg(d,2,5);return tLeg({c:o.c,b:o.b,u:"m",n:["Höhe","Abstand","Leiter"],pic:"🍎",flip:true,x:{title:"Leiter am Apfelbaum",story:`Die Leiter ist <b>${fmt(o.c)} m</b> lang. Ihr Fuß steht <b>${fmt(o.b)} m</b> vom Stamm entfernt.`,q:"In welcher Höhe lehnt die Leiter am Baum?"}})},
+    d=>{const [a,b]=AU.legsPair(d,2,8);return tHyp({a,b,u:"m",n:["Länge","Breite","Schnur"],pic:"🌷",x:{title:"Das neue Beet",story:`Das Gemüsebeet ist <b>${fmt(a)} m</b> lang und <b>${fmt(b)} m</b> breit. Zum Abstecken spannst du eine Schnur quer von Ecke zu Ecke.`,q:"Wie lang ist die Schnur?"}})}],
+  stadt:[
+    d=>{const [a,b]=AU.legsPair(d,20,80);return tHyp({a,b,u:"m",n:["Länge","Breite","Abkürzung"],pic:"🏙️",x:{title:"Abkürzung über den Platz",story:`Der Platz am Rheydter Markt ist an dieser Stelle <b>${fmt(a)} m</b> lang und <b>${fmt(b)} m</b> breit.`,q:"Wie lang ist der Weg schräg über den Platz?"}})},
+    d=>{const [a,b]=AU.legsPair(d,50,300,1);return tHyp({a,b,u:"m",n:["nach Osten","nach Norden","Luftlinie"],pic:"🚏",x:{title:"Luftlinie zur Haltestelle",story:`Die Haltestelle liegt <b>${fmt(a)} m</b> weiter östlich und <b>${fmt(b)} m</b> weiter nördlich.`,q:"Wie weit ist sie in Luftlinie entfernt?"}})},
+    d=>{const o=AU.hypLeg(d,4,12);return tLeg({c:o.c,b:o.b,u:"m",n:["Höhe","Abstand","Seil"],pic:"🚩",x:{title:"Seil am Fahnenmast",story:`Ein Halteseil ist <b>${fmt(o.c)} m</b> lang und <b>${fmt(o.b)} m</b> vom Mast entfernt im Boden verankert.`,q:"In welcher Höhe ist das Seil am Mast befestigt?"}})}],
+  profi:[
+    ()=>{const L=r1(rng(6,10)),B=r1(rng(5,8)),H=r1(rng(2.8,3.6)),e=Math.hypot(L,B),dd=Math.hypot(e,H);
+      return {kind:"num",ans:dd,unit:"m",sk:{a:H,b:e,unk:"c",lab:{a:`Höhe: ${fmt(H)} m`,b:`Bodendiagonale e`,c:"Raumdiagonale d = ?"},pic:"📦"},title:"Raumdiagonale im Klassenzimmer",
+        story:`Das Klassenzimmer ist <b>${fmt(L)} m</b> lang, <b>${fmt(B)} m</b> breit und <b>${fmt(H)} m</b> hoch. Eine Lichterkette soll von einer unteren Ecke bis zur gegenüberliegenden oberen Ecke gespannt werden.`,
+        q:"Wie lang ist die Raumdiagonale?",steps:`1) Bodendiagonale: e² = ${AU.f(L)}² + ${AU.f(B)}² = ${AU.f(Math.round(e*e*100)/100)} → e ≈ ${fmt(e)} m<br>2) Raumdiagonale: d² = e² + ${AU.f(H)}² = ${AU.f(Math.round(dd*dd*100)/100)}<br>d = √${AU.f(Math.round(dd*dd*100)/100)} ≈ ${AU.hl(fmt(dd)+" m")}`,
+        hint:"Zwei Schritte: Erst die Diagonale des Bodens (Länge und Breite), dann mit dieser Diagonale und der Höhe noch einmal Pythagoras.",err:{sum:L+B+H,part:e}}},
+    ()=>{const Bh=r1(rng(8,12)),h=r1(rng(2.5,4.5)),u=r1(rng(.4,.8)),s=Math.hypot(Bh/2,h)+u;
+      return {kind:"num",ans:s,unit:"m",sk:{a:h,b:Bh/2,unk:"c",lab:{a:`Firsthöhe: ${fmt(h)} m`,b:`halbe Breite: ${fmt(Bh/2)} m`,c:"Sparren ohne Überstand"},pic:"🏠"},title:"Dachsparren mit Überstand",
+        story:`Ein Satteldach ist <b>${fmt(Bh)} m</b> breit, der First liegt <b>${fmt(h)} m</b> über der Decke. Jeder Sparren steht unten noch <b>${fmt(u)} m</b> über die Wand hinaus.`,
+        q:"Wie lang muss ein Sparren insgesamt sein?",steps:`Halbe Breite: ${fmt(Bh)} : 2 = ${fmt(Bh/2)} m<br>Sparren bis zur Wand: √(${AU.f(Bh/2)}² + ${AU.f(h)}²) ≈ ${fmt(s-u)} m<br>mit Überstand: ${fmt(s-u)} m + ${fmt(u)} m ≈ ${AU.hl(fmt(s)+" m")}`,
+        hint:"Nur die halbe Dachbreite gehört ins Dreieck. Den Überstand addierst du am Ende.",err:{part:s-u,full:Math.hypot(Bh,h)+u}}},
+    ()=>{const o=AU.hypLeg(3,6,18);return tLeg({c:o.c,b:o.b,u:"m",n:["Höhe","Abstand","Leiter"],pic:"🚒",x:{title:"Drehleiter der Feuerwehr",story:`Die Drehleiter ist auf <b>${fmt(o.c)} m</b> ausgefahren, ihr Fuß steht <b>${fmt(o.b)} m</b> vom Haus entfernt.`,q:"In welcher Höhe berührt die Leiter die Hauswand?"}})},
+    ()=>{const x1=ri(-40,40),y1=ri(-40,40),x2=x1+ri(15,60)*pick([1,-1]),y2=y1+ri(15,60)*pick([1,-1]),dx=Math.abs(x2-x1),dy=Math.abs(y2-y1),c=Math.hypot(dx,dy);
+      return tHyp({a:dx,b:dy,u:"m",n:["Δx","Δy","Abstand"],pic:"🗺️",sym:["Δx","Δy","d"],x:{title:"Abstand im Koordinatensystem",story:`Auf dem Stadtplan (1 Kästchen = 1 m) liegt die Schule bei <b>P(${x1} | ${y1})</b> und die Haltestelle bei <b>Q(${x2} | ${y2})</b>.`,q:"Wie weit sind P und Q voneinander entfernt?"}})}]};
+const FIG_THEME={"Noah_Pythagoras":"schule","01_Schuelerin":"schule","classic":"schule","02_Fussballfan":"sport","06_Joggerin":"sport","05_Strassenbauer":"bau",
+  "07_Geschaeftsfrau":"buero","03_Seniorin":"garten","04_Senior":"garten","08_Passant":"stadt","Dittmann_Cap":"profi"};
+function themeTask(d){const th=FIG_THEME[figNow()]||"stadt";const t=pick(TH[th])(d);t.theme=th;return t}
+
+/* Kurieraufträge: oft ein Thema der gewählten Figur */
+{const base=makeTask;makeTask=function(g){const r=base(g);if(!g||g.id==="taxi"||r.target)return r;if(Math.random()>(isProfi()?.7:.45))return r;
+  try{const t=themeTask(r.diff||AU.diff());return Object.assign({tag:r.tag,deliver:r.deliver},t,{giver:r.giver,tries:0,solved:false,diff:r.diff,sel:[],id:"th_"+t.theme})}catch(e){console.warn("Themenaufgabe",e);return r}}}
+
+/* ---------- MPT-Kräfte: Tipps und Übungsaufgaben ---------- */
+const MPT={"Herr Aktas":"Zeichne dir zuerst das Dreieck und markiere den rechten Winkel. Gegenüber liegt die Hypotenuse.",
+  "Frau Colonna":"Schreib erst die Formel hin: c² = a² + b². Dann setzt du ein – Schritt für Schritt.",
+  "Frau Brand":"Mach am Ende die Probe: Die Hypotenuse muss die längste Seite sein. Sonst stimmt etwas nicht."};
+function mptTask(name){if(state.task)return;const d=AU.diff(),t=themeTask(d),dl={1:"leicht",2:"mittel",3:"schwer"}[d];
+  t.hint=`<b>Tipp von ${name.replace(/^Herr /,"Herrn ")}:</b> ${MPT[name]}<br>${t.hint||""}`;
+  showTask(Object.assign(t,{tag:`MPT-Übung bei ${name.replace(/^Herr /,"Herrn ")} · ${dl}`,deliver:"Danke!",hunt:"rolle_mpt",tries:0,solved:false,sel:[],diff:d}))}
+
+/* ---------- Frau Costantino: Aufgaben auf Englisch ---------- */
+const EN_HINT_H="The <b>hypotenuse</b> is the longest side, opposite the right angle: c² = a² + b², then take the square root. <i>(Gesucht ist die Hypotenuse: quadrieren, addieren, Wurzel ziehen.)</i>";
+const EN_HINT_L="You know the <b>hypotenuse</b>. A leg is: a² = c² − b², then take the square root. <i>(Gesucht ist eine Kathete: Hypotenuse² minus Kathete², dann Wurzel.)</i>";
+const EN=[
+  d=>{const [a,b]=AU.legsPair(d,9,28);return Object.assign(tHyp({a:Math.max(a,b),b:Math.min(a,b),u:"m",n:["length","width","diagonal"],pic:"🏀",x:{title:"The basketball court",story:`The school basketball court is <b>${fmt(Math.max(a,b))} m</b> long and <b>${fmt(Math.min(a,b))} m</b> wide. You run from one corner to the opposite corner. <i>(Das Spielfeld ist … lang und … breit. Du läufst von Ecke zu Ecke.)</i>`,q:"How long is the diagonal? (Wie lang ist die Diagonale?)"}}),{hint:EN_HINT_H})},
+  d=>{const o=AU.hypLeg(d,2,6);return Object.assign(tLeg({c:o.c,b:o.b,u:"m",n:["height","distance","ladder"],pic:"🪜",flip:true,x:{title:"A ladder against the wall",story:`A ladder is <b>${fmt(o.c)} m</b> long. Its foot is <b>${fmt(o.b)} m</b> away from the school wall. <i>(Eine Leiter ist … lang, ihr Fuß steht … von der Wand entfernt.)</i>`,q:"How high does the ladder reach? (Wie hoch reicht die Leiter?)"}}),{hint:EN_HINT_L})},
+  d=>{const [a,b]=AU.legsPair(d,3,8,10);return Object.assign(tHyp({a:Math.max(a,b),b:Math.min(a,b),u:"cm",n:["width","height","diagonal"],pic:"📺",rot:Math.PI/2,x:{title:"A new TV screen",story:`The screen is <b>${fmt(Math.max(a,b))} cm</b> wide and <b>${fmt(Math.min(a,b))} cm</b> high. <i>(Der Bildschirm ist … breit und … hoch.)</i>`,q:"What is the length of the diagonal? (Wie lang ist die Diagonale?)"}}),{hint:EN_HINT_H})},
+  d=>{const [a,b]=AU.legsPair(d,6,20);return Object.assign(tHyp({a,b,u:"m",n:["width","length","diagonal"],pic:"🚦",x:{title:"Crossing the road",story:`The crossing is <b>${fmt(a)} m</b> wide and <b>${fmt(b)} m</b> long. Some people walk diagonally – but that is longer and dangerous! <i>(Schräg über die Kreuzung ist länger und gefährlich.)</i>`,q:"How long is the diagonal way? (Wie lang ist der schräge Weg?)"}}),{hint:EN_HINT_H})},
+  d=>{const o=AU.hypLeg(d,10,35);return Object.assign(tLeg({c:o.c,b:o.b,u:"m",n:["height","distance","string"],pic:"🪁",x:{title:"Flying a kite",story:`The kite string is <b>${fmt(o.c)} m</b> long and tight. The kite is <b>${fmt(o.b)} m</b> away from you horizontally. <i>(Die Schnur ist … lang, der Drachen ist waagerecht … entfernt.)</i>`,q:"How high is the kite? (Wie hoch fliegt der Drachen?)"}}),{hint:EN_HINT_L})}];
+function englishTask(){if(state.task)return;const d=AU.diff(),t=pick(EN)(d),dl={1:"easy",2:"medium",3:"hard"}[d];
+  showTask(Object.assign(t,{tag:`🇬🇧 English task · Mrs Costantino · ${dl}`,deliver:"Thank you!",hunt:"rolle_en",tries:0,solved:false,sel:[],diff:d}))}
+/* Verkehrsunterricht nach dem Elternbrief: ebenfalls auf Englisch */
+{const base=costantinoTask;costantinoTask=function(){const t=base();const [a,b]=[t.sk.a,t.sk.b];
+  return Object.assign(t,{title:"Road safety lesson with Mrs Costantino",story:`“The crossing is <b>${a} m</b> wide and <b>${b} m</b> long. If you walk diagonally instead of using the traffic lights, you are on the road much longer – without protection.” <i>(Wer schräg über die Kreuzung läuft statt an der Ampel, ist viel länger auf der Fahrbahn.)</i>`,
+    q:"How long is the diagonal way across the crossing? (Wie lang ist der schräge Weg?)",hint:EN_HINT_H,tag:"Elternbrief · Road safety lesson"})}}
+
+/* Belohnung für Übungen */
+{const base=huntFound;huntFound=function(i){if(i!=="rolle_mpt"&&i!=="rolle_en")return base(i);const xp=i==="rolle_en"?12:8,m=i==="rolle_en"?12:10;save.xp+=xp;save.money+=m;persist();updateHud();jingle();
+  toast(i==="rolle_en"?"Well done! 🇬🇧":"Super gelöst!",`+${xp} XP · +${m} $`,"#3ddc84")}}
+{const base=interactables;interactables=function(VH){const L=base(VH);if(VH.id!=="walk"||state.task)return L;
+  for(const t of TALK){if(Math.abs(t.x-car.x)>6||Math.abs(t.y-car.y)>6)continue;
+    if(MPT[t.name])L.push({x:t.x,y:t.y,r:3,label:`💡 Übungsaufgabe von ${t.name.replace(/^Herr /,"Herrn ")} (MPT)`,act:()=>mptTask(t.name)});
+    if(t.name==="Frau Costantino")L.push({x:t.x,y:t.y,r:3,label:"🇬🇧 English task – Mrs Costantino",act:englishTask})}
+  return L}}
+
+/* ---------- Kinder: nur Fahrräder und E-Scooter ---------- */
+const KID_MSG="🧒 Als Kind kannst du nur Fahrräder und E-Scooter kaufen und fahren.";
+const kidToast=()=>toast("Nur für Erwachsene",KID_MSG,"#ff8a3d");
+{const base=buyVar;buyVar=function(vid){const v=VAR[vid];if(v&&kidBlocked(v.base)){kidToast();return}if(save.elternbrief){toast("✉️ Erst den Elternbrief klären","Verkehrsunterricht bei Frau Costantino an der GHS Dohr","#ff2a85");return}return base(vid)}}
+{const base=rentVar;rentVar=function(vid){const v=VAR[vid];if(v&&kidBlocked(v.base)){kidToast();return}return base(vid)}}
+{const base=useVar;useVar=function(vid){const v=VAR[vid];if(v&&kidBlocked(v.base)){kidToast();return}return base(vid)}}
+{const base=enterVehicle;enterVehicle=function(){const l=save.left;if(l&&kidBlocked(l.id)){kidToast();return}return base()}}
+{const base=renderShop;renderShop=function(){base();if(!isKid())return;
+  for(const b of $("vgrid").querySelectorAll("button[data-vbuy],button[data-vrent],button[data-vuse]")){const v=VAR[b.dataset.vbuy||b.dataset.vrent||b.dataset.vuse];if(!v||!kidBlocked(v.base))continue;
+    const n=document.createElement("button");n.type="button";n.disabled=true;n.textContent="🧒 Nur für Erwachsene";b.replaceWith(n);const c=n.closest(".vcard");if(c)c.classList.add("locked")}
+  const info=$("shopInfo");if(info&&!/Kind/.test(info.textContent))info.innerHTML+=" <b>"+KID_MSG+"</b>"}}
+{const base=interactables;interactables=function(VH){const L=base(VH);if(!isKid())return L;
+  for(const it of L){if(!/ kaufen · \$| mieten · \$| gehört dir – nehmen/.test(it.label))continue;const v=VARS.find(v=>it.label.includes(v.name));if(v&&kidBlocked(v.base)){it.label=`🔒 ${v.icon} ${v.name} – nur für Erwachsene`;it.act=kidToast}}
+  return L}}
+/* Wechselt man zu einer Kinder-Figur, während man ein Auto o. Ä. fährt: aussteigen */
+{let t=0;const base=update;update=function(dt){base(dt);t-=dt;if(t>0)return;t=1;if(state.mode==="play"&&kidBlocked(V().id)&&!V().fly){exitVehicle();toast("Ausgestiegen",KID_MSG,"#ff8a3d")}}}
 
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){

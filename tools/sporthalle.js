@@ -2,7 +2,7 @@
    Nach den Fotos vom 19.11.: Halle mit Holzverkleidung, dunkler Prallschutz unten, hohe Fenster, Rasterdecke mit Leuchtbändern,
    Basketballkörbe mit aufgemaltem Tor an den Stirnwänden, Sprossenwand mit Weichbodenmatte, Turnringe, Langbank, Geräteraum mit Kasten.
    Betreten durch die Tür am Umkleidetrakt (E / Tippen), drinnen ist die Halle frei begehbar.
-   Hauptmission „Der Diagonal-Sprint“ bei Frau Albers (Sportlehrerin): Spielfeld 15 m × 8 m vermessen, Diagonale berechnen (17 m),
+   Hauptmission „Der Diagonal-Sprint“ bei Herrn Maaß (Sportlehrer): Spielfeld 15 m × 8 m vermessen, Diagonale berechnen (17 m),
    Zusatzfrage zur Weichbodenmatte an der Sprossenwand, Anzahl der Diagonalen für 100 m – dann den Sprint selbst laufen.
    Alle Maße in Spielkarten-Koordinaten der Schule (x nach Osten, z nach Süden); fx_pass.js setzt sie auf das echte Grundstück. */
 const HALL={x0:-289.6,x1:-268.4,z0:-147.6,z1:-132.4,h:6.8,ex:[-290,-268,-148,-132],
@@ -15,8 +15,8 @@ function inHall(x,y,m=0){const [lx,lz]=hallL(x,y);return lx>HALL.x0-m&&lx<HALL.x
 
 /* ---------- Mission ---------- */
 QUESTS.push({id:"sporthalle",district:"Dohr/Torfbend",title:"Der Diagonal-Sprint",
-  giver:{x:-283,y:-134.6,name:"Frau Albers",role:"Sportlehrerin an der GHS Dohr",shirt:"#1e88e5"},
-  intro:"„Hallo! Ich bin Frau Albers, ich unterrichte Sport. Heute laufen wir den Diagonal-Sprint: quer über das grüne Spielfeld, von einer Ecke bis zur gegenüberliegenden Ecke. Miss bitte die Länge und die Breite des Spielfelds und rechne aus, wie lang die Sprintstrecke ist. Danach läufst du sie selbst!“",
+  giver:{x:-283,y:-134.6,name:"Herr Maaß",role:"Sportlehrer an der GHS Dohr",shirt:"#e07a2f"},
+  intro:"„Da bist du ja! Ich bin Herr Maaß, euer Sportlehrer. Heute laufen wir den Diagonal-Sprint: quer über das grüne Spielfeld, von einer Ecke bis zur gegenüberliegenden Ecke. Miss bitte die Länge und die Breite des Spielfelds und rechne aus, wie lang die Sprintstrecke ist. Danach läufst du sie selbst!“",
   measures:[{id:"a",label:"Länge des Spielfelds",short:"Länge",val:15,x:-279,y:-144.6,where:"an der langen grünen Linie",line:[-286.5,.05,-144,-271.5,.05,-144]},
             {id:"b",label:"Breite des Spielfelds",short:"Breite",val:8,x:-270.9,y:-140,where:"an der kurzen grünen Linie",line:[-271.5,.05,-144,-271.5,.05,-136]}],
   lab:{a:"Länge",b:"Breite",c:"Diagonale"},ans:17,unit:"m",
@@ -25,9 +25,9 @@ QUESTS.push({id:"sporthalle",district:"Dohr/Torfbend",title:"Der Diagonal-Sprint
     steps:`√(2,5² − 0,7²) = √(6,25 − 0,49) = √5,76 = <span class="hl">2,4 m</span>`,tip:"Die Matte ist die Hypotenuse. Gesucht ist eine Kathete: Hypotenuse² minus die andere Kathete²."},
   choice:{q:"Jeder soll mindestens 100 m sprinten. Wie viele Diagonalen muss man mindestens laufen?",opts:[{v:5,t:"5 Diagonalen"},{v:6,t:"6 Diagonalen"},{v:7,t:"7 Diagonalen"}],ok:6,
     fb:v=>v<6?"Zu wenig: 5 · 17 m = 85 m. Das sind noch keine 100 m.":v>6?"Das reicht, aber 6 · 17 m = 102 m genügen schon.":"Genau: 6 · 17 m = 102 m – mindestens 100 m. Jetzt lauf die erste Diagonale!"},
-  doneText:"Frau Albers stoppt deine Zeit und trägt sie ins Sportheft ein. Der Diagonal-Sprint ist ab jetzt fester Teil des Sportunterrichts.",xp:45,money:120});
+  doneText:"Herr Maaß stoppt deine Zeit und trägt sie ins Sportheft ein. Der Diagonal-Sprint ist ab jetzt fester Teil des Sportunterrichts.",xp:45,money:120});
 {const i=MAIN.indexOf("schulhof");MAIN.splice(i>=0?i+1:MAIN.length,0,"sporthalle")}
-if(typeof STAND_MODEL!=="undefined")STAND_MODEL["Frau Albers"]="06_Joggerin";
+if(typeof STAND_MODEL!=="undefined")STAND_MODEL["Herr Maaß"]="08_Passant";
 
 /* ---------- Innenraum ---------- */
 function buildHall(){
@@ -130,7 +130,7 @@ function hallGrid(){const pts=HALL.ex,c=[[pts[0],pts[2]],[pts[1],pts[2]],[pts[0]
 /* ---------- Betreten und Verlassen ---------- */
 function hallTeleport(inside){fade(()=>{const r=hallRot(),p=inside?hallR(HALL.doorIn[0],HALL.doorIn[1]-1.2):hallR(...HALL.doorOut),a=inside?-Math.PI/2+r:Math.PI/2+r;
   car.x=p[0];car.y=p[1];car.a=a;car.v=0;camYaw=a;camPos.set(car.x-Math.cos(a)*3.5,car.alt+2.4,car.y-Math.sin(a)*3.5);
-  if(inside)toast("🏀 Sporthalle der GHS Dohr",QUESTS.find(q=>q.id==="sporthalle")&&!qs(QUESTS.find(q=>q.id==="sporthalle")).done?"Frau Albers wartet am Spielfeld.":"Zum Verlassen zur Doppeltür gehen.","#e2611b")})}
+  if(inside)toast("🏀 Sporthalle der GHS Dohr",QUESTS.find(q=>q.id==="sporthalle")&&!qs(QUESTS.find(q=>q.id==="sporthalle")).done?"Herr Maaß wartet am Spielfeld.":"Zum Verlassen zur Doppeltür gehen.","#e2611b")})}
 {const base=interactables;interactables=function(VH){const L=base(VH);if(VH.id!=="walk")return L;
   const o=hallR(...HALL.doorOut),i=hallR(...HALL.doorIn);
   if(inHall(car.x,car.y))L.push({x:i[0],y:i[1],r:2.2,label:"🚪 Sporthalle verlassen",act:()=>hallTeleport(false)});
