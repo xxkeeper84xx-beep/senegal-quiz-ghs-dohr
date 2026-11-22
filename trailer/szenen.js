@@ -22,9 +22,10 @@ const rd=(s,off)=>rdA(s,off).slice(0,2);const RD={a:0};
 const SHOTS=[
  {id:"A",t0:0,t1:4.8,start(){place("walk",S0[0],S0[1],S0[2],0)},frame(t){const u=sm(t/4.8);CAMF=()=>({p:[lerp(560,700,u),lerp(150,95,u),lerp(420,330,u)],l:[lerp(860,880,u),0,lerp(210,220,u)],fov:45});
    $b.style.opacity=t<1.2?1-t/1.2:0;cap("Mönchengladbach.<small>Rheydt · Mülfort</small>",t,1.4,4.6)}},
- {id:"B",t0:4.8,t1:9.6,start(){place("walk",S0[0]+40,S0[1]+30,S0[2],0)},frame(t){const u=(t-4.8)/4.8,C=TALK.find(q=>q.name==="Frau Costantino")||{x:850,y:234};
-   CAMF=()=>({p:[C.x-4.5+u*8,1.75,C.y+6.2],l:[C.x+u*3.5,1.35,C.y-7],fov:48});
-   cap("Deine Schule.<br>Deine Lehrer.<small>GHS Dohr · Frau Costantino</small>",t,5.2,9.4)}},
+ {id:"B",t0:4.8,t1:9.6,start(){place("walk",S0[0]+40,S0[1]+30,S0[2],0)},frame(t){const u=(t-4.8)/4.8,T=TALK.find(q=>q.name==="Frau Costantino"),C=T||{x:850,y:234};
+   if(T)for(const S of STANDS)if(S.p===T.person){if(S.glb){scene.remove(S.glb.obj);S.glb.obj.visible=false}if(S.p.parent)S.p.parent.remove(S.p)}
+   CAMF=()=>({p:[C.x-10+u*12,5.5,C.y+20],l:[C.x+u*5,5,C.y-12],fov:50});
+   cap("Deine Schule.<small>GHS Dohr · Am Torfbend</small>",t,5.2,9.4)}},
  {id:"C",t0:9.6,t1:14.4,start(){place("walk",S0[0]-11*Math.cos(S0[2]),S0[1]-11*Math.sin(S0[2]),S0[2],1.8);ST.c=[car.x,car.y]},frame(t){const u=t-9.6,a=S0[2],x=ST.c[0]+Math.cos(a)*1.8*u,y=ST.c[1]+Math.sin(a)*1.8*u;
    car.x=x;car.y=y;car.a=a;car.v=1.8;CAMF=()=>({p:[x+Math.cos(a)*3.6+Math.sin(a)*1.2,1.25,y+Math.sin(a)*3.6-Math.cos(a)*1.2],l:[x,1.05,y],fov:42});
    cap("Noah.<small>Klasse 9 · Mathe-Ass in Ausbildung</small>",t,10.2,14.2)}},
