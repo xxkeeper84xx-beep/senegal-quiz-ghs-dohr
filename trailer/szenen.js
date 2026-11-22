@@ -30,35 +30,35 @@ const SHOTS=[
    cap("Noah.<small>Klasse 9 · Mathe-Ass in Ausbildung</small>",t,10.2,14.2)}},
  {id:"D",t0:14.4,t1:19.2,start(){place("walk",MK[0]+4,MK[1]+18,-Math.PI/2,0)},frame(t){const u=(t-14.4)/4.8,ang=1.9+u*.9;CAMF=()=>({p:[MK[0]+Math.cos(ang)*34,9-u*3,MK[1]+Math.sin(ang)*34],l:[MK[0],1.5,MK[1]],fov:50});
    cap("Die ganze Stadt<br>ist dein Klassenzimmer.",t,14.8,19.0)}},
- {id:"E1",t0:19.2,t1:21.6,start(){save.scootTuned=false;const [x,y,a]=rdA(150,2.3);place("bike",x,y,a,6)},frame(t){const s=150+(t-19.2)*6,[x,y,A]=rdA(s,2.3);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=6;const L=[-Math.sin(A),Math.cos(A)];
+ {id:"E1",t0:19.2,t1:20.8,start(){save.scootTuned=false;const [x,y,a]=rdA(150,2.3);place("bike",x,y,a,6)},frame(t){const s=150+(t-19.2)*6,[x,y,A]=rdA(s,2.3);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=6;const L=[-Math.sin(A),Math.cos(A)];
    CAMF=()=>({p:[x+L[0]*4.2+Math.cos(RD.a)*.8,1.2,y+L[1]*4.2+Math.sin(RD.a)*.8],l:[x,1.0,y],fov:44});$f.style.opacity=Math.max(0,1-(t-19.2)/.25)}},
- {id:"E2",t0:21.6,t1:24.0,start(){const [x,y,a]=rdA(175);place("moped",x,y,a,10)},frame(t){const s=175+(t-21.6)*10,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=10;
+ {id:"E2",t0:20.8,t1:24.0,start(){const [x,y,a]=rdA(175);place("moped",x,y,a,10)},frame(t){const s=175+(t-20.8)*10,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=10;
    CAMF=()=>({p:[x+Math.cos(RD.a)*5.5,.7,y+Math.sin(RD.a)*5.5+.6],l:[x,1.1,y],fov:40})}},
  {id:"F",t0:24.0,t1:28.8,start(){const [x,y,a]=rdA(160);place("auto",x,y,a,16)},frame(t){const s=160+(t-24)*16,[x,y,A]=rdA(s);RD.a=A;car.x=x;car.y=y;car.a=A;car.v=16;const L=[-Math.sin(RD.a),Math.cos(RD.a)],k=(t-24)/4.8;
    CAMF=()=>({p:[x-Math.cos(RD.a)*(7-k*3)+L[0]*(2.5+k*3),.9+k*.6,y-Math.sin(RD.a)*(7-k*3)+L[1]*(2.5+k*3)],l:[x+Math.cos(RD.a)*2,.8,y+Math.sin(RD.a)*2],fov:46});
    cap("a² + b² = c²",t,25.8,28.6,"grad mid")}},
- {id:"G1",t0:28.8,t1:31.2,start(){const q=questById("markt"),st=qs(q);st.acc=true;st.m={a:true,b:true};st.done=false;applyEffect("markt",false,false);refreshQuestWorld();
+ {id:"G1",t0:28.8,t1:32.0,start(){const q=questById("markt"),st=qs(q);st.acc=true;st.m={a:true,b:true};st.done=false;applyEffect("markt",false,false);refreshQuestWorld();
    const z=MG.q.markt.zone;showRoute([[z[0],z[1]],[z[2],z[3]]]);ST.z=z;place("walk",z[0]-3,z[3]+4,-.6,0)},
-  frame(t){const k=(t-28.8)/2.4,z=ST.z,cx=(z[0]+z[2])/2,cy=(z[1]+z[3])/2,ang=.55+k*.35;
+  frame(t){const k=(t-28.8)/3.2,z=ST.z,cx=(z[0]+z[2])/2,cy=(z[1]+z[3])/2,ang=.55+k*.35;
    CAMF=()=>({p:[cx+Math.cos(ang)*17,10.5-k*1.5,cy+Math.sin(ang)*17],l:[cx,0,cy],fov:46});
-   cap("9 m und 12 m …<br>quer nur 15 m.<small>Mission: Quer über den Markt</small>",t,29.0,31.1,"nocase")}},
- {id:"G2",t0:31.2,t1:33.6,start(){place("plane",700,60,.35,30);VEH.plane.fly=true;car.alt=55;car.vy=0},frame(t){const k=t-31.2,x=700+Math.cos(.35)*30*k,y=60+Math.sin(.35)*30*k;car.x=x;car.y=y;car.a=.35;car.v=30;VEH.plane.fly=true;car.alt=55+k*2;car.vy=2;car.steer=.35;
-   CAMF=()=>({p:[x-Math.cos(.35)*12-Math.sin(.35)*7,car.alt+3,y-Math.sin(.35)*12+Math.cos(.35)*7],l:[x+Math.cos(.35)*4,car.alt,y+Math.sin(.35)*4],fov:50});cap("Rechne dich<br>durch die Stadt.",t,31.4,33.4)}},
- {id:"H",t0:33.6,t1:38.4,start(){place("walk",WK.giver[0]-3,WK.giver[1]+18,-Math.PI/2,0);const q=questById("werkhof"),s=qs(q);s.acc=true;s.m={a:true,b:true};s.done=false;applyEffect("werkhof",false,false);refreshQuestWorld();ST.lit=false},
-  frame(t){const k=(t-33.6)/4.8,c=[WK.wall[0]+4,WK.wall[1]],ang=2.3+k*.7;CAMF=()=>({p:[c[0]+Math.cos(ang)*14,4+k*2,c[1]+Math.sin(ang)*14],l:[c[0],3,c[1]],fov:50});
-   if(t>=36&&!ST.lit){ST.lit=true;const q=questById("werkhof");qs(q).done=true;applyEffect("werkhof",true,true);refreshQuestWorld();for(const m of q.measures){m.tube.visible=m.lab.visible=true}}
-   $f.style.opacity=t>=36&&t<36.3?1-(t-36)/.3:0;cap(t<36?"6 m und 8 m …<small>Mission: Licht für den Werkhof</small>":"… sind 10 m Kabel.<small>Mission: Licht für den Werkhof</small>",t,33.9,38.3,"nocase")}},
- {id:"I1",t0:38.4,t1:40.8,start(){const q=questById("treppe"),st=qs(q);st.acc=true;st.m={a:true,b:true};st.done=false;refreshQuestWorld();
+   cap("9 m und 12 m …<br>quer nur 15 m.<small>Mission: Quer über den Markt</small>",t,29.0,31.9,"nocase")}},
+ {id:"G2",t0:32.0,t1:33.6,start(){place("plane",700,60,.35,30);VEH.plane.fly=true;car.alt=55;car.vy=0},frame(t){const k=t-32.0,x=700+Math.cos(.35)*30*k,y=60+Math.sin(.35)*30*k;car.x=x;car.y=y;car.a=.35;car.v=30;VEH.plane.fly=true;car.alt=55+k*2;car.vy=2;car.steer=.35;
+   CAMF=()=>({p:[x-Math.cos(.35)*12-Math.sin(.35)*7,car.alt+3,y-Math.sin(.35)*12+Math.cos(.35)*7],l:[x+Math.cos(.35)*4,car.alt,y+Math.sin(.35)*4],fov:50});cap("Rechne dich<br>durch die Stadt.",t,32.1,33.55)}},
+ {id:"H",t0:33.6,t1:36.8,start(){place("walk",WK.giver[0]-3,WK.giver[1]+18,-Math.PI/2,0);const q=questById("werkhof"),s=qs(q);s.acc=true;s.m={a:true,b:true};s.done=false;applyEffect("werkhof",false,false);refreshQuestWorld();ST.lit=false},
+  frame(t){const k=(t-33.6)/3.2,c=[WK.wall[0]+4,WK.wall[1]],ang=2.3+k*.7;CAMF=()=>({p:[c[0]+Math.cos(ang)*14,4+k*2,c[1]+Math.sin(ang)*14],l:[c[0],3,c[1]],fov:50});
+   if(t>=35.2&&!ST.lit){ST.lit=true;const q=questById("werkhof");qs(q).done=true;applyEffect("werkhof",true,true);refreshQuestWorld();for(const m of q.measures){m.tube.visible=m.lab.visible=true}}
+   $f.style.opacity=t>=35.2&&t<35.5?1-(t-35.2)/.3:0;cap(t<35.2?"6 m und 8 m …<small>Mission: Licht für den Werkhof</small>":"… sind 10 m Kabel.<small>Mission: Licht für den Werkhof</small>",t,33.8,36.75,"nocase")}},
+ {id:"I1",t0:36.8,t1:40.0,start(){const q=questById("treppe"),st=qs(q);st.acc=true;st.m={a:true,b:true};st.done=false;refreshQuestWorld();
    let cx=0,cy=0,cz=0;for(const m of q.measures){cx+=m.line[0]+m.line[3];cy+=m.line[1]+m.line[4];cz+=m.line[2]+m.line[5]}cx/=4;cy/=4;cz/=4;
    const dx=cx-SCH[0],dz=cz-SCH[1],L=Math.hypot(dx,dz)||1;ST.t={cx,cy,cz,ux:dx/L,uz:dz/L};place("walk",cx+dx/L*3,cz+dz/L*3,0,0)},
-  frame(t){const k=(t-38.4)/2.4,T=ST.t,px=-T.uz,pz=T.ux;
+  frame(t){const k=(t-36.8)/3.2,T=ST.t,px=-T.uz,pz=T.ux;
    CAMF=()=>({p:[T.cx+T.ux*8.5+px*(3-k*4),3.2,T.cz+T.uz*8.5+pz*(3-k*4)],l:[T.cx,2.2,T.cz],fov:50});
-   cap("3,9 m und 5,5 m …<br>6,7 m Handlauf.<small>Mission: Ein Handlauf für die Außentreppe</small>",t,38.6,40.7,"nocase")}},
- {id:"I2",t0:40.8,t1:43.2,start(){applyLook(Object.assign({},LOOK_DEF));const [x0,y0,a0]=rdA(330,1.9);RD.a=a0;place("auto",x0,y0,a0,0);exitVehicle();TR.on=false;TR.done=null;const L=[-Math.sin(RD.a),Math.cos(RD.a)];car.x+=L[0]*1.2;car.y+=L[1]*1.2;ST.i=[x0,y0];enterVehicle()},
-  frame(t){const [x,y]=ST.i;CAMF=()=>({p:[x+Math.sin(RD.a)*-6.5+Math.cos(RD.a)*2.5,1.7,y-Math.cos(RD.a)*-6.5+Math.sin(RD.a)*2.5],l:[x,1.0,y],fov:44});cap("Steig ein.",t,41.1,43.1);
-   $b.style.opacity=t>42.7?(t-42.7)/.5:0}},
- {id:"J",t0:43.2,t1:48,start(){},frame(t){const k=t-43.2;$b.style.opacity=0;$c.style.opacity=0;$l.style.opacity=Math.min(1,k/.15);$f.style.opacity=Math.max(0,1-k/.4);
-   $l.querySelector("h1").style.transform=`scale(${1.08-.08*sm(k/2.5)})`;const so=document.getElementById("soon"),T=3.1,u2=(k-T)/.3;so.style.opacity=k<T?0:Math.min(1,u2*1.5);so.style.transform=`translateX(-50%) scale(${k<T?1.6:1+.6*(1-sm(u2))})`;/* auf den Höhepunkt der Titelmelodie (46,3 s) */if(k>4.45)$l.style.opacity=Math.max(0,1-(k-4.45)/.35)}},
+   cap("3,9 m und 5,5 m …<br>6,7 m Handlauf.<small>Mission: Ein Handlauf für die Außentreppe</small>",t,37.0,39.95,"nocase")}},
+ {id:"I2",t0:40.0,t1:41.6,start(){applyLook(Object.assign({},LOOK_DEF));const [x0,y0,a0]=rdA(330,1.9);RD.a=a0;place("auto",x0,y0,a0,0);exitVehicle();TR.on=false;TR.done=null;const L=[-Math.sin(RD.a),Math.cos(RD.a)];car.x+=L[0]*1.2;car.y+=L[1]*1.2;ST.i=[x0,y0];enterVehicle()},
+  frame(t){const [x,y]=ST.i;CAMF=()=>({p:[x+Math.sin(RD.a)*-6.5+Math.cos(RD.a)*2.5,1.7,y-Math.cos(RD.a)*-6.5+Math.sin(RD.a)*2.5],l:[x,1.0,y],fov:44});cap("Steig ein.",t,40.1,41.55);
+   $b.style.opacity=t>41.35?(t-41.35)/.25:0}},
+ {id:"J",t0:41.6,t1:48,start(){},frame(t){const k=t-41.6;$b.style.opacity=0;$c.style.opacity=0;$l.style.opacity=Math.min(1,k/.15);$f.style.opacity=Math.max(0,1-k/.4);
+   $l.querySelector("h1").style.transform=`scale(${1.08-.08*sm(k/4)})`;const so=document.getElementById("soon"),T=4.8,u2=(k-T)/.3;so.style.opacity=k<T?0:Math.min(1,u2*1.5);so.style.transform=`translateX(-50%) scale(${k<T?1.6:1+.6*(1-sm(u2))})`;/* Logo mit dem Anstieg (41,6 s), COMING SOON auf dem Höhepunkt (46,4 s); Schnitte liegen auf den Takten der Titelmelodie (150 BPM, Takt 1,6 s) */if(k>6.05)$l.style.opacity=Math.max(0,1-(k-6.05)/.35)}},
 ];
 window.SHOTS=SHOTS;
 window.shotStart=id=>{const s=SHOTS.find(s=>s.id===id);$c.style.opacity=0;$f.style.opacity=0;$b.style.opacity=0;$l.style.opacity=0;CAMF=null;ST={};s.start();
