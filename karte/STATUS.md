@@ -3,6 +3,14 @@
 Stand 20.11.2026. **Das Spiel nutzt nur noch die echte Karte** (`pythagoras-city.html` lädt `mg-echt.js`).
 Die Auswahl zwischen Spielkarte und echter Karte ist entfernt; `echt.html` leitet auf das Spiel weiter.
 
+## Gräben ausheben (`tools/graben.js`)
+- **Hauptmission (Kapitel 3, nach dem Werkhof): „Ein Graben für die Wasserleitung“** bei Frau Lenzen in den Kleingärten neben dem Werkhof.
+  Garten 16 m × 12 m vermessen, schräger Graben 20 m, Zusatzfrage schräge Grabenwand (1,2 m tief, 0,5 m breiter → 1,3 m), Rohr wählen
+  (18/20/25 m). Danach Graben selbst ausheben: 8 Pflöcke, an jedem graben (E bzw. Tippen); der Graben entsteht Stück für Stück, das Rohr wird
+  verlegt, am Beet sprudelt Wasser.
+- **Nebenjob „Gräben für die Stadtwerke“** bei Herrn Kowalski am Mülforter Bruch, beliebig oft: neue Maße je Auftrag (Pythagoras-Aufgabe),
+  dann 3–6 Stücke graben, Lohn je nach Grabenlänge.
+
 ## Verkehr, Regeln und neue Figuren (`tools/verkehr.js`, `tools/rig.js`)
 - **Ampeln** (`fahrzeuge/Ampel.*`) an 12 echten Kreuzungen um Schule, Rheydter Markt, Rheydt Hbf und Haupthaus, mit Fußgängersignal.
   Zyklus 24 s, schaltet automatisch (Autos 11 s Grün, 2 s Gelb, 11 s Rot; Fußgänger 8 s Grün); Autos des Stadtverkehrs halten bei Rot. Bei Rot über die Kreuzung: gesehen von Polizei (70 m) oder Lehrkraft (35 m)
