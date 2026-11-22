@@ -55,7 +55,7 @@ function localBox(m){const p=m.position.clone(),r=m.rotation.clone(),vis=m.visib
 function setExtras(m,list){if(!m)return;const old=m.getObjectByName("vx");if(old)m.remove(old);if(!list||!list.length)return;
   const b=localBox(m);if(b.isEmpty())return;const g=new THREE.Group();g.name="vx";const L=b.max.x-b.min.x,Wd=b.max.z-b.min.z,Hh=b.max.y-b.min.y,s=1/(m.scale.x||1);
   const bx=(c,x,y,z,sx,sy,sz)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(sx*s,sy*s,sz*s),new THREE.MeshLambertMaterial({color:c}));o.position.set(x*s,y*s,z*s);o.name="vx";g.add(o)};
-  const small=L<2.6;
+  const small=L<2.6;if(!small)return;   /* Autos und Flugzeuge: nur Lackfarbe (Zubehör saß an manchen Modellen falsch) */
   for(const k of list){
     if(k==="korb"){bx("#2b2b2b",b.max.x-.1,b.min.y+Hh*.8,(b.min.z+b.max.z)/2,.26,.16,.3)}
     if(k==="akku"){bx("#222831",(b.min.x+b.max.x)/2-.05,b.min.y+Hh*.5,(b.min.z+b.max.z)/2,.38,.11,.11);bx("#3ddc84",(b.min.x+b.max.x)/2+.1,b.min.y+Hh*.5+.06,(b.min.z+b.max.z)/2,.05,.02,.04)}

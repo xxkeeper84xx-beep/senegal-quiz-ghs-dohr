@@ -119,6 +119,20 @@ Falls das Spiel verkauft werden soll, vorher:
    nach OpenAI-Bedingungen erlaubt; rein KI-erzeugte Inhalte sind aber kaum urheberrechtlich geschützt. Noch prüfen, mit welchem
    Dienst die Musik „Rheydt bei Nacht“ erzeugt wurde (z. B. Suno/Udio haben eigene Bedingungen).
 
+## Grafik-Umbau Teststrecke Schultor → Gehweg → Büdchen (22.11.)
+- `tools/grafik.js`, `tools/grafik_patch.py`: Kantenglättung (MSAA) an, Auflösung je Profil bis Gerätepixeldichte, dynamisch nachgeregelt
+  (Ziel 30 FPS Touch); Profile im Menü: Schul-iPad / Standard / Hoch; Bildratenanzeige im Menü.
+- Nachmittagslicht (Sonne Südwest ~34°, warm), Himmelslicht kühl, Dunst färbt Entfernung (Tiefe), Himmel passt in die Sichtweite.
+- Schatten enger um die Figur (schärfer), Kontaktschatten unter Noah, Passanten, Lehrkräften und Fahrzeugen.
+- Noah steht auf dem Boden (Sohle 2 cm unter Gehweg gemessen); der Schwebe-Eindruck kam vom fehlenden Kontaktschatten und dem groben, versetzten Sonnenschatten.
+- Häuser: Satteldächer für rechteckige Wohnhäuser, dunkler Sockel, Traufkante an Flachdächern. Gehweg nicht mehr weiß, Bordstein dunkler.
+- Fahrzeuge (GLB): Lack mit Klarlack/Spiegelung, getöntes Glas, matte Reifen. Zubehör an Autos entfernt (saß falsch).
+- Straßenmöbel entlang der Gehwege (Mülleimer, Bänke, Fahrradbügel, Poller), Schilder „Am Torfbend“ und Kinder-Warnschild, Büdchen als Kiosk.
+- Kamera weiter hinten/höher, Hochformat 66° Blickwinkel, ruhigere Drehung, rückt vor Laternenmasten. Oberfläche Hochformat kompakt
+  (Geld/Menü/Handy in einer Zeile, kleine Minikarte, Missionshinweis vollständig), Missionsmarker kleiner. Shader werden vor Spielstart übersetzt.
+- Gemessen nur in Software-Rendering (kein echtes Gerät): Gebietswechsel ~2,5 s Daten, ~10 s bis spielbar (Figuren laden neu).
+- Neu zu erstellende Modelle für den nächsten Qualitätsschritt: siehe Antwort vom 22.11. (Noah, Passanten, Fahrzeuge, Laternen, Gebäudeteile).
+
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
   Idle/Walk/Run mit Überblendung, Blick in Laufrichtung, Füße am Boden (Standfuß beim Gehen 0 cm, beim Laufen 0,2–0,4 cm pro Bild).

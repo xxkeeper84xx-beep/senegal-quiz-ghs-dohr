@@ -101,12 +101,21 @@ function buildBooth(G){const p0=freeSpot(G.at[0],G.at[1],true);const r=nearestRo
   const a=Math.atan2(-ny,-nx),gy=groundY(bx,by),g=new THREE.Group();g.position.set(bx,gy,by);g.rotation.y=-a;scene.add(g);
   const col=G.booth[0];
   const box=(w,h,d,m,x,y,z)=>{const k=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);k.position.set(x,y,z);k.castShadow=k.receiveShadow=true;g.add(k);return k};
-  box(1.6,2.3,2.4,xmat("#eceae4"),-.3,1.15,0);box(.5,1,2.3,xmat(col),.6,.5,0);box(.6,.06,2.4,xmat("#8a6a45"),.65,1.03,0);
-  const aw=box(.9,.06,2.6,xmat(col),.85,2.35,0);aw.rotation.z=-.35;
-  for(let i=0;i<5;i++){const s=box(.14,.2,.14,xmat(["#d81e2c","#f2b81f","#2e8b57","#1b2f6b","#e8742a"][i]),.6,1.16,-.9+i*.45)}
+  /* Kiosk: Putzbau mit Sockel, Flachdach, Leuchtschild, gestreiftem Vordach, Schaufenster mit Regal, Glastür, Getränkekisten */
+  box(2.6,2.9,3.4,xmat("#e8e2d6"),-.7,1.45,0);box(2.66,.35,3.46,xmat("#6f6a62"),-.7,.175,0);box(2.9,.18,3.7,xmat("#3a3d42"),-.7,2.99,0);
+  const glass=new THREE.MeshLambertMaterial({color:0x9fc4dc,transparent:true,opacity:.38,depthWrite:false});
+  const signT=canvasTex(512,80,(c)=>{c.fillStyle=col;c.fillRect(0,0,512,80);c.fillStyle="#fff";c.font="bold 46px sans-serif";c.textAlign="center";c.textBaseline="middle";c.fillText(G.booth[1].toUpperCase(),256,42)});signT.wrapS=signT.wrapT=THREE.ClampToEdgeWrapping;
+  {const sg=new THREE.Mesh(new THREE.PlaneGeometry(3.3,.5),new THREE.MeshBasicMaterial({map:signT}));sg.rotation.y=Math.PI/2;sg.position.set(.62,2.64,0);g.add(sg)}
+  box(.3,1.1,1.8,xmat("#c9b48f"),.32,1.3,-.55);for(let r=0;r<3;r++)for(let i=0;i<6;i++)box(.1,.22,.12,xmat(["#d81e2c","#f2b81f","#2e8b57","#1b2f6b","#e8742a","#f4f4f4"][(i+r)%6]),.5,.95+r*.36,-1.3+i*.3);
+  {const w=new THREE.Mesh(new THREE.BoxGeometry(.04,1.3,1.95),glass);w.position.set(.61,1.45,-.55);g.add(w)}box(.09,.07,2.05,xmat("#2b3138"),.62,.78,-.55);box(.09,.07,2.05,xmat("#2b3138"),.62,2.12,-.55);
+  box(.06,2.15,1.0,xmat("#2b3a4a"),.61,1.08,1.05);{const d=new THREE.Mesh(new THREE.BoxGeometry(.03,1.35,.62),glass);d.position.set(.65,1.3,1.05);g.add(d)}box(.08,.05,.18,xmat("#c9ccd2"),.67,1.05,.7);
+  const stripe=canvasTex(64,64,(c)=>{for(let i=0;i<8;i++){c.fillStyle=i%2?"#f4f4f4":col;c.fillRect(i*8,0,8,64)}});stripe.repeat.set(4,1);
+  const awM=new THREE.MeshLambertMaterial({map:stripe});const aw=box(1.25,.04,3.6,awM,1.2,2.33,0);aw.rotation.z=-.27;box(.03,.24,3.6,awM,1.8,2.07,0);
+  for(let k=0;k<3;k++)box(.4,.28,.3,xmat(k%2?"#1b5e9a":"#d81e2c"),1.0,.14+k*.29,1.85);box(.4,.28,.3,xmat("#2e8b57"),1.0,.14,2.2);
+  box(.35,1.1,.5,xmat("#1d3a5f"),1.0,.55,-1.9);box(.3,.25,.45,xmat("#f4f4f4"),1.05,1.15,-1.9);
   const lab=textSprite(6.2,1.17);lab.material.depthTest=true;lab.userData.set(G.booth[1],"#fff","rgba(10,14,32,.85)");lab.position.set(bx,gy+3.7,by);
   // fester Stand: Zellen unter dem Häuschen sperren (nicht auf Straßen)
-  for(let u=-1.1;u<=.5;u+=.5)for(let w=-1.2;w<=1.2;w+=.5){const wx=bx+Math.cos(a)*u-Math.sin(a)*w,wy=by+Math.sin(a)*u+Math.cos(a)*w,i=gi(wx,wy);if(i>=0&&!(surf[i]&4))solid[i]=Math.max(solid[i],1)}
+  for(let u=-2.0;u<=.6;u+=.5)for(let w=-1.75;w<=1.75;w+=.5){const wx=bx+Math.cos(a)*u-Math.sin(a)*w,wy=by+Math.sin(a)*u+Math.cos(a)*w,i=gi(wx,wy);if(i>=0&&!(surf[i]&4))solid[i]=Math.max(solid[i],1)}
   const pp={x:p0.x,y:p0.y};G.pos={x:pp.x,y:pp.y,name:G.name,role:G.role};
   const before=new Set(Object.keys(_hm));G.person=standPerson(pp.x,pp.y,a,G.shirt);if(window.__lin)for(const k of Object.keys(_hm))if(!before.has(k))_hm[k].color.convertSRGBToLinear()}
 
