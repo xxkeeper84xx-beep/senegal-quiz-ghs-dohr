@@ -8400,7 +8400,7 @@ async function initGlbCrowd(){
   if(!GLB.ready)GLB.failed=true}
 /** Modell vorbereiten: Animationen auf der Stelle, Materialien, Bodenabstand, Lauftempo der Clips messen. */
 /* Vorab gemessene Werte (Bodenabstand, Schritttempo von Walk/Run): spart auf dem iPad mehrere Sekunden Rechenzeit pro Figur */
-const GLB_PREP={"Noah_Pythagoras": {"offY": 0.0072, "walk": 1.279, "run": 2.997}, "01_Schuelerin": {"offY": 0.0064, "walk": 1.114, "run": 2.626}, "02_Fussballfan": {"offY": 0.0081, "walk": 1.358, "run": 3.167}, "03_Seniorin": {"offY": 0.0017, "walk": 1.172, "run": 2.749}, "04_Senior": {"offY": 0.0012, "walk": 1.33, "run": 3.144}, "05_Strassenbauer": {"offY": -0.0002, "walk": 1.452, "run": 3.446}, "06_Joggerin": {"offY": 0.0015, "walk": 1.261, "run": 2.954}, "08_Passant": {"offY": 0.0085, "walk": 1.497, "run": 3.494}, "07_Geschaeftsfrau": {"offY": 0.0076, "walk": 1.312, "run": 3.074}};
+const GLB_PREP={"Noah_Pythagoras": {"offY": 0.0072, "walk": 1.279, "run": 2.997}, "01_Schuelerin": {"offY": 0.0062, "walk": 1.114, "run": 2.626}, "02_Fussballfan": {"offY": 0.0082, "walk": 1.358, "run": 3.167}, "03_Seniorin": {"offY": 0.0034, "walk": 1.172, "run": 2.749}, "04_Senior": {"offY": 0.0012, "walk": 1.33, "run": 3.144}, "05_Strassenbauer": {"offY": -0.0002, "walk": 1.452, "run": 3.446}, "06_Joggerin": {"offY": 0.0015, "walk": 1.261, "run": 2.954}, "08_Passant": {"offY": 0.0089, "walk": 1.497, "run": 3.494}, "07_Geschaeftsfrau": {"offY": 0.0081, "walk": 1.312, "run": 3.074}};
 function prepGlb(gltf,name){
   const scene=gltf.scene,clips={};
   for(const c of gltf.animations){
