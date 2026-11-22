@@ -12,13 +12,18 @@ from shapely.geometry import shape, Polygon, MultiPolygon, LineString, Point, bo
 from shapely.ops import unary_union
 
 PKG, OUT = sys.argv[1], sys.argv[2]
+# optional: Gebiet  X0 X1 Z0 Z1 Kennung  (ohne Angabe: Phase-1-Ausschnitt Rheydt)
+REG = sys.argv[3:8]
 W = json.load(open(os.path.join(PKG, "world.json")))
 E0, N0, H0 = W["origin_utm_nhn_m"]
 T = Transformer.from_crs("EPSG:4326", "EPSG:25832", always_xy=True)
 
 # Ausschnitt Phase 1 (beide Schulen, Rheydt Markt, Rheydt Hbf) in Paket-Koordinaten
 X0, X1, Z0, Z1 = -1350.0, 1250.0, -950.0, 1350.0
-CX, CZ = (X0 + X1) / 2, (Z0 + Z1) / 2
+CX, CZ = (X0 + X1) / 2, (Z0 + Z1) / 2      # Bezugspunkt der Spielkoordinaten bleibt für alle Gebiete gleich (Mitte Phase 1)
+RID = "rheydt"
+if REG:
+    X0, X1, Z0, Z1 = map(float, REG[:4]); RID = REG[4]
 HX, HY = (X1 - X0) / 2, (Z1 - Z0) / 2
 CLIP = sbox(X0, Z0, X1, Z1)
 
@@ -329,11 +334,39 @@ for f in json.load(open(os.path.join(PKG, "grenzen", "stadtteile.geojson")))["fe
         districts.append({"n": name, "b": [min(xs), min(ys), max(xs), max(ys)], "poly": rings, "hint": ""})
 print(len(trees) // 2, "Bäume,", len(pois), "Orte,", len(districts), "Stadtteile")
 
+# ------------------------------------------------------------ Flughafen: Start- und Landebahnen, Rollwege, Vorfeld
+aero = {"runways": [], "taxi": [], "aprons": []}
+for f in feats:
+    p = f["properties"]
+    aw = p.get("aeroway")
+    if not aw:
+        continue
+    g = shape(f["geometry"])
+    if aw in ("runway", "taxiway") and g.geom_type in ("LineString", "MultiLineString"):
+        for ln in ([g] if g.geom_type == "LineString" else list(g.geoms)):
+            q = LineString(proj_coords(ln.coords)).intersection(CLIP)
+            for qq in ([q] if q.geom_type == "LineString" else getattr(q, "geoms", [])):
+                if qq.geom_type == "LineString" and qq.length > 3:
+                    w = hval(p.get("width")) or (30 if aw == "runway" else 12)
+                    (aero["runways"] if aw == "runway" else aero["taxi"]).append({"p": flat(list(qq.coords)), "w": w, "ref": p.get("ref", "")})
+    elif aw == "apron" and g.geom_type in ("Polygon", "MultiPolygon"):
+        for q in ([g] if g.geom_type == "Polygon" else list(g.geoms)):
+            qq = Polygon(proj_coords(q.exterior.coords)).buffer(0).intersection(CLIP)
+            for r in ([qq] if qq.geom_type == "Polygon" else getattr(qq, "geoms", [])):
+                if r.geom_type == "Polygon" and r.area > 50:
+                    aero["aprons"].append(flat(list(r.exterior.coords)[:-1]))
+print(len(aero["runways"]), "Bahnen,", len(aero["taxi"]), "Rollwege,", len(aero["aprons"]), "Vorfelder")
+
 # ------------------------------------------------------------ Startpunkt: Gehweg vor der Schule am Torfbend
 tor = ORTE["torfbend"]
+if RID != "rheydt":
+    # anderes Gebiet: Startpunkt am Straßenknoten nahe der Mitte (wird beim Gebietswechsel durch die echte Position ersetzt)
+    mx, my = to_game((X0 + X1) / 2, (Z0 + Z1) / 2)
+    best_n = min(range(len(nodes) // 2), key=lambda i: (nodes[2 * i] - mx) ** 2 + (nodes[2 * i + 1] - my) ** 2) if nodes else None
+    tor = {"x": nodes[2 * best_n] if best_n is not None else mx, "y": nodes[2 * best_n + 1] if best_n is not None else my}
 best = None
 for r in roads:
-    if r.get("n") != "Am Torfbend" or not r["c"]:
+    if (RID == "rheydt" and r.get("n") != "Am Torfbend") or not r["c"]:
         continue
     for a, b2 in zip(r["i"], r["i"][1:]):
         ax, ay, bx, by = nodes[2 * a], nodes[2 * a + 1], nodes[2 * b2], nodes[2 * b2 + 1]
@@ -344,6 +377,8 @@ for r in roads:
         d = math.hypot(tor["x"] - px, tor["y"] - py)
         if best is None or d < best[0]:
             best = (d, px, py, dx, dy, r["w"])
+if best is None:   # Gebiet ohne Autostraße: Start in der Mitte
+    best = (0, tor["x"], tor["y"], 1, 0, 0)
 d, px, py, dx, dy, w = best
 L = math.hypot(dx, dy)
 nx, ny = -dy / L, dx / L
@@ -355,7 +390,9 @@ print("Start am Torfbend:", start, "Abstand Straße–Marker", round(d, 1), "m")
 sx, sy, sa = start
 talk = [{"x": round(sx + math.cos(sa) * 6, 2), "y": round(sy + math.sin(sa) * 6, 2), "name": "Herr Dittmann", "role": "Lehrer, Klassenlehrer der 9c",
          "say": ["Willkommen in Rheydt! Das ist die echte Karte – Straßen und Gebäude stimmen mit der Stadt überein.", "Merk dir: Die Hypotenuse liegt immer dem rechten Winkel gegenüber und ist die längste Seite."]}]
-MG = {"origin": [51.159, 6.466], "half": [HX, HY], "real": {"offset": [CX, CZ], "bbox": [X0, Z0, X1, Z1], "orte": ORTE,
+if RID != "rheydt":
+    talk = []
+MG = {"origin": [51.159, 6.466], "half": [HX, HY], "region": RID, "center": [round((X0 + X1) / 2 - CX, 2), round((Z0 + Z1) / 2 - CZ, 2)], "aero": aero, "real": {"offset": [CX, CZ], "bbox": [X0, Z0, X1, Z1], "orte": ORTE,
       "quelle": "© OpenStreetMap-Mitwirkende (ODbL) · Geobasis NRW (dl-de/zero-2-0) · Stadt Mönchengladbach",
       "hinweis": "Gebäude mit d=1 haben eine angenommene Standardhöhe"},
       "nodes": nodes, "roads": roads, "buildings": buildings, "areas": areas, "rails": rails, "trees": trees, "pois": pois,
