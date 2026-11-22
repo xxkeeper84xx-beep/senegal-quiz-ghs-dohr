@@ -115,6 +115,9 @@ Falls das Spiel verkauft werden soll, vorher:
 3. Offen beim Lehrer zu klären: Zustimmung Schulleitung/Schulträger (Name GHS Dohr, Gebäude, Fotos), Lizenzen der gelieferten
    GLB-Modelle, der Musik „Rheydt bei Nacht“ und des Martinshorns (bei KI-Diensten deren Nutzungsbedingungen),
    Nebentätigkeit (Bezirksregierung Düsseldorf), kein „GTA“ in der Werbung, keine Werbung/Käufe im Spiel für Kinder.
+   Stand 22.11.: GLB-Modelle, Bilder und übrige Dateien stammen laut Lehrer aus ChatGPT (bezahltes Abo) – kommerzielle Nutzung
+   nach OpenAI-Bedingungen erlaubt; rein KI-erzeugte Inhalte sind aber kaum urheberrechtlich geschützt. Noch prüfen, mit welchem
+   Dienst die Musik „Rheydt bei Nacht“ erzeugt wurde (z. B. Suno/Udio haben eigene Bedingungen).
 
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
