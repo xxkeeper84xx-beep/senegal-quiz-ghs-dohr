@@ -8,14 +8,16 @@
    desc:"Schieferblauer Kompaktwagen: bequem, sparsam und mit Platz für die ganze Lerngruppe."});
  VEHICLES.push({id:"plane",name:"Flugzeug",icon:"🛩️",price:9000,req:5,max:60,acc:6,rev:-2,r:3.2,grassF:.8,turn:1.3,cam:3.2,lights:true,fly:true,plane:true,
    desc:"Kleines Propellerflugzeug. Auf einer langen, geraden Straße Anlauf nehmen: ab 18 m/s hebt es mit R ab. In der Luft bleibt es immer in Bewegung."});
- VEH.auto=VEHICLES.find(v=>v.id==="auto");VEH.plane=VEHICLES.find(v=>v.id==="plane");
+ VEHICLES.splice(VEHICLES.findIndex(v=>v.id==="auto")+1,0,{id:"suv",name:"SUV Rheydt",icon:"🚙",price:1690,req:2,max:21,acc:7,rev:-4.5,r:1.15,grassF:.65,turn:2.3,cam:1.05,lights:true,nitro:true,
+   desc:"Großer SUV mit viel Platz und hoher Sitzposition – gebaut für Rheydt."});
+ VEH.auto=VEHICLES.find(v=>v.id==="auto");VEH.suv=VEHICLES.find(v=>v.id==="suv");VEH.plane=VEHICLES.find(v=>v.id==="plane");
  Object.assign(VEH.moped,{name:"Motorrad",icon:"🏍️",desc:"Bordeauxrotes Straßenmotorrad: flott durch die Stadt, mit Licht für die Nacht."});
- DEF_PAINT.auto="#4a5d73";DEF_PAINT.plane="#f2efe6"}
-const VMOD={scoot:"E-Scooter",bike:"Fahrrad",moped:"Motorrad",auto:"Auto",heli:"Helikopter",plane:"Flugzeug"};
-const VPAINT={scoot:"Petrol",bike:"Sandgelb",moped:"Bordeaux",auto:"Schieferblau",heli:"Petrol",plane:"Cremeweiss"};
+ DEF_PAINT.auto="#4a5d73";DEF_PAINT.suv="#2f4a3c";DEF_PAINT.plane="#f2efe6"}
+const VMOD={scoot:"E-Scooter",bike:"Fahrrad",moped:"Motorrad",auto:"Auto",suv:"SUV_Rheydt",heli:"Helikopter",plane:"Flugzeug"};
+const VPAINT={scoot:"Lack",bike:"Lack",moped:"Lack",auto:"Lack",suv:"Lack",heli:"Petrol",plane:"Cremeweiss"};   /* neue Modelle (22.11.): Lackmaterial heißt „Lack“ */
 const VG={done:{},size:{}};
 /* Platzhalter, bis die Modelle geladen sind */
-{const base=buildVehicles;buildVehicles=function(){base();vehMeshes.auto=makeCar(pc("auto"),true,{type:"hatch"});vehMeshes.plane=makeHeli(pc("plane"));vehMeshes.plane.visible=false}}
+{const base=buildVehicles;buildVehicles=function(){base();vehMeshes.auto=makeCar(pc("auto"),true,{type:"hatch"});vehMeshes.suv=makeCar(pc("suv"),true,{type:"sedan"});vehMeshes.plane=makeHeli(pc("plane"));vehMeshes.plane.visible=false}}
 function vehFromGlb(id,gltf){
   const two=TWO.has(id),g=new THREE.Group(),body=new THREE.Group(),model=gltf.scene;g.add(body);body.add(model);
   model.rotation.y=Math.PI/2;if(two){model.scale.setScalar(10);g.scale.setScalar(.1)}
@@ -25,7 +27,7 @@ function vehFromGlb(id,gltf){
       if(/Glas/i.test(m.name)){m.transparent=true;m.opacity=Math.min(m.opacity,.55);m.depthWrite=false}}
     o.material=m});
   if(paint)paint.userData.orig=paint.color.clone();
-  const wheels=[];model.traverse(o=>{if(/^(Rad_(Vorn|Hinten)(_[LR])?|Bugrad|Hauptrad_[LR])$/.test(o.name)){const b=new THREE.Box3().setFromObject(o),s=b.getSize(new THREE.Vector3());
+  const wheels=[];model.traverse(o=>{if(/^(Rad_(Vorne?|Hinten)(_[LR])?|Bugrad|Hauptrad_[LR])$/.test(o.name)){const b=new THREE.Box3().setFromObject(o),s=b.getSize(new THREE.Vector3());
     o.rotation.order="YXZ";wheels.push({n:o,r:Math.max(.05,s.y/2/(two?10:1)),front:/Vorn|Bugrad/.test(o.name)})}});
   const dummy=()=>{const d=new THREE.Object3D();d.material={opacity:0};return d};
   const rotor=model.getObjectByName("Hauptrotor")||dummy();
@@ -51,7 +53,7 @@ async function loadVehicles(){if(!THREE.GLTFLoader)return;
 /* Räder, Lenkung, Rotoren und Propeller */
 function vehAnim(dt){const VH=V();
   for(const id in VG.done){const g=vehMeshes[id];if(!g||!g.visible)continue;const U=g.userData,act=VH.id===id,v=act?car.v:0;
-    for(const w of U.glbWheels){w.n.rotation.x+=v*dt/w.r;if(w.front&&!TWO.has(id)&&id!=="plane")w.n.rotation.y=act?car.steer*.45:0}
+    for(const w of U.glbWheels){if(w.m===undefined)w.m=w.n.getObjectByName(w.n.name+"_Mesh")||null;(w.m||w.n).rotation.x+=v*dt/w.r;if(w.front&&!TWO.has(id)&&id!=="plane")w.n.rotation.y=act?car.steer*.45:0}
     if(U.tailReal)U.tailReal.rotation.x+=(act?(.25+.75*(car.rotor||0)):0)*dt*64;
     if(U.prop)U.prop.rotation.z+=(act?(VH.fly||Math.abs(car.v)>.5||keys.w||keys.arrowup?1:.25):0)*dt*55;
     if(id==="plane"&&act){U.body.rotation.z=clamp((car.vy||0)/12,-.3,.35);U.body.rotation.x=-car.steer*.55*clamp(Math.abs(car.v)/20,0,1)}}}

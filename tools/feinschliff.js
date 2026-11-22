@@ -22,7 +22,7 @@ function snapShadow(){const cam=sun.shadow.camera,size=(cam.right-cam.left),tex=
 
 /* 3) Fahrzeuge auf dem Boden: Höhe vorn und hinten getrennt (Bordstein, Gehweg, Fahrbahn haben unterschiedliche Höhen).
       Vorher zählte nur die Fahrzeugmitte, dadurch steckte z. B. das Vorderrad des Fahrrads im Gehweg. */
-const AXLE={scoot:.5,bike:.57,moped:.71,auto:1.29,smart:.9,van:1.5,prius:1.35,aston:1.4,maser:1.45};
+const AXLE={scoot:.5,bike:.57,moped:.71,auto:1.29,suv:1.42,smart:.9,van:1.5,prius:1.35,aston:1.4,maser:1.45};
 function groundContact(){const VH=V();if(VH.fly||VH.id==="walk")return;const g=vehMeshes[VH.id];if(!g)return;const h=AXLE[VH.id]||1.2,c=Math.cos(car.a),s=Math.sin(car.a);
   const yf=groundY(car.x+c*h,car.y+s*h),yb=groundY(car.x-c*h,car.y-s*h),ym=groundY(car.x,car.y);
   g.position.y=Math.max((yf+yb)/2,ym-.02);g.rotation.z=Math.atan2(yf-yb,2*h)}

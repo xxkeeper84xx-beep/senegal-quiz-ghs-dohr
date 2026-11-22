@@ -24,6 +24,7 @@ const VARS=[
   {id:"ca_kompakt",base:"auto",shop:"auto",name:"Kompaktwagen",icon:"🚘",price:890,paint:"#4a5d73",st:{},def:true,desc:"Der Alltagswagen: sparsam und zuverlässig."},
   {id:"ca_sport",base:"auto",shop:"auto",name:"Kompakt Sport",icon:"🚘",price:1050,paint:"#d81e2c",st:{max:23,acc:8.5},x:["streifen","spoiler"],desc:"Sportfahrwerk, Spoiler und Rennstreifen."},
   {id:"ca_elektro",base:"auto",shop:"auto",name:"Elektro-Kompakt",icon:"⚡",price:1180,paint:"#3fa7d6",st:{max:21,acc:9},desc:"Leise, elektrisch und spritzig beim Anfahren."},
+  {id:"ca_suv",base:"suv",shop:"auto",name:"SUV Rheydt",icon:"🚙",price:1690,paint:"#2f4a3c",st:{},def:true,desc:"Großer SUV mit viel Platz und hoher Sitzposition – gebaut für Rheydt."},
   {id:"ca_van",base:"van",shop:"auto",name:"Transporter",icon:"🚐",price:1090,paint:"#f2f2f2",st:{},def:true,desc:"Viel Laderaum: jede Lieferung bringt 50 % mehr Geld."},
   {id:"ca_prius",base:"prius",shop:"auto",name:"Toyota Prius",icon:"🚗",price:1390,paint:"#a9bccd",st:{},def:true,desc:"Leiser Hybrid mit mehr Tempo für weite Lieferungen."},
   {id:"ca_aston",base:"aston",shop:"auto",name:"Aston Martin",icon:"🏎️",price:2590,paint:"#1f5c4a",st:{},def:true,desc:"Britischer Sportwagen mit langer Motorhaube."},
@@ -156,7 +157,7 @@ function buildAero(){const A=MG.aero;if(!A||!(A.runways.length+A.taxi.length+A.a
 const SHOWS={rad:[],auto:[],flug:[]};
 {const R=RAD;const sc=VARS.filter(v=>v.base==="scoot"),bk=VARS.filter(v=>v.base==="bike");
   sc.forEach((v,i)=>SHOWS.rad.push({v,room:R,X:2.6-i*2.6,Z:-5.6,h:Math.PI/2}));bk.forEach((v,i)=>SHOWS.rad.push({v,room:R,X:3.2-i*2.2,Z:4.4,h:-Math.PI/2+.25}))}
-{const R=AUT,cars=VARS.filter(v=>v.shop==="auto"&&!/moped/.test(v.base));const slots=[[5.2,-10.5],[5.2,-3.5],[5.2,3.5],[5.2,10.5],[-2.4,-10.5],[-2.4,-3.5],[-2.4,3.5],[-2.4,10.5]];
+{const R=AUT,cars=VARS.filter(v=>v.shop==="auto"&&!/moped/.test(v.base));const slots=[[5.2,-10.5],[5.2,-3.5],[5.2,3.5],[5.2,10.5],[-2.4,-10.5],[-2.4,-3.5],[-2.4,3.5],[-2.4,10.5],[1.4,0]];
   cars.forEach((v,i)=>{const s=slots[i];if(s)SHOWS.auto.push({v,room:R,X:s[0],Z:s[1],h:Math.PI/2+(i%2?.55:-.55)})});
   VARS.filter(v=>v.base==="moped").forEach((v,i)=>SHOWS.auto.push({v,room:R,X:-8,Z:(i?1:-1)*8,h:Math.PI/2}))}
 {const air=VARS.filter(v=>v.base==="plane").concat(VARS.filter(v=>v.base==="heli"));air.forEach((v,i)=>{const p=FLUG.spots[i];if(p)SHOWS.flug.push({v,x:p[0],y:p[1],a:FLUG.a})})}

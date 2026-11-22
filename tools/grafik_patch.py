@@ -15,7 +15,7 @@ R('sun.intensity=1.45; hemi.intensity=.62;\n  sun.color.setRGB(1,.95-du*.25,.86-
 R('sun.position.set(car.x+95,165,car.y+105);','sun.position.set(car.x+GFX_SUN[0],GFX_SUN[1],car.y+GFX_SUN[2]);')
 # Häuser: Satteldach statt Flachdach, Sockel und Traufkante
 R('const A=polyArea(p), ccw=A>0; let u=0;','const A=polyArea(p), ccw=A>0; let u=0;const GB=gfxGable(p,h,m,kind,t);if(GB)h=GB.eave;')
-R('if(kind!=="fence")addFlat(gRoof,p,h,kind==="hedge"?col:roofCol,4);','if(GB)gfxGableRoof(G,gRoof,GB,col,roofCol);else if(kind!=="fence")addFlat(gRoof,p,h,kind==="hedge"?col:roofCol,4);gfxBands(p,h,m,kind,ck,ccw,!GB);')
+R('if(kind!=="fence")addFlat(gRoof,p,h,kind==="hedge"?col:roofCol,4);','if(GB)gfxGableRoof(G,gRoof,GB,col,roofCol);else if(kind!=="fence")addFlat(gRoof,p,h,kind==="hedge"?col:roofCol,4);gfxBands(p,h,m,kind,ck,ccw,!GB);gfxRecord(p,h,m,kind,ccw,GB,t);')
 # Beläge: Gehweg nicht mehr fast weiß, Bordstein dunkler (sichtbare Kante)
 R('gSide.mesh(new THREE.MeshLambertMaterial({map:texPave,color:0xf4f2ec,','gSide.mesh(new THREE.MeshLambertMaterial({map:texPave,color:0xd3ccbe,')
 R('gCurb.mesh(new THREE.MeshLambertMaterial({color:0xb9b6ad,','gCurb.mesh(new THREE.MeshLambertMaterial({color:0x96938c,')

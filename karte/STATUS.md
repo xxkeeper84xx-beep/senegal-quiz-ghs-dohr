@@ -133,6 +133,16 @@ Falls das Spiel verkauft werden soll, vorher:
 - Gemessen nur in Software-Rendering (kein echtes Gerät): Gebietswechsel ~2,5 s Daten, ~10 s bis spielbar (Figuren laden neu).
 - Neu zu erstellende Modelle für den nächsten Qualitätsschritt: siehe Antwort vom 22.11. (Noah, Passanten, Fahrzeuge, Laternen, Gebäudeteile).
 
+## Neue Modelle eingebaut (22.11., `tools/modelle.js`, Quellen in `modelle_quelle/`)
+- Figuren (Noah + 8 Passanten) ersetzt: gleiche Knochen und Clips, Fußhöhe/Schrittgeschwindigkeit neu berechnet (praktisch unverändert);
+  Noah 23 000, Passanten ~10 000 Dreiecke; Texturen 1024/512 px.
+- Fahrzeuge Auto, Fahrrad, E-Scooter, Motorrad ersetzt (Material „Lack“, Räder Rad_Vorne/Rad_Hinten mit *_Mesh zum Rollen);
+  Sitz-/Trittbretthöhe aus Sattel/Sitz/Trittbrett. Neu: **SUV Rheydt** (Autohaus, $1.690, ab Rang 2, nur Erwachsene).
+- Ampel ersetzt (Signal_Rot/Gelb/Gruen), Laternen als neues Modell (instanziert, leuchten nachts).
+- Fassaden-Bausatz in Noahs Nähe (Reichweite je Profil 28/42/65 m): Fenster mit Laibung genau auf den gemalten Fenstern,
+  Hauseingänge auf den gemalten Haustüren, Regenrohre, Dachgauben auf Satteldächern; Ladenerdgeschoss an Gewerbebauten,
+  **Ladenfassade Rheydt** an Einkaufsstraßen der Rheydter Innenstadt (bis 650 m um den Markt). OSM enthält in Rheydt keine Ladenpunkte.
+
 ## Erledigt
 - **Noah** ist die Spielfigur (`figuren/Noah_Pythagoras.*`, optimiert von 8,7 MB auf 2,9 MB; 43 000 Dreiecke).
   Idle/Walk/Run mit Überblendung, Blick in Laufrichtung, Füße am Boden (Standfuß beim Gehen 0 cm, beim Laufen 0,2–0,4 cm pro Bild).
