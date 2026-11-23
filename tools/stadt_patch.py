@@ -13,4 +13,6 @@ R('ob.scale.set(.9+hh*.6,th,.9+hh*.6);ob.rotation.set((hh-.5)*.08,hh*6,(hh-.5)*.
 # Kellerabgang am Erweiterungsbau: Brüstung mit Geländer am Südende offen (Treppe nach unten in stadt.js); Quelle tools/school.js entsprechend
 R('for(let z=z0+.6;z<z1-.4;z+=.13)box("white",x1+1.0,B0+.75,z,.03,.9,.03);box("white",x1+1.0,B0+1.2,(z0+z1)/2,.06,.05,z1-z0-.8);box("brickRed",x1+1.0,B0+.15,(z0+z1)/2,.25,.3,z1-z0-.6);',
   'for(let z=z0+.6;z<z1-1.6;z+=.13)box("white",x1+1.0,B0+.75,z,.03,.9,.03);box("white",x1+1.0,B0+1.2,(z0+.6+z1-1.6)/2,.06,.05,z1-1.6-z0-.6);box("brickRed",x1+1.0,B0+.15,(z0+.3+z1-1.6)/2,.25,.3,z1-1.6-z0-.3);box("white",x1+1.0,B0+.75,z1-1.62,.05,1.0,.05);')
+# Fußwege durch Gebäude an der Schule vor dem Aufbau des Wegenetzes entfernen
+R('const NXY=MG.nodes, roads=MG.roads;','if(typeof stadtRoadsFilter==="function")stadtRoadsFilter();const NXY=MG.nodes, roads=MG.roads;')
 open(P,"w",encoding="utf-8").write(s);print("stadt_patch ok")

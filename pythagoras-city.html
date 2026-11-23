@@ -724,7 +724,7 @@ const isTouch=matchMedia("(pointer:coarse)").matches||"ontouchstart" in window;
 if(isTouch)document.body.classList.add("touch");
 
 /* ================= Straßennetz ================= */
-const NXY=MG.nodes, roads=MG.roads;
+if(typeof stadtRoadsFilter==="function")stadtRoadsFilter();const NXY=MG.nodes, roads=MG.roads;
 const nx=i=>NXY[2*i], ny=i=>NXY[2*i+1];
 const use=new Uint16Array(NXY.length/2+1);
 for(const r of roads){for(const i of r.i)use[i]++;use[r.i[0]]+=2;use[r.i[r.i.length-1]]+=2}
@@ -10286,6 +10286,19 @@ function kaBelag(){if(!KA.G||!KA.st)return;const rc=new THREE.Raycaster();rc.cam
     for(const h of rc.intersectObjects(scene.children,true)){const m=h.object;if(!m.isMesh||m.isSprite||h.point.y>.4||h.point.y<-.2)continue;let q=m,own=false;while(q){if(q===KA.G)own=true;q=q.parent}if(own||m===STADT.shMesh)continue;if(!m.material.__ka){KA.st(m);n++}}}
   KA.belaege=n}
 {const base=kitInit;kitInit=async function(){await base.apply(this,arguments);try{kaBelag()}catch(e){console.warn("Kellerabgang Belag",e)}}}
+/* Fußwege der Kartendaten, die an der Schule durch Gebäude führen (Passanten liefen durch Wände, auf dem Hof endete ein
+   markierter Weg an der Wand), entfallen: ≥ 30 % der Länge in Schulgebäuden oder anderen Gebäuden im Umkreis von 250 m */
+/* wird vor dem Aufbau des Wegenetzes aufgerufen (stadt_patch.py); nur Funktionsdeklarationen und MG verwenden */
+function stadtRoadsFilter(){if((MG.region||"rheydt")!=="rheydt"||!MG.roads||!MG.nodes||!MG.buildings||!MG.FX)return;try{
+  const N=MG.nodes,C=MG.FX(-295,-100),R=250,rects=[[-332,-318,-84,-66],[-318,-293,-82,-70],[-293,-279,-90,-67],[-279,-268,-90,-80],[-296,-268,-106,-90],[-290,-268,-148,-132],[-292,-266,-132,-125],[-258,-245,-82,-66]];
+  const B=MG.buildings.filter(b=>{const p=b.p;return Math.hypot(p[0]-C[0],p[1]-C[1])<R+60});
+  const inB=(x,y)=>{const [lx,lz]=hallL(x,y);if(rects.some(r=>lx>r[0]&&lx<r[1]&&lz>r[2]&&lz<r[3]))return true;for(const b of B){const p=b.p;if(Math.abs(p[0]-x)>80||Math.abs(p[1]-y)>80)continue;if(inPoly(x,y,p))return true}return false};
+  const inS=(x,y)=>{const [lx,lz]=hallL(x,y);return rects.some(r=>lx>r[0]&&lx<r[1]&&lz>r[2]&&lz<r[3])};
+  const weg=[];MG.roads=MG.roads.filter(r=>{const fuss=/^(footway|path|steps|cycleway|pedestrian)$/.test(r.h||""),zuf=r.h==="service";if(!fuss&&!zuf)return true;let n=0,k=0,near=false;
+    for(let j=1;j<r.i.length;j++){const ax=N[2*r.i[j-1]],ay=N[2*r.i[j-1]+1],bx=N[2*r.i[j]],by=N[2*r.i[j]+1],L=Math.hypot(bx-ax,by-ay);
+      for(let s=0;s<=L;s+=1){const x=ax+(bx-ax)*s/(L||1),y=ay+(by-ay)*s/(L||1);if(Math.hypot(x-C[0],y-C[1])<R)near=true;n++;if(fuss?inB(x,y):inS(x,y))k++}}
+    if(near&&n>4&&k/n>=(fuss?.3:.1)){weg.push((r.h||"")+":"+(r.osm||"?"));return false}return true});
+  window.__wegeEntfernt=weg}catch(e){console.warn("Schulwege",e)}}
 
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){
