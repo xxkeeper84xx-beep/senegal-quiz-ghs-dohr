@@ -202,3 +202,8 @@ Ladezeit der Welt im Test: ca. 2 s. Ohne Begrenzung der Bäume waren es über 3 
 - Regenrohre liegen direkt an der Wand an.
 - Geparkte Fahrräder und E-Scooter (Modelle aus Pythagoras_City_GLB_Modelle) vor Läden und neben Haustüren; auf schmalen Gehwegen längs an der Wand, auf breiten quer im Ständer. Rahmenfarbe je Rad verschieden.
 - Höchstzahl je Profil: Schul-iPad 8/3, Standard 24/8, Hoch 40/14 (Fahrrad/Scooter, je ca. 6 300 Dreiecke).
+
+## Passanten, neue Modelle (23.11.)
+- Acht neu aufgebaute Passanten (Pythagoras_City_Passanten_Neue_Modelle_GLB, MakeHuman-Basis, CC0) ersetzen die vorherigen; Quellen in modelle_quelle/Figuren_Passanten_Neue_Modelle/README_Claude.txt.
+- Aufbereitung ohne Vereinfachung (9–11 Tsd. Dreiecke je Figur, Texturen 512 px), Fußhöhe und Schrittgeschwindigkeit neu gemessen (GLB_PREP).
+- Umfärbung kennt jetzt deutsche Materialnamen (Shirt/Pullover, Hose, Schuhe, Frisur/Haar, Haut, Kombi-Kleidung als Ganzes); Arbeitskleidung bleibt unverändert.
