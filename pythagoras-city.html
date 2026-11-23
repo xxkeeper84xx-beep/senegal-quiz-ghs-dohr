@@ -2186,7 +2186,7 @@ function buildSchool(){
   {const x0=-296,x1=-268,z0=-106,z1=-90,H=7.6;
     let F=face("E",z0,z1,x1,.3);const ax=[-103.6,-100.2,-96.8,-93.4],we=ax.flatMap(c=>[W(F,c,2.2,.8,2.6,"rect",{cols:2}),W(F,c,2.2,4.3,6.3,"rect",{cols:2})]);
     skin(F,H,we,"brickRed");windows(F,we,{frame:"frameGrey",panes:"modern",sill:"concrete",recess:.12});band(F,3.45,3.75,.02,"concrete");band(F,7.1,7.6,.02,"concrete");band(F,0,.35,.02,"concrete");
-    for(let z=z0+.6;z<z1-.4;z+=.13)box("white",x1+1.0,B0+.75,z,.03,.9,.03);box("white",x1+1.0,B0+1.2,(z0+z1)/2,.06,.05,z1-z0-.8);box("brickRed",x1+1.0,B0+.15,(z0+z1)/2,.25,.3,z1-z0-.6);
+    for(let z=z0+.6;z<z1-1.6;z+=.13)box("white",x1+1.0,B0+.75,z,.03,.9,.03);box("white",x1+1.0,B0+1.2,(z0+.6+z1-1.6)/2,.06,.05,z1-1.6-z0-.6);box("brickRed",x1+1.0,B0+.15,(z0+.3+z1-1.6)/2,.25,.3,z1-1.6-z0-.3);box("white",x1+1.0,B0+.75,z1-1.62,.05,1.0,.05);
     F=face("N",x0,x1,z0,.3);const wn=[W(F,-293.5,1.2,3.9,6.2,"rect",{cols:1,rows:2}),...[-287.5,-281,-274.5].map(c=>W(F,c,2.2,4.3,6.3,"rect",{cols:2}))];
     skin(F,H,wn,"brickRed");windows(F,wn,{frame:"frameGrey",panes:"modern",sill:"concrete",recess:.12});band(F,3.45,3.75,.02,"concrete");band(F,7.1,7.6,.02,"concrete");
     band(F,0,3.0,.02,"whiteBrick",0,F.len);
@@ -10099,7 +10099,7 @@ function fernUpdate(force){if(!FERN.ready)return;const px=car.x,py=car.y;if(!for
   FERN.sun.position.set(cam.position.x+GFX_SUN[0],GFX_SUN[1],cam.position.z+GFX_SUN[2]);FERN.sun.target.position.set(cam.position.x,0,cam.position.z);
   if(FERN.sky&&skyDome){FERN.sky.visible=skyDome.visible;FERN.sky.position.copy(cam.position);FERN.sky.scale.setScalar(FERN.cam.far*.9/2600);FERN.sky.material=skyDome.material}
   FERN.scene.background=scene.background;const ac=renderer.autoClear,bg=scene.background,sv=skyDome?skyDome.visible:false;
-  R0(FERN.scene,FERN.cam);renderer.autoClear=false;renderer.clearDepth();scene.background=null;if(skyDome)skyDome.visible=false;
+  R0(FERN.scene,FERN.cam);renderer.autoClear=false;renderer.clear(false,true,true);scene.background=null;if(skyDome)skyDome.visible=false;
   R0(scene,cam);renderer.autoClear=ac;scene.background=bg;if(skyDome)skyDome.visible=sv}}
 
 /* ---------- 3. Wahrzeichen ---------- */
@@ -10201,7 +10201,7 @@ function schulGehwegWeg(){try{let n=0;scene.traverse(o=>{if(!o.isMesh||!o.geomet
    am Trakt entlang nach Osten bis zur Eingangsnische (links), rechts Asphalt, am Ende Metallzaun; gebogene Laterne.
    Maße in Schulkoordinaten (x Osten, z Süden). Die Hofmauer zur Feuerwehrzufahrt (x −262,2) und die Messlinien der Hof-Mission bleiben frei. */
 const HW={zW:-118,xG:-292,xF:-268,xW0:-299.5,gate:[-124.2,-121.0]};
-function hwBuild(){if(typeof hallR!=="function"||!MG.FX||HW.done)return;HW.done=true;const o=hallR(0,0),e1=hallR(1,0),A=Math.atan2(e1[1]-o[1],e1[0]-o[0]),G=new THREE.Group();G.name="hallenweg";
+function hwBuild(){if(typeof hallR!=="function"||!MG.FX||HW.done)return;HW.done=true;const o=hallR(-280,-120),e1=hallR(-279,-120),A=Math.atan2(e1[1]-o[1],e1[0]-o[0]),G=new THREE.Group();G.name="hallenweg";
   const tex=(f,w=256,h=256)=>{const c=document.createElement("canvas");c.width=w;c.height=h;f(c.getContext("2d"),w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t};
   const brickW=tex((g,w,h)=>{g.fillStyle="#c9c7c0";g.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let k=0;k<6;k++){const x=k*52-(r%2)*26,y=r*32;g.fillStyle=`hsl(40,5%,${86+((r*7+k*3)%5)}%)`;g.fillRect(x+3,y+3,47,27)}});
   const pav=tex((g,w,h)=>{g.fillStyle="#5d5c59";g.fillRect(0,0,w,h);for(let y=0;y<h;y+=16)for(let x=-16;x<w;x+=32){const q=(y/16)%2*16;g.fillStyle=`hsl(30,3%,${38+((x*3+y*5)%13)}%)`;g.fillRect(x+q+1,y+1,30,14)}});
@@ -10235,6 +10235,51 @@ function hwBuild(){if(typeof hallR!=="function"||!MG.FX||HW.done)return;HW.done=
   const mark=(x0,x1,z0,z1)=>{for(let x=x0;x<=x1;x+=.35)for(let z=z0;z<=z1;z+=.35){const p=hallR(x,z),i=gi(p[0],p[1]);if(i>=0)solid[i]=Math.max(solid[i],1)}};
   mark(xW0,xF,zW-.15,zW+.15);mark(xG-.15,xG+.15,-125,g0-.05);mark(xG-.15,xG+.15,g1+.05,zW);mark(xF-.1,xF+.1,-125,zW)}
 {const base=buildTreeMeshes;buildTreeMeshes=function(){try{hwBuild();if(HW.G){const p=hallR(HW.xG-3.3,-128.4);treeList.push({x:p[0],y:p[1],r:3.4,th:2.6,tw:1.4})}}catch(e){console.warn("Hallenweg",e)}return base.apply(this,arguments)}}
+
+/* ---------- 8. Kellerabgang am Erweiterungsbau (Foto 23.11.): Treppe entlang der Ostfassade nach unten ----------
+   Zwischen Fassade (x −268) und Brüstung mit Geländer (x −267). Eingang am Südende, 14 Stufen bis 2,6 m tief, unten Kellertür
+   und vergitterte Kellerfenster. Der Boden ist an dieser Stelle ausgeschnitten. Sichtbar, aber nicht begehbar
+   (das Spiel kennt nur ebenen Boden; der Schacht ist gesperrt). */
+const KA={x0:-268,x1:-267.13,zTop:-90.45,zEnd:-105.4,depth:2.6,steps:14};
+function kaBuild(){if(typeof hallR!=="function"||!MG.FX||KA.done)return;KA.done=true;const o=hallR(-268,-98),e1=hallR(-267,-98),A=Math.atan2(e1[1]-o[1],e1[0]-o[0]),G=new THREE.Group();G.name="kellerabgang";
+  const mat=c=>new THREE.MeshLambertMaterial({color:new THREE.Color(c).convertSRGBToLinear()}),M={beton:mat(0x76726b),stufe:mat(0x8f8b83),sohle:mat(0x4d4a45),ziegel:mat(0x7a3a2c),tuer:mat(0x4b4f56),glas:mat(0x1d2a33),gitter:mat(0xa7acb0)};
+  const put=(geo,m,x,y,z)=>{const me=new THREE.Mesh(geo,m),p=hallR(x,z);me.position.set(p[0],y,p[1]);me.rotation.y=-A;me.castShadow=true;me.receiveShadow=true;G.add(me);return me};
+  const box=(m,x0,x1,y0,y1,z0,z1)=>put(new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0),m,(x0+x1)/2,BASE_Y+(y0+y1)/2,(z0+z1)/2);
+  const {x0,x1,zTop,zEnd,depth,steps}=KA,run=.28,rise=depth/steps,zBot=zTop-run*steps;
+  for(let i=0;i<steps;i++){const za=zTop-i*run,m=M.stufe.clone();m.color.multiplyScalar(1-.55*i/steps);box(m,x0,x1,-(i+1)*rise-.05,-i*rise,za-run,za)}   // Stufen (nach Norden abwärts, unten dunkler)
+  box(M.sohle,x0,x1,-depth-.15,-depth,zEnd,zBot);                                                      // Schachtsohle
+  box(M.beton,x1,x1+.12,-depth-.15,0,zEnd,zTop);                                                      // Schachtwand unter der Brüstung
+  box(M.ziegel,x0-.25,x0,-depth-.15,0,zEnd,zTop);                                                     // Kellerwand unter der Fassade
+  box(M.beton,x0,x1+.12,-depth-.15,0,zEnd-.12,zEnd);                                                  // Stirnwand Nord
+  box(M.tuer,x0-.02,x0+.04,-depth,-depth+2.1,zEnd+.4,zEnd+1.45);                                        // Kellertür
+  for(const zc of [-96.8,-100.6]){box(M.glas,x0-.01,x0+.02,-1.15,-.25,zc-.55,zc+.55);for(let k=-4;k<=4;k++)box(M.gitter,x0+.03,x0+.05,-1.15,-.25,zc+k*.12-.01,zc+k*.12+.01)}
+  G.traverse(m=>{if(m.isMesh)m.renderOrder=-3});
+  // Abdeckung: unsichtbar, schreibt nur Tiefe über der Öffnung → Hofbelag (renderOrder −1) und Boden werden dort nicht darübergezeichnet
+  {const q=[[x0-.02,zEnd],[x1,zEnd],[x1,zTop],[x0-.02,zTop]].map(([x,z])=>hallR(x,z)),sh=new THREE.Shape(q.map(([x,z])=>new THREE.Vector2(x,-z))),g=new THREE.ShapeGeometry(sh);g.rotateX(-Math.PI/2);
+    const mk=new THREE.Mesh(g,new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,depthTest:false,side:THREE.DoubleSide,stencilWrite:true,stencilRef:1,stencilFunc:THREE.AlwaysStencilFunc,stencilZPass:THREE.ReplaceStencilOp}));
+    mk.position.y=BASE_Y+.25;mk.renderOrder=-50;mk.frustumCulled=false;G.add(mk);KA.mask=mk}
+  scene.add(G);KA.G=G;
+  // Boden aufschneiden: Bodenfläche als Form mit Loch neu aufbauen; den grünen Außenboden darunter tiefer legen
+  let gr=null,far=null;scene.traverse(m=>{const P=m.isMesh&&m.geometry&&m.geometry.parameters;if(!P)return;if(P.width===2*HX+800&&P.height===2*HY+800)gr=m;else if(P.width===9000&&P.height===9000)far=m});
+  if(far)far.position.y=-depth-1;
+  if(gr){const W=gr.geometry.parameters.width,H=gr.geometry.parameters.height,px=gr.position.x,pz=gr.position.z,L=(wx,wz)=>new THREE.Vector2(wx-px,-(wz-pz));
+    const sh=new THREE.Shape([new THREE.Vector2(-W/2,-H/2),new THREE.Vector2(W/2,-H/2),new THREE.Vector2(W/2,H/2),new THREE.Vector2(-W/2,H/2)]);
+    const hp=[[x0,zEnd],[x1,zEnd],[x1,zTop],[x0,zTop]].map(([x,z])=>L(...hallR(x,z)));sh.holes.push(new THREE.Path(hp.reverse()));
+    const g=new THREE.ShapeGeometry(sh);const pos=g.attributes.position,uv=g.attributes.uv;for(let i=0;i<pos.count;i++)uv.setXY(i,(pos.getX(i)+W/2)/W,(pos.getY(i)+H/2)/H);
+    g.computeVertexNormals();gr.geometry.dispose();gr.geometry=g;KA.loch=true}
+  // Hofbelag und Boden in der markierten Öffnung aussparen (Schablonenpuffer)
+  const st=m=>{if(!m||!m.material||m.material.__ka)return;const M=m.material;M.__ka=1;M.stencilWrite=true;M.stencilRef=1;M.stencilFunc=THREE.NotEqualStencilFunc;M.stencilZPass=THREE.KeepStencilOp;M.stencilFail=THREE.KeepStencilOp;M.stencilZFail=THREE.KeepStencilOp;M.needsUpdate=true};
+  KA.st=st;st(gr);G.children.forEach(m=>{if(m!==KA.mask){m.renderOrder=-3;m.frustumCulled=false}});
+  // gesperrt: nicht in den Schacht laufen
+  for(let x=x0;x<=x1+.15;x+=.3)for(let z=zEnd;z<=zTop;z+=.3){const p=hallR(x,z),i=gi(p[0],p[1]);if(i>=0)solid[i]=Math.max(solid[i],1)}}
+{const base=buildTreeMeshes;buildTreeMeshes=function(){try{kaBuild()}catch(e){console.warn("Kellerabgang",e)}return base.apply(this,arguments)}}
+
+/* Beläge über der Kelleröffnung aussparen – erst wenn Schule und Hof gebaut sind: alle flachen Flächen, die ein Strahl durch die Öffnung trifft */
+function kaBelag(){if(!KA.G||!KA.st)return;const rc=new THREE.Raycaster();rc.camera=camera;let n=0;
+  for(const f of [.2,.5,.8])for(const xx of [KA.x0+.2,(KA.x0+KA.x1)/2,KA.x1-.2]){const z=KA.zTop+(KA.zEnd-KA.zTop)*f,c=hallR(xx,z);rc.set(new THREE.Vector3(c[0],3,c[1]),new THREE.Vector3(0,-1,0));
+    for(const h of rc.intersectObjects(scene.children,true)){const m=h.object;if(!m.isMesh||m.isSprite||h.point.y>.4||h.point.y<-.2)continue;let q=m,own=false;while(q){if(q===KA.G)own=true;q=q.parent}if(own||m===STADT.shMesh)continue;if(!m.material.__ka){KA.st(m);n++}}}
+  KA.belaege=n}
+{const base=kitInit;kitInit=async function(){await base.apply(this,arguments);try{kaBelag()}catch(e){console.warn("Kellerabgang Belag",e)}}}
 
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){

@@ -225,7 +225,7 @@ function buildSchool(){
   {const x0=-296,x1=-268,z0=-106,z1=-90,H=7.6;
     let F=face("E",z0,z1,x1,.3);const ax=[-103.6,-100.2,-96.8,-93.4],we=ax.flatMap(c=>[W(F,c,2.2,.8,2.6,"rect",{cols:2}),W(F,c,2.2,4.3,6.3,"rect",{cols:2})]);
     skin(F,H,we,"brickRed");windows(F,we,{frame:"frameGrey",panes:"modern",sill:"concrete",recess:.12});band(F,3.45,3.75,.02,"concrete");band(F,7.1,7.6,.02,"concrete");band(F,0,.35,.02,"concrete");
-    for(let z=z0+.6;z<z1-.4;z+=.13)box("white",x1+1.0,B0+.75,z,.03,.9,.03);box("white",x1+1.0,B0+1.2,(z0+z1)/2,.06,.05,z1-z0-.8);box("brickRed",x1+1.0,B0+.15,(z0+z1)/2,.25,.3,z1-z0-.6);
+    /* Kellerabgang: Brüstung mit Geländer, am Südende offen (Treppe nach unten, stadt.js) */for(let z=z0+.6;z<z1-1.6;z+=.13)box("white",x1+1.0,B0+.75,z,.03,.9,.03);box("white",x1+1.0,B0+1.2,(z0+.6+z1-1.6)/2,.06,.05,z1-1.6-z0-.6);box("brickRed",x1+1.0,B0+.15,(z0+.3+z1-1.6)/2,.25,.3,z1-1.6-z0-.3);box("white",x1+1.0,B0+.75,z1-1.62,.05,1.0,.05);
     F=face("N",x0,x1,z0,.3);const wn=[W(F,-293.5,1.2,3.9,6.2,"rect",{cols:1,rows:2}),...[-287.5,-281,-274.5].map(c=>W(F,c,2.2,4.3,6.3,"rect",{cols:2}))];
     skin(F,H,wn,"brickRed");windows(F,wn,{frame:"frameGrey",panes:"modern",sill:"concrete",recess:.12});band(F,3.45,3.75,.02,"concrete");band(F,7.1,7.6,.02,"concrete");
     band(F,0,3.0,.02,"whiteBrick",0,F.len);

@@ -1,0 +1,17 @@
+// Kellerabgang am Erweiterungsbau ansehen (Blick wie Foto: entlang der Ostfassade nach Norden)
+const {chromium}=require('playwright');const fs=require('fs');const three=fs.readFileSync(__dirname+'/../three/package/build/three.min.js');const errs=[];const tag=process.argv[2]||'ka';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await (await b.newContext({viewport:{width:1000,height:750}})).newPage();
+p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(/Keller/.test(m.text()))errs.push(m.text())});
+await p.route(/cdnjs.cloudflare.com/,r=>r.fulfill({body:three,contentType:'application/javascript'}));await p.route(/fonts\.g/,r=>r.abort());
+await p.goto('http://localhost:8766/index.html');await p.waitForFunction(()=>window.__ready,null,{timeout:600000});
+await p.evaluate(()=>{startCreate(false);createProfile('T',Object.assign({},LOOK_DEF));hideTitle();window.requestAnimationFrame=()=>0});
+await p.waitForFunction(()=>state.mode==='play'&&KIT.ready&&FERN.ready,null,{timeout:900000});
+const V=await p.evaluate(()=>({loch:!!KA.loch,cams:{foto:[hallR(-265.6,-85),hallR(-268.6,-118)],oben:[hallR(-266.4,-87.6),hallR(-267.7,-94.5)],hof:hallR(-264,-80)}}));console.log('ka',JSON.stringify(V));
+console.log('treffer',await p.evaluate(()=>{const c=hallR(-267.55,-98),rc=new THREE.Raycaster(new THREE.Vector3(c[0],20,c[1]),new THREE.Vector3(0,-1,0));rc.camera=camera;return JSON.stringify(rc.intersectObjects(scene.children,true).filter(h=>h.object.visible&&h.object!==STADT.shMesh).slice(0,6).map(h=>[h.point.y.toFixed(3),h.object.parent&&h.object.parent.name,h.object.material&&h.object.material.color&&h.object.material.color.getHexString(),h.object.renderOrder]))}));
+await p.evaluate(()=>{state.time=720;const base=updateCamera;updateCamera=function(dt,VH){base(dt,VH);if(window.__cam){camera.position.set(...window.__cam[0]);camera.lookAt(...window.__cam[1])}}});
+const shots=[['foto',[[V.cams.foto[0][0],1.55,V.cams.foto[0][1]],[V.cams.foto[1][0],0.4,V.cams.foto[1][1]]]],['schacht',[[V.cams.oben[0][0],2.2,V.cams.oben[0][1]],[V.cams.oben[1][0],-2.0,V.cams.oben[1][1]]]]];
+for(const [n,c] of shots){await p.evaluate(([c,h])=>{car.x=h[0];car.y=h[1];KIT.last.x=1e9;KIT.last.t=0;window.__cam=c;for(let i=0;i<20;i++)update(1/30);render3D(1/30,performance.now());$('toast').style.opacity=0},[c,V.cams.hof]);await p.screenshot({path:__dirname+`/${tag}_${n}.png`,timeout:600000})}
+console.log('stencil',await p.evaluate(()=>JSON.stringify({belaege:KA.belaege,ctx:renderer.getContext().getContextAttributes().stencil,bits:renderer.getContext().getParameter(renderer.getContext().STENCIL_BITS)})));console.log('pixel',await p.evaluate(()=>{const rc=new THREE.Raycaster();rc.camera=camera;const out=[];for(const [x,y] of [[-.4,-.84],[-.3,-.7],[-.45,-.6]]){rc.setFromCamera(new THREE.Vector2(x,y),camera);
+  out.push(rc.intersectObjects(scene.children,true).filter(h=>h.object.visible&&h.object!==STADT.shMesh&&!h.object.isSprite).slice(0,4).map(h=>[h.point.y.toFixed(2),h.object.parent&&h.object.parent.name,h.object.material&&h.object.material.colorWrite===false?'MASKE':(h.object.material.color&&h.object.material.color.getHexString()),h.object.renderOrder,h.object.material.transparent?'T':'']))}
+  const g=KA.G;let n=0,vis=0;g.traverse(m=>{if(m.isMesh){n++;if(m.visible)vis++}});return JSON.stringify({out,n,vis,gvis:g.visible,inScene:!!g.parent})}));
+console.log('ERR',errs.slice(0,5));await b.close()})();
