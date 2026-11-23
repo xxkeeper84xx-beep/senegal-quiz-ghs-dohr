@@ -8549,8 +8549,19 @@ function standAlt(I){I.mixer.timeScale=.65;I.alt=[["Spine",.16],["Spine1",.12],[
   I.obj.traverse(o=>{if(!o.isMesh)return;const mt=o.material,nm=(o.userData.srcMat||mt).name||"";
     if(/^Hut$/i.test(nm)){o.visible=false;return}
     if(/Sakko|Weste/i.test(nm)){const src=o.userData.srcMat||mt,c=src.clone();const g=src.map?recolorTex(src.map,0):null;if(g)c.map=g;c.color.set(0x3e4b5c).convertSRGBToLinear();c.needsUpdate=true;o.material=c;o.userData.kittel=1}})}
-/* Frau Costantino: vollere Figur (Hüfte, Rumpf, Beine breiter; Kopf und Hals in normaler Größe) */
-function standVoll(I){const h=[1.2,1,1.26],sp=[1.07,1,1.14],ul=[1.12,1,1.12];I.scl=[["Hips",h],["Spine1",sp],["Neck",[1/(h[0]*sp[0]),1,1/(h[2]*sp[2])]],["LeftUpLeg",ul],["RightUpLeg",ul],["LeftLeg",[1/ul[0],1,1/ul[2]]],["RightLeg",[1/ul[0],1,1/ul[2]]]].map(([n,v])=>[I.obj.getObjectByName(n),v]).filter(b=>b[0]);standAltPose(I)}
+/* Frau Costantino: vollere Figur – Hüfte, Rumpf und Oberschenkel nur seitlich und in der Tiefe breiter (Höhe bleibt);
+   Hals/Kopf, Unterschenkel und Füße werden zurückgerechnet, damit Kopf, Schuhe und Bodenkontakt normal bleiben.
+   Die Achsen jedes Knochens werden im Figurenraum bestimmt (seitlich = x, oben = y, vorn = z). */
+function standVoll(I){const o=I.obj;o.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(o.matrixWorld).invert(),M=new THREE.Matrix4(),e=new THREE.Vector3();
+  const ax=b=>{M.multiplyMatrices(inv,b.matrixWorld);const c=[0,1,2].map(k=>e.setFromMatrixColumn(M,k).normalize().clone());const up=[0,1,2].sort((a,b2)=>Math.abs(c[b2].y)-Math.abs(c[a].y))[0];
+    const rest=[0,1,2].filter(k=>k!==up),lat=Math.abs(c[rest[0]].x)>=Math.abs(c[rest[1]].x)?rest[0]:rest[1],dep=rest.find(k=>k!==lat);return {up,lat,dep}};
+  const sv=(b,fl,fd)=>{const a=ax(b),v=[1,1,1];v[a.lat]=fl;v[a.dep]=fd;return [b,v]};
+  // Becken nicht skalieren (sonst verschwinden die Schuhe); Breite über Rumpf und Oberschenkel
+  const B=n=>o.getObjectByName(n),SP=[1.14,1.2],SP1=[1.06,1.1],UL=[1.2,1.22];I.scl=[];
+  const add=(n,f)=>{const b=B(n);if(b)I.scl.push(sv(b,f[0],f[1]))};
+  add("Spine",SP);add("Spine1",SP1);add("Neck",[1/(SP[0]*SP1[0]),1/(SP[1]*SP1[1])]);
+  for(const s of ["Left","Right"]){add(s+"UpLeg",UL);add(s+"Leg",[1/UL[0],1/UL[1]])}
+  standAltPose(I)}
 const standAltPose=I=>{if(I.alt)for(const [b,a] of I.alt)b.rotation.x+=a;if(I.scl)for(const [b,v] of I.scl)b.scale.set(...v)};
 {const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);
   for(const S of STANDS){const I=S.glb;if(!I)continue;if(!S.p.parent){scene.remove(I.obj);S.glb=null;continue}S.p.visible=false;
