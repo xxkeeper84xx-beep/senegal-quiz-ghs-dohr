@@ -5,7 +5,7 @@
      werden um die Spielfigur herum aufgebaut (Anzahl je Grafikprofil), mit Kollision.
    - Autohaus: die drei Modelle als neue Fahrzeuge zum Kaufen und Selberfahren (fahrzeuge/Rheydt_*.json, mit Radknoten). */
 const RA={files:["Rheydt_Stadtauto","Rheydt_Limousine","Rheydt_SUV_Metallic"],ready:false,slots:[],grid:new Map(),cell:40,last:{x:1e9,y:1e9,t:0},pk:[]};
-const RA_CAP={schule:{r:55,park:10,trafR:45,traf:4},standard:{r:85,park:26,trafR:80,traf:10},hoch:{r:130,park:48,trafR:130,traf:20}};
+const RA_CAP={schule:{r:55,park:10,trafR:45,traf:4,farR:220},standard:{r:85,park:26,trafR:80,traf:10,farR:320},hoch:{r:130,park:48,trafR:130,traf:20,farR:450}};
 const RA_PARKCOL=["#e8eaf2","#2b2f3d","#9aa0a8","#1d3a5f","#6b6f78","#f2f2f2","#111111","#8a1f2b","#3f5f4f","#c9c3b4","#4a5d73","#b8262e"];
 const RA_COL=new THREE.Color();
 
@@ -68,6 +68,9 @@ function raTraffic(){RA.traf=[];for(const n of npcs){if(n.bike||n.police)continu
   const cap=RA_CAP[GFX.id]||RA_CAP.standard;let shown=0;
   const L=RA.traf.map(n=>[n.x===undefined?1e9:Math.hypot(n.x-car.x,n.y-car.y),n]).sort((a,b)=>a[0]-b[0]);
   for(const [d,n] of L){const on=d<cap.trafR&&shown<cap.traf&&!n.police&&n.mesh&&n.mesh.parent;if(on){shown++;n.ra.position.copy(n.mesh.position);n.ra.rotation.copy(n.mesh.rotation)}
-    if(n.ra.visible!==on){n.ra.visible=on;if(n.mesh)n.mesh.visible=!on}}
+    if(n.ra.visible!==on)n.ra.visible=on;if(n.mesh)n.mesh.visible=!on&&d<cap.farR}
+  for(const n of npcs)if(n.bike&&n.mesh&&n.x!==undefined)n.mesh.visible=Math.hypot(n.x-car.x,n.y-car.y)<cap.farR;
   RA.last.t-=dt;if(RA.last.t>0)return;RA.last.t=.5;if(Math.hypot(car.x-RA.last.x,car.y-RA.last.y)<8)return;RA.last.x=car.x;RA.last.y=car.y;raPark()}}
 {const base=kitInit;kitInit=async function(){await base.apply(this,arguments);try{await raInit()}catch(e){console.warn("Rheydt-Autos",e)}}}
+/* Bodenkontakt: Reifen der Rheydt-Modelle standen gemessen 3–4 cm in der Fahrbahn */
+{const base=groundContact,UP={rstadt:.04,rlim:.045,rsuv:.04};groundContact=function(){base();const VH=V(),g=vehMeshes[VH.id];if(g&&UP[VH.id]&&!VH.fly)g.position.y+=UP[VH.id]}}

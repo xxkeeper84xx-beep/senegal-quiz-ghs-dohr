@@ -8,7 +8,7 @@
      mehrere Dachgauben je Dachseite, auf der Dachfläche hinter der Traufe.
      Reichweite und Anzahl je Grafikprofil. */
 const KIT={parts:{},ready:false,bld:[],grid:new Map(),cell:50,last:{x:1e9,y:1e9,t:0}};
-const KIT_CAP={schule:{r:28,win:70,door:16,pipe:24,dorm:16,shop:10,shopR:6,bikeP:8,scooP:3,rhaus:3},standard:{r:42,win:200,door:36,pipe:50,dorm:40,shop:24,shopR:14,bikeP:24,scooP:8,rhaus:8},hoch:{r:65,win:460,door:70,pipe:90,dorm:80,shop:40,shopR:24,bikeP:40,scooP:14,rhaus:16}};
+const KIT_CAP={schule:{r:28,win:70,door:16,pipe:24,dorm:16,shop:10,shopR:6,bikeP:8,scooP:3,rhaus:3,lampR:120,treeR:300},standard:{r:42,win:200,door:36,pipe:50,dorm:40,shop:24,shopR:14,bikeP:24,scooP:8,rhaus:8,lampR:180,treeR:450},hoch:{r:65,win:460,door:70,pipe:90,dorm:80,shop:40,shopR:24,bikeP:40,scooP:14,rhaus:16,lampR:260,treeR:700}};
 /* Gebäude für den Bausatz merken (aus buildCity aufgerufen) */
 function gfxRecord(p,h,m,kind,ccw,GB,t){if(m>0||!(kind==="res"||kind==="brick"))return;let cx=0,cy=0;const n=p.length/2;for(let i=0;i<n;i++){cx+=p[2*i];cy+=p[2*i+1]}cx/=n;cy/=n;
   const B={p,h,ccw,kind,GB,cx,cy,i:KIT.bld.length,shopT:/retail|commercial|kiosk|supermarket|shop/.test(t||"")};KIT.bld.push(B);const k=Math.floor(cx/KIT.cell)+"_"+Math.floor(cy/KIT.cell);(KIT.grid.get(k)||KIT.grid.set(k,[]).get(k)).push(B)}
@@ -38,6 +38,12 @@ function kitRideSeats(id){if(typeof RIDE_POS==="undefined"||!RIDE_POS[id])return
   if(id==="scoot")RIDE_POS.scoot.deck=[x,y];else RIDE_POS[id].seat=[x,y];KIT.seat=KIT.seat||{};KIT.seat[id]=[x,y]}
 {const base=vehSwap;vehSwap=function(id,gl){base(id,gl);try{kitRideSeats(id)}catch(e){console.warn("Sitzhöhe",e)}}}
 
+/* ---------- nur Nahes zeichnen: Instanzen um Noah herum auswählen (Laternen, Bäume) ---------- */
+class KitNear{constructor(ms){this.L=ms.map(m=>({m,n:m.count,src:m.instanceMatrix.array.slice(0,m.count*16),col:m.instanceColor?m.instanceColor.array.slice(0,m.count*3):null}))}
+  apply(px,py,R,skip){const R2=R*R;for(const e of this.L){const a=e.m.instanceMatrix.array;let k=0;for(let i=0;i<e.n;i++){const x=e.src[i*16+12],z=e.src[i*16+14],d=(x-px)*(x-px)+(z-py)*(z-py);if(d>R2||(skip&&skip(d)))continue;
+      a.set(e.src.subarray(i*16,i*16+16),k*16);if(e.col)e.m.instanceColor.array.set(e.col.subarray(i*3,i*3+3),k*3);k++}
+    e.m.count=k;e.m.instanceMatrix.needsUpdate=true;if(e.col)e.m.instanceColor.needsUpdate=true}}}
+{const base=buildTreeMeshes;buildTreeMeshes=function(){const before=new Set(scene.children);const r=base.apply(this,arguments);KIT.treeMs=scene.children.filter(o=>!before.has(o)&&o.isInstancedMesh);return r}}
 /* ---------- Laternen ---------- */
 async function kitLamps(){const P=await kitLoad("lamp","stadt/Laterne.json");let pole=null;scene.traverse(o=>{if(o.isInstancedMesh&&o.geometry&&o.geometry.parameters&&o.geometry.parameters.height===7)pole=o});if(!pole)return;
   const sib=scene.children.filter(o=>o.isInstancedMesh&&o.count===pole.count&&o!==pole&&o.material&&(o.material===pole.material||o.material===lampBulbMat));
@@ -45,19 +51,23 @@ async function kitLamps(){const P=await kitLoad("lamp","stadt/Laterne.json");let
   let led=null;P.root.traverse(o=>{if(!led&&/LED_Gehaeuse/.test(o.name))led=o});const lb=led?new THREE.Box3().setFromObject(led).getCenter(new THREE.Vector3()):new THREE.Vector3(1,0,0);
   const yaw=-Math.atan2(-lb.z,lb.x),H=P.box.max.y-P.box.min.y,sc=6.5/Math.max(1,H),fix=new THREE.Matrix4().makeRotationY(yaw).premultiply(new THREE.Matrix4().makeScale(sc,sc,sc));fix.premultiply(new THREE.Matrix4().makeTranslation(0,-P.box.min.y*sc,0));
   const n=pole.count,m=new THREE.Matrix4(),out=new THREE.Matrix4();KIT.lampMats=[];
-  for(const {geo,mat} of P.parts){const im=new THREE.InstancedMesh(geo,mat,n);for(let i=0;i<n;i++){pole.getMatrixAt(i,m);out.multiplyMatrices(m,fix);im.setMatrixAt(i,out)}im.castShadow=true;im.frustumCulled=false;scene.add(im);
+  KIT.lampGlb=[];for(const {geo,mat} of P.parts){const im=new THREE.InstancedMesh(geo,mat,n);KIT.lampGlb.push(im);for(let i=0;i<n;i++){pole.getMatrixAt(i,m);out.multiplyMatrices(m,fix);im.setMatrixAt(i,out)}im.castShadow=true;im.frustumCulled=false;scene.add(im);
     if(/Leuchtenabdeckung|LED/i.test(mat.name||"")){mat.emissive=new THREE.Color(0xfff0c8);mat.emissiveIntensity=0;KIT.lampMats.push(mat)}}
-  pole.visible=false;for(const o of sib)o.visible=false;scene.traverse(o=>{if(o.isInstancedMesh&&o.count===n&&o.geometry&&o.geometry.parameters&&(o.geometry.parameters.width===1.6||o.geometry.parameters.width===.7))o.visible=false})}
+  const old=[pole,...sib];scene.traverse(o=>{if(o.isInstancedMesh&&o.count===n&&o.geometry&&o.geometry.parameters&&(o.geometry.parameters.width===1.6||o.geometry.parameters.width===.7)&&!old.includes(o))old.push(o)});
+  for(const o of old)o.visible=true;KIT.lampNear=new KitNear(KIT.lampGlb);KIT.lampFar=new KitNear(old)}
+function kitCull(){const cap=KIT_CAP[GFX.id]||KIT_CAP.standard,px=car.x,py=car.y,LR=cap.lampR||150;
+  if(KIT.lampNear){KIT.lampNear.apply(px,py,LR);KIT.lampFar.apply(px,py,camera.far,d=>d<LR*LR)}
+  if(KIT.treeMs){if(!KIT.treeNear)KIT.treeNear=new KitNear(KIT.treeMs);KIT.treeNear.apply(px,py,Math.min(cap.treeR||400,camera.far+30))}}
 {const base=render3D;render3D=function(dt,now){if(KIT.lampMats){const dk=darkness();for(const m of KIT.lampMats)m.emissiveIntensity=dk*2.2}base(dt,now)}}
 
 /* ---------- Fassaden-Bausatz um Noah herum ---------- */
-const SHOP_STR=/^(Hauptstraße|Marktstraße|Markt|Limitenstraße|Stresemannstraße|Harmoniestraße|Am Neumarkt|Wilhelm-Strater-Straße|Langensgasse|Paulstraße|Gracht|Bahnhofstraße|Friedrich-Ebert-Straße)$/;
-function kitShopWall(B,x,y){if(B.shopT)return !!nearestRoad(x,y,10);if(!KIT.rheydt(x,y))return false;return !!nearestRoad(x,y,9,e=>e.r.h==="pedestrian"||SHOP_STR.test(e.r.n||""))}
+const SHOP_STR=/^(Hauptstraße|Marktstraße|Markt|Limitenstraße|Stresemannstraße|Harmoniestraße|Am Neumarkt|Wilhelm-Strater-Straße|Langensgasse|Paulstraße|Gracht|Bahnhofstraße|Friedrich-Ebert-Straße|Hindenburgstraße|Bismarckstraße|Alter Markt|Waldhausener Straße|Steinmetzstraße|Stepgesstraße|Albertusstraße|Kaiserstraße|Lüpertzender Straße|Sandradstraße|Viersener Straße|Regentenstraße|Kapuzinerplatz|Marktstieg|Abteistraße|Mühlenstraße|Kirchplatz)$/;
+function kitShopWall(B,x,y){if(B.shopT)return !!nearestRoad(x,y,10);if(!KIT.zentrum(x,y))return false;return !!nearestRoad(x,y,9,e=>e.r.h==="pedestrian"||SHOP_STR.test(e.r.n||""))}
 const KM={};
 /* Klinker-Reihenhaus (MG Teil 2) vor Straßenwänden: Rheydt häufig, sonst selten; nur Häuser ohne eigenes Satteldach */
 function kitRHWall(B,i,x0,z0,L,dx,dz,onx,onz,shop){if(!KM.rhaus||shop||B.GB||L<5.8||B.h<5||B.h>11)return null;
   const mx=x0+dx*L/2,mz=z0+dz*L/2;if(!nearestRoad(mx+onx*7,mz+onz*7,9,e=>e.r&&e.r.w>=4.5&&!/footway|path|steps|cycleway|service/.test(e.r.h||"")))return null;
-  const o=MG.real&&MG.real.orte&&MG.real.orte.rheydt_marktplatz,rh=o&&Math.hypot(mx-o.x,mz-o.y)<1100;if(kitHash(B.i*13+i,77)>(rh?.75:.22))return null;
+  const rh=KIT.zentrum(mx,mz,1.6);if(kitHash(B.i*13+i,77)>(rh?.75:.22))return null;
   let dep=9.3;for(const f of [.2,.5,.8]){const ax=x0+dx*L*f,az=z0+dz*L*f;for(let t=.6;t<=9.3;t+=.4){if(!inPoly(ax-onx*t,az-onz*t,B.p)){dep=Math.min(dep,t-.4);break}}}
   if(dep<4)return null;let n=Math.max(1,Math.round(L/6.8)),sx=L/(n*6.8);if(sx<.82&&n>1){n--;sx=L/(n*6.8)}if(sx>1.3||sx<.8)return null;
   const sy=(B.h+.3)/(KIT.rhEave||7);if(sy<.85||sy>1.4)return null;return {n,sx,sz:Math.min(1,dep/9.3),sy}}
@@ -69,8 +79,10 @@ function kitNormVeh(name,len){const P=KIT.parts[name];if(!P)return;const b=P.box
   const M=new THREE.Matrix4().makeTranslation(-(b.min.x+b.max.x)/2,-b.min.y,-(b.min.z+b.max.z)/2);if(ez>ex)M.premultiply(new THREE.Matrix4().makeRotationY(Math.PI/2));M.premultiply(new THREE.Matrix4().makeScale(sc,sc,sc));
   for(const q of P.parts)q.geo.applyMatrix4(M);P.box=new THREE.Box3();for(const q of P.parts){q.geo.computeBoundingBox();P.box.union(q.geo.boundingBox)}}
 KIT.rheydt=(x,y)=>{const o=MG.real&&MG.real.orte&&MG.real.orte.rheydt_marktplatz;return !!o&&Math.hypot(x-o.x,y-o.y)<650};
+/* Innenstädte (Läden, Ladenfassaden, Klinker-Reihenhäuser): Rheydt um den Markt, Gladbach um Hbf/Hindenburgstraße/Alter Markt, Odenkirchen */
+KIT.zentrum=(x,y,f=1)=>{const O=MG.real&&MG.real.orte;if(!O)return false;const r=O.rheydt_marktplatz,g=O.gladbach_hbf;return (!!r&&Math.hypot(x-r.x,y-r.y)<650*f)||(!!g&&Math.hypot(x-g.x+250,y-g.y-150)<1150*f)};
 function kitShopNear(x,y){for(const q of (MG.pois||[])){if(Math.abs(q.x-x)>16||Math.abs(q.y-y)>16)continue;if(/shop|cafe|restaurant|bakery|pharmacy|bank|kiosk|hairdresser|ice_cream|fast_food|supermarket|convenience|clothes|florist/.test(q.k||""))return true}return false}
-function kitBuildInst(){const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;const R=cap.r,px=car.x,py=car.y;const near=[];
+function kitBuildInst(){try{kitCull()}catch(e){console.warn("Nahauswahl",e)}const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;const R=cap.r,px=car.x,py=car.y;const near=[];
   const c0=Math.floor((px-R)/KIT.cell),c1=Math.floor((px+R)/KIT.cell),r0=Math.floor((py-R)/KIT.cell),r1=Math.floor((py+R)/KIT.cell);
   for(let a=c0;a<=c1;a++)for(let b=r0;b<=r1;b++){const L=KIT.grid.get(a+"_"+b);if(L)for(const B of L){const d=Math.hypot(B.cx-px,B.cy-py);if(d<R+20)near.push([d,B])}}
   near.sort((a,b)=>a[0]-b[0]);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(1,1,1),P=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0);
