@@ -196,3 +196,9 @@ Ladezeit der Welt im Test: ca. 2 s. Ohne Begrenzung der Bäume waren es über 3 
 5. **Kacheln nachladen** statt eines festen Ausschnitts; weiter entfernte Geometrie vereinfachen.
 6. **Fassaden der Schule**: Für den Standort Torfbend liegen Fotos vor. Für das **Haupthaus Altenbroicher Straße 50–52** fehlen
    Referenzfotos (Fenster, Eingänge, Schilder, Hof).
+
+## Bausatz-Feinschliff (23.11.)
+- Dachgauben: bis zu 4 je Dachseite, 30 % größer, sitzen auf der Dachfläche hinter der Traufe; zu kleine Dächer bekommen keine Gaube mehr (vorher ragten sie über Giebel und Traufe).
+- Regenrohre liegen direkt an der Wand an.
+- Geparkte Fahrräder und E-Scooter (Modelle aus Pythagoras_City_GLB_Modelle) vor Läden und neben Haustüren; auf schmalen Gehwegen längs an der Wand, auf breiten quer im Ständer. Rahmenfarbe je Rad verschieden.
+- Höchstzahl je Profil: Schul-iPad 8/3, Standard 24/8, Hoch 40/14 (Fahrrad/Scooter, je ca. 6 300 Dreiecke).
