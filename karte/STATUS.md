@@ -219,3 +219,18 @@ Eingebaut:
 Nicht eingebaut (Begründung):
 - Amtliche Wahrzeichen (Schule, Haupthaus, Hauptkirche, Schloss, Borussia-Park, Hbf): echte Umrisse, aber allgemeine Fenstertextur und Luftbild-Dächer mit Flecken; auf Straßenhöhe schlechter als die jetzigen Fassaden. Quellen liegen in modelle_quelle/MG_Teil_2/Gebaeude.
 - Karten (Stadtkarte, Rheydt-Detailkarte 64 MB, Schulumfeld): Das Spiel blendet ab ca. 1,1 km in Dunst über; ein Luftbild-Horizont wäre am Boden unsichtbar. Sinnvoll später als Ansicht beim Fliegen. Teil 1 nicht im Repo (Größe).
+
+## Ganze Stadt – Stufe 1 (23.11.)
+Eingebaut:
+- Vorab berechnete Gebäudeschatten je Kachel (gleiche Sonnenrichtung), dynamische Schatten nur in Spielernähe.
+- Fernansicht: die übrige Stadt als vereinfachte Blöcke (40-m-Raster aus allen 46 Kacheln, 142 108 Gebäude) auf Höhengelände mit Luftbild; eigener Zeichendurchgang, Dunst weiter gefasst.
+- Boden nach Luftbild nur in Rheydt (Detailkarte, ca. 1,3 m/Pixel). Das grobe Stadtkarten-Luftbild (7,5 m/Pixel) gab außerhalb Schlieren und ist abgeschaltet.
+- Wahrzeichen: GHS Dohr Torfbend und Haupthaus, Hauptkirche (Backsteinfläche), Schloss, Hbf, Borussia-Park (graue Verkleidung) – Fassaden noch ohne Fotos.
+- Innenstadt-Regeln auch für Gladbach (Hindenburgstr., Bismarckstr., Alter Markt …); Nachbarkachel wird am Rand vorgeladen.
+- Leistung: Laternen (3 148 je Kachel) und Bäume nur in Spielernähe, entfernte Verkehrsautos ausgeblendet.
+Messung (Software-Rendering im Container, Profil Schul-iPad, Hauptdurchgang; Fernansicht kostet zusätzlich ca. 2 Aufrufe und 0,12 Mio. Dreiecke):
+- Torfbend: 3,29 → 0,90 Mio. Dreiecke; Innenstadt 4,70 → 0,92; Borussia-Park 2,54 → 0,60; Kachelgrenze 3,32 → 0,89.
+- Zeichenaufrufe schwanken je nach Verkehr/Passanten: 450–1 300 vorher, 270–970 nachher – in Rheydt weiterhin zu hoch für alte iPads.
+- Bodenkontakt: Füße 1–4 cm über Fahrbahn/Bordstein, Treppe bis 7 cm; Räder ±1 cm (nach Korrektur).
+- Dauertest 3 Minuten: Speicher stabil um 165 MB, keine wachsende Objektzahl.
+Offen (Stufe 2): Kachelwechsel ohne Neuladen, feine Luftbilder für alle Bezirke, weniger Zeichenaufrufe (Passanten/Verkehr bündeln), Gewerbe-Bausatz, Messung auf echtem Schul-iPad, Fassaden nach Fotos.
