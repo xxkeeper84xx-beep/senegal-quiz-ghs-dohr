@@ -8538,10 +8538,8 @@ function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue
   if(act.idle){act.idle.play();act.idle.time=Math.random()*act.idle.getClip().duration}
   if(n==="Herr Ballhorn")standAlt(I);
   obj.position.set(S.x,groundY(S.x,S.y)+M.offY,S.y);obj.rotation.y=Math.PI/2-S.a;scene.add(obj);S.p.visible=false;S.glb=I}}
-/* Herr Ballhorn: alter, gebrechlicher Hausmeister – gebeugt, langsam, mit Gehstock */
+/* Herr Ballhorn: alter, gebrechlicher Hausmeister – gebeugt, langsam (ohne Gehstock) */
 function standAlt(I){I.mixer.timeScale=.65;I.alt=[["Spine",.16],["Spine1",.12],["Spine2",.08],["Neck",.14]].map(([n,a])=>[I.obj.getObjectByName(n),a]).filter(b=>b[0]);
-  const g=new THREE.CylinderGeometry(.016,.02,.9,8);g.translate(0,.45,0);const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:new THREE.Color(0x3b2a1e).convertSRGBToLinear()}));m.position.set(-.3,0,.16);m.rotation.set(.12,0,-.1);m.castShadow=true;
-  const k=new THREE.Mesh(new THREE.TorusGeometry(.055,.014,6,12,Math.PI),m.material);k.position.set(0,.9,.05);k.rotation.y=Math.PI/2;m.add(k);I.obj.add(m);
   // Hausmeisterkittel statt Anzug (Jacke grau entsättigt, graublau getönt), ohne Hut – graues Haar sichtbar
   I.obj.traverse(o=>{if(!o.isMesh)return;const mt=o.material,nm=(o.userData.srcMat||mt).name||"";
     if(/^Hut$/i.test(nm)){o.visible=false;return}
