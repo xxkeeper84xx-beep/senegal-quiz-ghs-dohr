@@ -113,3 +113,34 @@ async function stadtBoden(){const name=MG.region||"rheydt";try{await stadtScript
 /* Start: nach dem Bau der Stadt Schatten, nach den Modellen Fernansicht und Wahrzeichen */
 {const base=buildCity;buildCity=function(){STADT.B.length=0;const r=base.apply(this,arguments);try{stadtShadows()}catch(e){console.warn("Schatten vorab",e)}stadtBoden().catch(e=>console.warn("Boden",e));return r}}
 {const base=kitInit;kitInit=async function(){await base.apply(this,arguments);try{await wzInit()}catch(e){console.warn("Wahrzeichen",e)}try{await fernInit()}catch(e){console.warn("Fernansicht",e)}}}
+
+/* ---------- 6. Allee „Am Torfbend“ gegenüber der Schule: Baumscheiben und Längsparkbuchten im Wechsel ---------- */
+const ALLEE={n:"Am Torfbend",x0:770,x1:1000,pit:1.7,bay:5.8,w:2.3,items:[]};
+function alleePlan(){if(ALLEE.done)return;ALLEE.done=true;const P={x:0,y:0,dx:1,dy:0};
+  for(const e of edges){if(!e.r||e.r.n!==ALLEE.n||!e.r.c)continue;let s=9,k=0;
+    while(s<e.len-9){const isBay=k%2===1,L=isBay?ALLEE.bay:ALLEE.pit;if(s+L>e.len-9)break;edgePos(e,s+L/2,P);
+      const sd=P.dx>=0?1:-1;   // Normale (−dy, dx)·sd zeigt nach Süden (+y): die Seite gegenüber der Schule
+      const nx=-P.dy*sd,ny=P.dx*sd,off=e.r.w/2+ALLEE.w/2,x=P.x+nx*off,y=P.y+ny*off;
+      let ok=x>ALLEE.x0&&x<ALLEE.x1;if(ok)for(const [a,o] of [[0,0],[L/2,.9],[-L/2,.9],[L/2,-.9],[-L/2,-.9]]){const i=gi(x+P.dx*a+nx*o,y+P.dy*a+ny*o);if(i<0||hgt[i]||solid[i]){ok=false;break}}
+      if(ok&&nearestRoad(x,y,e.r.w/2+2.5,q=>q!==e&&q.r&&q.r.c&&q.r.n!==ALLEE.n))ok=false;
+      if(ok)ALLEE.items.push({bay:isBay,x,y,ang:Math.atan2(P.dy,P.dx),L,dx:P.dx,dy:P.dy,nx,ny});
+      s+=L;k++}}}
+function alleeBuild(){alleePlan();const Y=SIDE_Y+.006,pos=[],uv=[],posP=[],posK=[];
+  const quad=(arr,c,a,b,hl,hw,y,u)=>{const P=[[-hl,-hw],[hl,-hw],[hl,hw],[-hl,-hw],[hl,hw],[-hl,hw]];for(const [l,w] of P){arr.push(c.x+a[0]*l+b[0]*w,y,c.y+a[1]*l+b[1]*w);if(u)u.push(l*.5,w*.5)}};
+  for(const it of ALLEE.items){const a=[it.dx,it.dy],b=[it.nx,it.ny];
+    if(it.bay){quad(pos,it,a,b,it.L/2-.05,ALLEE.w/2,Y,uv);quad(posK,{x:it.x+it.nx*(ALLEE.w/2-.08),y:it.y+it.ny*(ALLEE.w/2-.08)},a,b,it.L/2,.08,Y+.004)}
+    else{quad(posP,it,a,b,it.L/2-.12,ALLEE.w/2-.25,Y+.002);quad(posK,it,a,b,it.L/2,ALLEE.w/2-.1,Y+.001)}}
+  const mk=(p,u,mat)=>{if(!p.length)return;const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(p,3));if(u)g.setAttribute("uv",new THREE.Float32BufferAttribute(u,2));g.computeVertexNormals();
+    const m=new THREE.Mesh(g,mat);m.receiveShadow=true;m.renderOrder=1;scene.add(m);return m};
+  const tex=texPave.clone();tex.needsUpdate=true;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+  mk(posK,null,new THREE.MeshLambertMaterial({color:0xb8b5ad,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));   // Bordstein-/Einfassungsstreifen
+  mk(pos,uv,new THREE.MeshLambertMaterial({map:tex,color:0x7d7a74,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));   // Pflaster der Parkbuchten
+  mk(posP,null,new THREE.MeshLambertMaterial({color:0x5b4a39,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}))}      // Baumscheiben
+/* Bäume in die Baumscheiben (vor dem Bau der Baum-Instanzen) */
+{const base=buildTrees;buildTrees=function(){try{alleePlan();MG.trees=MG.trees||[];for(const it of ALLEE.items)if(!it.bay)MG.trees.push(it.x,it.y);alleeBuild()}catch(e){console.warn("Allee",e)}return base.apply(this,arguments)}}
+/* Parkende Autos in den Buchten (eben, auf Gehweghöhe); keine halb-auf-dem-Gehweg-Autos und keine Laternen in der Allee */
+const alleeNear=(x,y,r)=>ALLEE.items.some(it=>Math.hypot(it.x-x,it.y-y)<r);
+{const base=raSlots;raSlots=function(){base();const keep=RA.slots.filter(S=>!alleeNear(S.x,S.y,6));RA.slots.length=0;RA.grid.clear();
+  for(const it of ALLEE.items)if(it.bay&&kitHash(Math.round(it.x),Math.round(it.y))<.72)keep.push({x:it.x,y:it.y,ang:it.ang+(kitHash(Math.round(it.y),3)<.5?Math.PI:0),flat:true,y0:SIDE_Y+.01,m:Math.floor(kitHash(Math.round(it.x),7)*3),c:Math.floor(kitHash(Math.round(it.y),11)*RA_PARKCOL.length)});
+  for(const S of keep){RA.slots.push(S);const k=Math.floor(S.x/RA.cell)+"_"+Math.floor(S.y/RA.cell);(RA.grid.get(k)||RA.grid.set(k,[]).get(k)).push(S)}}}
+{const base=kitCull;kitCull=function(){if(KIT.lampNear&&!ALLEE.lampsDone){ALLEE.lampsDone=true;const f=(x,z)=>ALLEE.items.some(it=>Math.abs((x-it.x)*it.dx+(z-it.y)*it.dy)<it.L/2+.6&&Math.abs((x-it.x)*it.nx+(z-it.y)*it.ny)<ALLEE.w/2+.4);KIT.lampNear.drop(f);KIT.lampFar.drop(f)}return base()}}

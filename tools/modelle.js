@@ -39,7 +39,8 @@ function kitRideSeats(id){if(typeof RIDE_POS==="undefined"||!RIDE_POS[id])return
 {const base=vehSwap;vehSwap=function(id,gl){base(id,gl);try{kitRideSeats(id)}catch(e){console.warn("Sitzhöhe",e)}}}
 
 /* ---------- nur Nahes zeichnen: Instanzen um Noah herum auswählen (Laternen, Bäume) ---------- */
-class KitNear{constructor(ms){this.L=ms.map(m=>({m,n:m.count,src:m.instanceMatrix.array.slice(0,m.count*16),col:m.instanceColor?m.instanceColor.array.slice(0,m.count*3):null}))}
+class KitNear{drop(fn){for(const e of this.L){const src=[],col=[];let k=0;for(let i=0;i<e.n;i++){if(fn(e.src[i*16+12],e.src[i*16+14]))continue;src.push(...e.src.subarray(i*16,i*16+16));if(e.col)col.push(...e.col.subarray(i*3,i*3+3));k++}e.src=Float32Array.from(src);if(e.col)e.col=Float32Array.from(col);e.n=k}}
+  constructor(ms){this.L=ms.map(m=>({m,n:m.count,src:m.instanceMatrix.array.slice(0,m.count*16),col:m.instanceColor?m.instanceColor.array.slice(0,m.count*3):null}))}
   apply(px,py,R,skip){const R2=R*R;for(const e of this.L){const a=e.m.instanceMatrix.array;let k=0;for(let i=0;i<e.n;i++){const x=e.src[i*16+12],z=e.src[i*16+14],d=(x-px)*(x-px)+(z-py)*(z-py);if(d>R2||(skip&&skip(d)))continue;
       a.set(e.src.subarray(i*16,i*16+16),k*16);if(e.col)e.m.instanceColor.array.set(e.col.subarray(i*3,i*3+3),k*3);k++}
     e.m.count=k;e.m.instanceMatrix.needsUpdate=true;if(e.col)e.m.instanceColor.needsUpdate=true}}}

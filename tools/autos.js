@@ -52,8 +52,8 @@ function raPark(){if(!RA.inst)return;const cap=RA_CAP[GFX.id]||RA_CAP.standard,R
   const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler(),Pv=new THREE.Vector3(),S1=new THREE.Vector3(1,1,1);let n=0;
   for(const [d,S] of near){if(n>=cap.park)break;const mi=RA.ok.indexOf(S.m)>=0?RA.ok.indexOf(S.m):0,K=RA.inst[mi];if(!K||K.n>=K.cap)continue;
     // Räder auf der Gehwegseite 15 cm höher: Auto leicht um die Längsachse geneigt
-    const fx=Math.cos(S.ang),fy=Math.sin(S.ang);E.set(0,-S.ang,0);Q.setFromEuler(E);Q.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(fx,0,fy),raRoll(S)));
-    Pv.set(S.x,(ROAD_Y+SIDE_Y)/2,S.y);M.compose(Pv,Q,S1);
+    const fx=Math.cos(S.ang),fy=Math.sin(S.ang);E.set(0,-S.ang,0);Q.setFromEuler(E);Q.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(fx,0,fy),S.flat?0:raRoll(S)));
+    Pv.set(S.x,S.y0!==undefined?S.y0:(ROAD_Y+SIDE_Y)/2,S.y);M.compose(Pv,Q,S1);
     K.ms.forEach((im,j)=>{im.setMatrixAt(K.n,M);if(im.instanceColor){im.setColorAt(K.n,RA_COL.set(RA_PARKCOL[S.c]).convertSRGBToLinear());}});K.n++;n++;
     for(const t of [-1.45,0,1.45])parkedList.push({x:S.x+fx*t,y:S.y+fy*t,bike:true,ra:true})}
   for(const K of RA.inst)for(const im of K.ms){im.count=K.n;im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true}}
