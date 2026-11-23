@@ -1,0 +1,10 @@
+const {chromium}=require('playwright');const fs=require('fs');const three=fs.readFileSync(__dirname+'/../three/package/build/three.min.js');const errs=[];
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await (await b.newContext({viewport:{width:1080,height:810}})).newPage();
+p.on('pageerror',e=>errs.push(e.message));await p.route(/cdnjs.cloudflare.com/,r=>r.fulfill({body:three,contentType:'application/javascript'}));await p.route(/fonts\.g/,r=>r.abort());
+await p.goto('http://localhost:8766/index.html');await p.waitForFunction(()=>window.__ready,null,{timeout:400000});
+await p.evaluate(()=>{startCreate(false);createProfile('Tester',Object.assign({},LOOK_DEF));hideTitle();window.requestAnimationFrame=()=>0});
+await p.waitForFunction(()=>state.mode==='play'&&RA.ready&&VG.done.rstadt&&VG.done.rlim&&VG.done.rsuv,null,{timeout:500000}).catch(()=>{});
+await p.evaluate(()=>{const base=updateCamera;updateCamera=function(dt,VH){base(dt,VH);if(window.__cam){camera.position.set(...window.__cam[0]);camera.lookAt(...window.__cam[1])}};
+  const R=ROOMS.find(r=>r.id==='auto');const c=rW(R,R.D/2-1.5,R.W/2-1.5),t=rW(R,-4,-2);window.__cam=[[c[0],4.2,c[1]],[t[0],.6,t[1]]];const q=rW(R,R.D/2-2,0);car.x=q[0];car.y=q[1];refreshShows(true);
+  for(let i=0;i<10;i++)update(1/30);render3D(1/30,performance.now());$('toast').style.opacity=0});
+await p.screenshot({path:__dirname+'/aut_boden.png'});console.log('ERR',errs.slice(0,3));await b.close()})();

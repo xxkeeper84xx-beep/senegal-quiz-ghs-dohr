@@ -9337,7 +9337,7 @@ function buildRoom(R){const G=new THREE.Group(),B0=BASE_Y,{W,D,H}=R;G.position.s
   if(R.solid){scene.add(G);R.group=G;return G}
   // Innenraum
   const I=new THREE.Group();G.add(I);const ia=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);I.add(m);return m};
-  const tiles=canvasTex(512,512,(g)=>{const c=R.id==="auto"?["#d9dadc","#cfd0d3"]:R.id==="rad"?["#c9c3b6","#beb8ab"]:["#d6d8db","#cacdd1"];for(let y=0;y<4;y++)for(let x=0;x<4;x++){g.fillStyle=c[(x+y)%2];g.fillRect(x*128,y*128,128,128);g.fillStyle="rgba(0,0,0,.18)";g.fillRect(x*128,y*128,128,2);g.fillRect(x*128,y*128,2,128)}noise(g,512,512,6000,["rgba(0,0,0,.04)","rgba(255,255,255,.08)"],2)});
+  const tiles=canvasTex(512,512,(g)=>{const c=R.id==="auto"?["#3c3f44","#393c41"]:R.id==="rad"?["#c9c3b6","#beb8ab"]:["#d6d8db","#cacdd1"];for(let y=0;y<4;y++)for(let x=0;x<4;x++){g.fillStyle=c[(x+y)%2];g.fillRect(x*128,y*128,128,128);g.fillStyle=R.id==="auto"?"rgba(255,255,255,.07)":"rgba(0,0,0,.18)";g.fillRect(x*128,y*128,128,2);g.fillRect(x*128,y*128,2,128)}noise(g,512,512,6000,["rgba(0,0,0,.04)","rgba(255,255,255,.08)"],2)});
   tiles.repeat.set(D/4,W/4);const fl=ia(new THREE.PlaneGeometry(D-.4,W-.4),litM(tiles,.2,{polygonOffset:true,polygonOffsetFactor:-8,polygonOffsetUnits:-8}),0,B0+.05,0);fl.rotation.x=-Math.PI/2;fl.renderOrder=2;
   const inner=canvasTex(256,256,(g)=>{g.fillStyle=R.id==="auto"?"#e9ebee":"#f3efe7";g.fillRect(0,0,256,256);noise(g,256,256,2500,["rgba(0,0,0,.04)","rgba(255,255,255,.1)"],2)});
   const wl=(x,z,w,ry,gl)=>{const p=ia(new THREE.PlaneGeometry(w,H-.1),litM(inner,.45),x,B0+(H-.1)/2,z);p.rotation.y=ry;return p};
