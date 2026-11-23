@@ -2782,7 +2782,7 @@ function triSketch(t){
   const flip=S.flip?-1:1,rot=S.rot||0;
   for(const k in P){let [x,y]=P[k];x*=flip;const c=Math.cos(rot),s=Math.sin(rot);P[k]=[x*c-y*s,x*s+y*c]}
   const xs=Object.values(P).map(p=>p[0]),ys=Object.values(P).map(p=>p[1]),mx=Math.min(...xs),Mx=Math.max(...xs),my=Math.min(...ys),My=Math.max(...ys);
-  const sc=Math.min((W-150)/((Mx-mx)||1),(H-80)/((My-my)||1)),ox=(W-(Mx-mx)*sc)/2,oy=(H-(My-my)*sc)/2;
+  const sc=Math.min((W-200)/((Mx-mx)||1),(H-80)/((My-my)||1)),ox=(W-(Mx-mx)*sc)/2,oy=(H-(My-my)*sc)/2;
   for(const k in P)P[k]=[ox+(P[k][0]-mx)*sc,H-(oy+(P[k][1]-my)*sc)];
   const cen=[(P.A[0]+P.B[0]+P.C[0])/3,(P.A[1]+P.B[1]+P.C[1])/3];
   const side={a:[P.C,P.A],b:[P.C,P.B],c:[P.A,P.B]},ink="#1a2147",hot="#e2384d",sel="#2f6fd8",ok="#14874a";
@@ -2792,8 +2792,9 @@ function triSketch(t){
     const col=solved?ok:isS?sel:isU?hot:ink;
     out+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${col}" stroke-width="${isS||isU||solved?6:3.5}" stroke-linecap="round" ${isU?'stroke-dasharray="10 6"':""}/>`;
     if(t.kind==="tap")out+=`<line class="hit" data-side="${k}" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="transparent" stroke-width="26" style="cursor:pointer"/>`;
-    const m=[(p[0]+q[0])/2,(p[1]+q[1])/2],d=[m[0]-cen[0],m[1]-cen[1]],L=Math.hypot(...d)||1,lx=m[0]+d[0]/L*20,ly=m[1]+d[1]/L*20+5;
-    const anchor=Math.abs(d[0]/L)<.35?"middle":d[0]>0?"start":"end";
+    const m=[(p[0]+q[0])/2,(p[1]+q[1])/2],d=[m[0]-cen[0],m[1]-cen[1]],L=Math.hypot(...d)||1;let lx=m[0]+d[0]/L*20;const ly=m[1]+d[1]/L*20+5;
+    const anchor=Math.abs(d[0]/L)<.35?"middle":d[0]>0?"start":"end";const tw=String(lab[k]||"").length*8.2;   /* Beschriftung nie über den Rand hinaus */
+    if(anchor==="end")lx=Math.max(lx,tw+4);else if(anchor==="start")lx=Math.min(lx,W-4-tw);else lx=Math.min(Math.max(lx,tw/2+4),W-4-tw/2);
     out+=`<text x="${lx}" y="${ly}" text-anchor="${anchor}" font-family="JetBrains Mono,monospace" font-size="13.5" font-weight="700" fill="${col}" pointer-events="none">${lab[k]||""}</text>`}
   const C=P.C,ua=[P.A[0]-C[0],P.A[1]-C[1]],ub=[P.B[0]-C[0],P.B[1]-C[1]],na=Math.hypot(...ua),nb=Math.hypot(...ub),e=15;
   if(S.angle!==false){const p1=[C[0]+ua[0]/na*e,C[1]+ua[1]/na*e],p2=[C[0]+ub[0]/nb*e,C[1]+ub[1]/nb*e],p3=[p1[0]+ub[0]/nb*e,p1[1]+ub[1]/nb*e];
@@ -2821,7 +2822,7 @@ const AUFG=[
  // ---- Feuerwache
  {id:"f_len",g:"fire",d:[1,3],make:d=>{const [a,b]=AU.legsPair(d,4,12);const B=Math.min(a,b),A=Math.max(a,b);return tHyp({a:A,b:B,u:"m",n:["Wand","Abstand","Leiter"],pic:"🚒",
    x:{title:"Wie lang muss die Leiter sein?",story:`Im zweiten Stock ruft jemand um Hilfe. Das Fenster liegt <b>${fmt(A)} m</b> hoch. Wegen der Hecke kann die Leiter erst <b>${fmt(B)} m</b> vor der Hauswand aufgestellt werden.`,q:"Wie lang muss die Leiter mindestens sein?"}})}},
- {id:"f_foot",g:"fire",d:[1,3],make:d=>{const o=AU.hypLeg(d,3,8);const [c,h]=[o.c,o.a];return tLeg({c,b:h,u:"m",n:["Abstand","Höhe","Leiter"],sym:["b","a","c"],pic:"🪜",flip:true,
+ {id:"f_foot",g:"fire",d:[1,3],make:d=>{const o=AU.hypLeg(d,3,8);const [c,h]=[o.c,o.a];return tLeg({c,b:h,u:"m",n:["Abstand","Höhe","Leiter"],sym:["b","a","c"],pic:"🪜",flip:true,rot:-Math.PI/2,
    x:{title:"Wo muss der Leiterfuß stehen?",story:`Eine <b>${fmt(c)} m</b> lange Leiter soll genau bis zu einer Dachrinne in <b>${fmt(h)} m</b> Höhe reichen.`,q:"Wie weit von der Hauswand entfernt muss der Fuß der Leiter stehen?"}})}},
  {id:"f_reach",g:"fire",d:[2,3],make:d=>{const o=AU.hypLeg(d,2,5);return tLeg({c:o.c,b:o.b,u:"m",n:["Höhe","Abstand","Leiter"],pic:"🪜",
    x:{title:"Wie hoch reicht die Leiter?",story:`Die Steckleiter ist <b>${fmt(o.c)} m</b> lang. Damit sie sicher steht, ist ihr Fuß <b>${fmt(o.b)} m</b> von der Wand entfernt.`,q:"In welcher Höhe lehnt die Leiter an der Wand?"}})}},
