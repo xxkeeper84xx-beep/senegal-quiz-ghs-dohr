@@ -318,7 +318,7 @@ function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue
   const rl=standRole(S),teach=/lehrer/i.test(rl);   /* alle Lehrkräfte mit heller Hautfarbe */
   tintGlb(I,Object.assign(randomTint(role),{shirt:S.shirt,outfit:-1},teach?{skin:pick(SKIN_MUL.slice(0,3))}:{}));
   if(act.idle){act.idle.play();act.idle.time=Math.random()*act.idle.getClip().duration}
-  if(n==="Herr Ballhorn")standAlt(I);
+  if(n==="Herr Ballhorn")standAlt(I);if(n==="Frau Costantino")standVoll(I);
   obj.position.set(S.x,groundY(S.x,S.y)+M.offY,S.y);obj.rotation.y=Math.PI/2-S.a;scene.add(obj);S.p.visible=false;S.glb=I}}
 /* Herr Ballhorn: alter, gebrechlicher Hausmeister – gebeugt, langsam (ohne Gehstock) */
 function standAlt(I){I.mixer.timeScale=.65;I.alt=[["Spine",.16],["Spine1",.12],["Spine2",.08],["Neck",.14]].map(([n,a])=>[I.obj.getObjectByName(n),a]).filter(b=>b[0]);
@@ -326,7 +326,9 @@ function standAlt(I){I.mixer.timeScale=.65;I.alt=[["Spine",.16],["Spine1",.12],[
   I.obj.traverse(o=>{if(!o.isMesh)return;const mt=o.material,nm=(o.userData.srcMat||mt).name||"";
     if(/^Hut$/i.test(nm)){o.visible=false;return}
     if(/Sakko|Weste/i.test(nm)){const src=o.userData.srcMat||mt,c=src.clone();const g=src.map?recolorTex(src.map,0):null;if(g)c.map=g;c.color.set(0x3e4b5c).convertSRGBToLinear();c.needsUpdate=true;o.material=c;o.userData.kittel=1}})}
-const standAltPose=I=>{if(I.alt)for(const [b,a] of I.alt)b.rotation.x+=a};
+/* Frau Costantino: vollere Figur (Hüfte, Rumpf, Beine breiter; Kopf und Hals in normaler Größe) */
+function standVoll(I){const h=[1.2,1,1.26],sp=[1.07,1,1.14],ul=[1.12,1,1.12];I.scl=[["Hips",h],["Spine1",sp],["Neck",[1/(h[0]*sp[0]),1,1/(h[2]*sp[2])]],["LeftUpLeg",ul],["RightUpLeg",ul],["LeftLeg",[1/ul[0],1,1/ul[2]]],["RightLeg",[1/ul[0],1,1/ul[2]]]].map(([n,v])=>[I.obj.getObjectByName(n),v]).filter(b=>b[0]);standAltPose(I)}
+const standAltPose=I=>{if(I.alt)for(const [b,a] of I.alt)b.rotation.x+=a;if(I.scl)for(const [b,v] of I.scl)b.scale.set(...v)};
 {const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);
   for(const S of STANDS){const I=S.glb;if(!I)continue;if(!S.p.parent){scene.remove(I.obj);S.glb=null;continue}S.p.visible=false;
     const d=Math.hypot(S.x-car.x,S.y-car.y);I.obj.visible=d<CR.radius;if(!I.obj.visible)continue;
