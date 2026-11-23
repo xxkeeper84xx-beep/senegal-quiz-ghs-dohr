@@ -225,7 +225,7 @@ Eingebaut:
 - Vorab berechnete Gebäudeschatten je Kachel (gleiche Sonnenrichtung), dynamische Schatten nur in Spielernähe.
 - Fernansicht: die übrige Stadt als vereinfachte Blöcke (40-m-Raster aus allen 46 Kacheln, 142 108 Gebäude) auf Höhengelände mit Luftbild; eigener Zeichendurchgang, Dunst weiter gefasst.
 - Boden nach Luftbild nur in Rheydt (Detailkarte, ca. 1,3 m/Pixel). Das grobe Stadtkarten-Luftbild (7,5 m/Pixel) gab außerhalb Schlieren und ist abgeschaltet.
-- Wahrzeichen: GHS Dohr Torfbend und Haupthaus, Hauptkirche (Backsteinfläche), Schloss, Hbf, Borussia-Park (graue Verkleidung) – Fassaden noch ohne Fotos.
+- Wahrzeichen: GHS Dohr Haupthaus (Torfbend bleibt die nach Fotos gebaute Schule), Hauptkirche (Backsteinfläche), Schloss, Hbf, Borussia-Park (graue Verkleidung) – Fassaden noch ohne Fotos.
 - Innenstadt-Regeln auch für Gladbach (Hindenburgstr., Bismarckstr., Alter Markt …); Nachbarkachel wird am Rand vorgeladen.
 - Leistung: Laternen (3 148 je Kachel) und Bäume nur in Spielernähe, entfernte Verkehrsautos ausgeblendet.
 Messung (Software-Rendering im Container, Profil Schul-iPad, Hauptdurchgang; Fernansicht kostet zusätzlich ca. 2 Aufrufe und 0,12 Mio. Dreiecke):
