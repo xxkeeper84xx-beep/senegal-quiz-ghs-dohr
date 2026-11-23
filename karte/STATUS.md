@@ -234,4 +234,4 @@ Messung (Software-Rendering im Container, Profil Schul-iPad, Hauptdurchgang; Fer
 - Bodenkontakt: Füße 1–4 cm über Fahrbahn/Bordstein, Treppe bis 7 cm; Räder ±1 cm (nach Korrektur).
 - Dauertest 3 Minuten: Speicher stabil um 165 MB, keine wachsende Objektzahl.
 Offen (Stufe 2): Kachelwechsel ohne Neuladen, feine Luftbilder für alle Bezirke, weniger Zeichenaufrufe (Passanten/Verkehr bündeln), Gewerbe-Bausatz, Messung auf echtem Schul-iPad, Fassaden nach Fotos.
-- Allee „Am Torfbend“ gegenüber der Schule (x 770–1000): Baumscheiben (1,7 m) und gepflasterte Längsparkbuchten (5,8 m × 2,3 m) im Wechsel, 20 Buchten, gut 70 % besetzt; dort keine halb auf dem Gehweg parkenden Autos und keine Laternen in den Buchten.
+- Allee „Am Torfbend“ nach Fotos (modelle_quelle/fotos_am_torfbend): Südseite Grünstreifen mit großen Kastanien (alle 9,5 m, Stamm 5–7 m), dahinter Schotter-Parkstreifen mit Querparkplätzen und hellen Pflaster-Trennstreifen; Nordseite Pflasterrinne; „30“ auf der Fahrbahn. Entfernt: falsch liegende Platzflächen und der alte Schul-Gehwegstreifen aus der Spielkarte, der schräg über der Fahrbahn lag.

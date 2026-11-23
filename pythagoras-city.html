@@ -2597,8 +2597,8 @@ function buildTreeMeshes(){
   const ob=new THREE.Object3D(),col=new THREE.Color();
   const tI=new THREE.InstancedMesh(trunk,bark,treeList.length);let ti=0;
   by.forEach((list,v)=>{if(!list.length)return;const cI=new THREE.InstancedMesh(variants[v],leaf,list.length);cI.customDepthMaterial=leafDepth;
-    list.forEach((t,i)=>{const hh=h01(t.x*3.1+t.y*7.7),th=2.1+hh*1.7,gy=groundY(t.x,t.y),r=t.r*(.8+hh*.5);
-      ob.position.set(t.x,gy,t.y);ob.scale.set(.9+hh*.6,th,.9+hh*.6);ob.rotation.set((hh-.5)*.08,hh*6,(hh-.5)*.08);ob.updateMatrix();tI.setMatrixAt(ti++,ob.matrix);
+    list.forEach((t,i)=>{const hh=h01(t.x*3.1+t.y*7.7),th=t.th||2.1+hh*1.7,gy=groundY(t.x,t.y),r=t.r*(.8+hh*.5);
+      ob.position.set(t.x,gy,t.y);ob.scale.set((t.tw||1)*(.9+hh*.6),th,(t.tw||1)*(.9+hh*.6));ob.rotation.set((hh-.5)*.08,hh*6,(hh-.5)*.08);ob.updateMatrix();tI.setMatrixAt(ti++,ob.matrix);
       ob.position.set(t.x,gy+th+r*(v===1?.35:.45),t.y);ob.scale.set(r*(.95+h01(i)*.25),r*(.9+h01(i+9)*.3),r*(.95+h01(i+5)*.25));ob.rotation.set(0,hh*17,0);ob.updateMatrix();cI.setMatrixAt(i,ob.matrix);
       const k=.85+h01(i*7+v)*.3;col.setRGB(k,k,k);cI.setColorAt(i,col)});
     cI.castShadow=true;cI.receiveShadow=true;cI.frustumCulled=false;scene.add(cI)});
@@ -10139,36 +10139,61 @@ async function stadtBoden(){const name=MG.region||"rheydt";try{await stadtScript
 {const base=buildCity;buildCity=function(){STADT.B.length=0;const r=base.apply(this,arguments);try{stadtShadows()}catch(e){console.warn("Schatten vorab",e)}stadtBoden().catch(e=>console.warn("Boden",e));return r}}
 {const base=kitInit;kitInit=async function(){await base.apply(this,arguments);try{await wzInit()}catch(e){console.warn("Wahrzeichen",e)}try{await fernInit()}catch(e){console.warn("Fernansicht",e)}}}
 
-/* ---------- 6. Allee „Am Torfbend“ gegenüber der Schule: Baumscheiben und Längsparkbuchten im Wechsel ---------- */
-const ALLEE={n:"Am Torfbend",x0:770,x1:1000,pit:1.7,bay:5.8,w:2.3,items:[]};
-function alleePlan(){if(ALLEE.done)return;ALLEE.done=true;const P={x:0,y:0,dx:1,dy:0};
-  for(const e of edges){if(!e.r||e.r.n!==ALLEE.n||!e.r.c)continue;let s=9,k=0;
-    while(s<e.len-9){const isBay=k%2===1,L=isBay?ALLEE.bay:ALLEE.pit;if(s+L>e.len-9)break;edgePos(e,s+L/2,P);
-      const sd=P.dx>=0?1:-1;   // Normale (−dy, dx)·sd zeigt nach Süden (+y): die Seite gegenüber der Schule
-      const nx=-P.dy*sd,ny=P.dx*sd,off=e.r.w/2+ALLEE.w/2,x=P.x+nx*off,y=P.y+ny*off;
-      let ok=x>ALLEE.x0&&x<ALLEE.x1;if(ok)for(const [a,o] of [[0,0],[L/2,.9],[-L/2,.9],[L/2,-.9],[-L/2,-.9]]){const i=gi(x+P.dx*a+nx*o,y+P.dy*a+ny*o);if(i<0||hgt[i]||solid[i]){ok=false;break}}
-      if(ok&&nearestRoad(x,y,e.r.w/2+2.5,q=>q!==e&&q.r&&q.r.c&&q.r.n!==ALLEE.n))ok=false;
-      if(ok)ALLEE.items.push({bay:isBay,x,y,ang:Math.atan2(P.dy,P.dx),L,dx:P.dx,dy:P.dy,nx,ny});
-      s+=L;k++}}}
-function alleeBuild(){alleePlan();const Y=SIDE_Y+.006,pos=[],uv=[],posP=[],posK=[];
-  const quad=(arr,c,a,b,hl,hw,y,u)=>{const P=[[-hl,-hw],[hl,-hw],[hl,hw],[-hl,-hw],[hl,hw],[-hl,hw]];for(const [l,w] of P){arr.push(c.x+a[0]*l+b[0]*w,y,c.y+a[1]*l+b[1]*w);if(u)u.push(l*.5,w*.5)}};
-  for(const it of ALLEE.items){const a=[it.dx,it.dy],b=[it.nx,it.ny];
-    if(it.bay){quad(pos,it,a,b,it.L/2-.05,ALLEE.w/2,Y,uv);quad(posK,{x:it.x+it.nx*(ALLEE.w/2-.08),y:it.y+it.ny*(ALLEE.w/2-.08)},a,b,it.L/2,.08,Y+.004)}
-    else{quad(posP,it,a,b,it.L/2-.12,ALLEE.w/2-.25,Y+.002);quad(posK,it,a,b,it.L/2,ALLEE.w/2-.1,Y+.001)}}
-  const mk=(p,u,mat)=>{if(!p.length)return;const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(p,3));if(u)g.setAttribute("uv",new THREE.Float32BufferAttribute(u,2));g.computeVertexNormals();
-    const m=new THREE.Mesh(g,mat);m.receiveShadow=true;m.renderOrder=1;scene.add(m);return m};
-  const tex=texPave.clone();tex.needsUpdate=true;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
-  mk(posK,null,new THREE.MeshLambertMaterial({color:0xb8b5ad,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));   // Bordstein-/Einfassungsstreifen
-  mk(pos,uv,new THREE.MeshLambertMaterial({map:tex,color:0x7d7a74,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));   // Pflaster der Parkbuchten
-  mk(posP,null,new THREE.MeshLambertMaterial({color:0x5b4a39,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}))}      // Baumscheiben
-/* Bäume in die Baumscheiben (vor dem Bau der Baum-Instanzen) */
-{const base=buildTrees;buildTrees=function(){try{alleePlan();MG.trees=MG.trees||[];for(const it of ALLEE.items)if(!it.bay)MG.trees.push(it.x,it.y);alleeBuild()}catch(e){console.warn("Allee",e)}return base.apply(this,arguments)}}
-/* Parkende Autos in den Buchten (eben, auf Gehweghöhe); keine halb-auf-dem-Gehweg-Autos und keine Laternen in der Allee */
+/* ---------- 6. Allee „Am Torfbend“ nach Fotos (23.11.) ----------
+   Südseite (gegenüber der Schule): Grünstreifen am Bordstein mit großen Kastanien, dahinter ein Schotter-Parkstreifen
+   mit Querparkplätzen (helle Pflaster-Trennstreifen). Nordseite: Pflasterrinne am Fahrbahnrand. Fahrbahn mit „30“. */
+const ALLEE={n:"Am Torfbend",x0:770,x1:1000,verge:1.7,depth:5.2,bay:2.6,tree:9.5,items:[],trees:[],rinne:[],z30:[]};
+function alleePlan(){if(ALLEE.done)return;ALLEE.done=true;const P={x:0,y:0,dx:1,dy:0},A=ALLEE;
+  const free=(x,y)=>{const i=gi(x,y);return i>=0&&!hgt[i]&&!solid[i]};
+  for(const e of edges){if(!e.r||e.r.n!==A.n||!e.r.c)continue;const hw=e.r.w/2;
+    for(let s=8;s<e.len-8;s+=A.bay){edgePos(e,s+A.bay/2,P);const sd=P.dx>=0?1:-1,nx=-P.dy*sd,ny=P.dx*sd;   // Normale nach Süden
+      const o=hw+A.verge+A.depth/2,x=P.x+nx*o,y=P.y+ny*o;if(x<A.x0||x>A.x1)continue;
+      let ok=true;for(const q of [hw+.3,hw+A.verge,hw+A.verge+1.5,hw+A.verge+3,hw+A.verge+A.depth])for(const a of [-1.2,0,1.2])if(!free(P.x+nx*q+P.dx*a,P.y+ny*q+P.dy*a))ok=false;
+      if(ok&&nearestRoad(x,y,hw+A.verge+A.depth,q=>q!==e&&q.r&&q.r.c&&q.r.n!==A.n))ok=false;
+      if(ok)A.items.push({x,y,ang:Math.atan2(P.dy,P.dx),dx:P.dx,dy:P.dy,nx,ny,rx:P.x,ry:P.y,hw})}
+    for(let s=10;s<e.len-6;s+=A.tree){edgePos(e,s,P);const sd=P.dx>=0?1:-1,nx=-P.dy*sd,ny=P.dx*sd,o=hw+A.verge/2,x=P.x+nx*o,y=P.y+ny*o;
+      if(x>A.x0-10&&x<A.x1+10&&free(x,y)&&A.items.some(it=>Math.hypot(it.x-x,it.y-y)<A.depth))A.trees.push({x,y})}
+    for(let s=2;s<e.len-2;s+=2){edgePos(e,s+1,P);const sd=P.dx>=0?1:-1,nx=P.dy*sd,ny=-P.dx*sd,o=hw-.25;   // Nordseite
+      const x=P.x+nx*o,y=P.y+ny*o;if(x>A.x0-40&&x<A.x1+20)A.rinne.push({x,y,dx:P.dx,dy:P.dy,nx,ny})}
+    for(const f of [.3,.8]){edgePos(e,e.len*f,P);const lane=e.r.w/4,sd=f<.5?1:-1;const x=P.x+(-P.dy)*lane*sd,y=P.y+P.dx*lane*sd;if(x>A.x0-60&&x<A.x1+40)A.z30.push({x,y,ang:Math.atan2(P.dy,P.dx)+(sd>0?0:Math.PI)})}}}
+function alleeBuild(){alleePlan();const A=ALLEE,Y=SIDE_Y+.006,G={gras:[],kies:[],trenn:[],rinne:[]};
+  const quad=(arr,cx,cy,a,b,hl,hw,y)=>{for(const [l,w] of [[-hl,-hw],[hl,-hw],[hl,hw],[-hl,-hw],[hl,hw],[-hl,hw]])arr.push(cx+a[0]*l+b[0]*w,y,cy+a[1]*l+b[1]*w)};
+  for(const it of A.items){const a=[it.dx,it.dy],b=[it.nx,it.ny],vg=it.hw+A.verge/2;
+    quad(G.gras,it.rx+it.nx*vg,it.ry+it.ny*vg,a,b,A.bay/2+.02,A.verge/2,Y);
+    quad(G.kies,it.x,it.y,a,b,A.bay/2+.02,A.depth/2,Y+.001);
+    quad(G.trenn,it.x+it.dx*A.bay/2,it.y+it.dy*A.bay/2,a,b,.13,A.depth/2,Y+.002)}
+  for(const r of A.rinne)quad(G.rinne,r.x,r.y,[r.dx,r.dy],[r.nx,r.ny],1.02,.24,ROAD_Y+.004);
+  const mk=(p,col,off,map,rep)=>{if(!p.length)return;const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(p,3));
+    if(map){const uv=[];for(let i=0;i<p.length;i+=3)uv.push(p[i]*rep,p[i+2]*rep);g.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2))}g.computeVertexNormals();
+    const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:col,map:map||null,polygonOffset:true,polygonOffsetFactor:off,polygonOffsetUnits:off}));m.receiveShadow=true;scene.add(m)};
+  const kt=texPave.clone();kt.needsUpdate=true;kt.wrapS=kt.wrapT=THREE.RepeatWrapping;
+  mk(G.gras,0x5d7a3a,-3);mk(G.kies,0xb3ab9b,-3,kt,.6);mk(G.trenn,0xc9c6c0,-5);mk(G.rinne,0x8d8a84,-3,kt,1.8);
+  // „30“ auf der Fahrbahn
+  const c=document.createElement("canvas");c.width=256;c.height=128;const x=c.getContext("2d");x.fillStyle="#fff";x.font="bold 120px Arial";x.textAlign="center";x.textBaseline="middle";x.fillText("30",128,70);
+  const t=new THREE.CanvasTexture(c);t.anisotropy=8;const mt=new THREE.MeshLambertMaterial({map:t,transparent:true,opacity:.92,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-6,polygonOffsetUnits:-6});
+  for(const z of A.z30){const m=new THREE.Mesh(new THREE.PlaneGeometry(2.6,1.3),mt);m.rotation.set(-Math.PI/2,0,-z.ang-Math.PI/2);m.position.set(z.x,ROAD_Y+.008,z.y);m.receiveShadow=true;scene.add(m)}}
+/* Kastanien: hoher Stamm, große Krone (Bauminstanzen kennen dafür Stammhöhe th und Stammdicke tw) */
+{const base=buildTreeMeshes;buildTreeMeshes=function(){try{alleePlan();for(const t of ALLEE.trees)treeList.push({x:t.x,y:t.y,r:4.6+kitHash(Math.round(t.x),2)*1.2,th:5.2+kitHash(Math.round(t.y),4)*1.6,tw:2.6})}catch(e){console.warn("Allee",e)}return base.apply(this,arguments)}}
+{const base=buildTrees;buildTrees=function(){try{alleeBuild()}catch(e){console.warn("Allee",e)}return base.apply(this,arguments)}}
+/* Querparken auf dem Schotterstreifen; dort keine halb-auf-dem-Gehweg-Autos und keine Laternen */
 const alleeNear=(x,y,r)=>ALLEE.items.some(it=>Math.hypot(it.x-x,it.y-y)<r);
-{const base=raSlots;raSlots=function(){base();const keep=RA.slots.filter(S=>!alleeNear(S.x,S.y,6));RA.slots.length=0;RA.grid.clear();
-  for(const it of ALLEE.items)if(it.bay&&kitHash(Math.round(it.x),Math.round(it.y))<.72)keep.push({x:it.x,y:it.y,ang:it.ang+(kitHash(Math.round(it.y),3)<.5?Math.PI:0),flat:true,y0:SIDE_Y+.01,m:Math.floor(kitHash(Math.round(it.x),7)*3),c:Math.floor(kitHash(Math.round(it.y),11)*RA_PARKCOL.length)});
+{const base=raSlots;raSlots=function(){base();const keep=RA.slots.filter(S=>!alleeNear(S.x,S.y,5.5));RA.slots.length=0;RA.grid.clear();
+  for(const it of ALLEE.items){const h=kitHash(Math.round(it.x*3),Math.round(it.y*3));if(h>.78)continue;const nose=h<.6;   // meist mit der Front zur Straße
+    keep.push({x:it.x-it.nx*.25,y:it.y-it.ny*.25,ang:Math.atan2(nose?-it.ny:it.ny,nose?-it.nx:it.nx)+(kitHash(Math.round(it.y),5)-.5)*.08,flat:true,y0:SIDE_Y+.01,m:Math.floor(kitHash(Math.round(it.x),7)*3),c:Math.floor(kitHash(Math.round(it.y),11)*RA_PARKCOL.length)})}
   for(const S of keep){RA.slots.push(S);const k=Math.floor(S.x/RA.cell)+"_"+Math.floor(S.y/RA.cell);(RA.grid.get(k)||RA.grid.set(k,[]).get(k)).push(S)}}}
-{const base=kitCull;kitCull=function(){if(KIT.lampNear&&!ALLEE.lampsDone){ALLEE.lampsDone=true;const f=(x,z)=>ALLEE.items.some(it=>Math.abs((x-it.x)*it.dx+(z-it.y)*it.dy)<it.L/2+.6&&Math.abs((x-it.x)*it.nx+(z-it.y)*it.ny)<ALLEE.w/2+.4);KIT.lampNear.drop(f);KIT.lampFar.drop(f)}return base()}}
+{const base=kitCull;kitCull=function(){if(KIT.lampNear&&!ALLEE.lampsDone){ALLEE.lampsDone=true;const f=(x,z)=>ALLEE.items.some(it=>Math.abs((x-it.rx)*it.dx+(z-it.ry)*it.dy)<ALLEE.bay/2+.3&&(x-it.rx)*it.nx+(z-it.ry)*it.ny>it.hw-.2&&(x-it.rx)*it.nx+(z-it.ry)*it.ny<it.hw+ALLEE.verge+ALLEE.depth+.3);KIT.lampNear.drop(f);KIT.lampFar.drop(f)}return base()}}
+/* Die drei „Platz“-Flächen entlang Am Torfbend (Kartendaten der Parkflächen, versetzt über der Fahrbahn) entfallen – der Parkstreifen ersetzt sie */
+if(MG&&MG.areas&&(MG.region||"rheydt")==="rheydt"){MG.areas=MG.areas.filter(a=>{if(a.t!=="plaza")return true;const xs=a.p.filter((v,i)=>i%2===0),ys=a.p.filter((v,i)=>i%2===1);
+  return !(Math.min(...xs)>780&&Math.max(...xs)<1000&&Math.min(...ys)>225&&Math.max(...ys)<275)})}
+/* Zufahrten (service), die fast deckungsgleich auf der Straße Am Torfbend liegen (Kartendaten der Parkplatzzufahrt), entfallen */
+if(MG&&MG.roads&&MG.nodes&&(MG.region||"rheydt")==="rheydt"){const N=MG.nodes,main=MG.roads.filter(r=>r.n==="Am Torfbend"&&r.h==="residential");
+  const dSeg=(x,y)=>{let d=1e9;for(const r of main)for(let j=1;j<r.i.length;j++){const ax=N[2*r.i[j-1]],ay=N[2*r.i[j-1]+1],bx=N[2*r.i[j]],by=N[2*r.i[j]+1],dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1)));d=Math.min(d,Math.hypot(x-ax-dx*t,y-ay-dy*t))}return d};
+  const n0=MG.roads.length;MG.roads=MG.roads.filter(r=>{if(r.h!=="service")return true;const pts=r.i.map(k=>[N[2*k],N[2*k+1]]);if(!pts.every(([x,y])=>x>760&&x<1010&&y>215&&y<285))return true;return !pts.every(([x,y])=>dSeg(x,y)<3.5)});
+  ALLEE.zufahrtWeg=n0-MG.roads.length}
+/* Gehwegstreifen der Schule aus der alten Spielkarte (lokal z −63…−56, 147 m lang) liegt auf der echten Karte schräg über der Fahrbahn → ausblenden */
+function schulGehwegWeg(){try{let n=0;scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.parent||o.parent.type!=="Group")return;o.geometry.computeBoundingBox();const b=o.geometry.boundingBox;
+  if(Math.abs(b.max.y-b.min.y)<.01&&b.min.y>.25&&b.min.y<.3&&b.min.z>-64&&b.max.z<-55&&b.max.x-b.min.x>100){o.visible=false;n++}});ALLEE.schulGehweg=n}catch(e){console.warn("Schulgehweg",e)}}
+{const base=kitInit;kitInit=async function(){schulGehwegWeg();await base.apply(this,arguments);schulGehwegWeg()}}
 
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){
