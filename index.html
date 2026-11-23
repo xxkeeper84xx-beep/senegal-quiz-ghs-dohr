@@ -9234,6 +9234,9 @@ const VARS=[
   {id:"ca_sport",base:"auto",shop:"auto",name:"Kompakt Sport",icon:"🚘",price:1050,paint:"#d81e2c",st:{max:23,acc:8.5},x:["streifen","spoiler"],desc:"Sportfahrwerk, Spoiler und Rennstreifen."},
   {id:"ca_elektro",base:"auto",shop:"auto",name:"Elektro-Kompakt",icon:"⚡",price:1180,paint:"#3fa7d6",st:{max:21,acc:9},desc:"Leise, elektrisch und spritzig beim Anfahren."},
   {id:"ca_suv",base:"suv",shop:"auto",name:"SUV Rheydt",icon:"🚙",price:1690,paint:"#2f4a3c",st:{},def:true,desc:"Großer SUV mit viel Platz und hoher Sitzposition – gebaut für Rheydt."},
+  {id:"ca_rstadt",base:"rstadt",shop:"auto",name:"Rheydt Stadtauto",icon:"🚗",price:940,paint:"#c0392b",st:{},def:true,desc:"Kompakter Kombi für die Stadt: wendig, sparsam und mit viel Platz."},
+  {id:"ca_rlim",base:"rlim",shop:"auto",name:"Rheydt Limousine",icon:"🚘",price:1490,paint:"#1d3a5f",st:{},def:true,desc:"Lange, ruhige Limousine mit Chromleisten – elegant über die Gracht."},
+  {id:"ca_rsuv",base:"rsuv",shop:"auto",name:"SUV Metallic",icon:"🚙",price:1890,paint:"#5b7a66",st:{},def:true,desc:"Hoher SUV mit Metalliclack und Dachreling."},
   {id:"ca_van",base:"van",shop:"auto",name:"Transporter",icon:"🚐",price:1090,paint:"#f2f2f2",st:{},def:true,desc:"Viel Laderaum: jede Lieferung bringt 50 % mehr Geld."},
   {id:"ca_prius",base:"prius",shop:"auto",name:"Toyota Prius",icon:"🚗",price:1390,paint:"#a9bccd",st:{},def:true,desc:"Leiser Hybrid mit mehr Tempo für weite Lieferungen."},
   {id:"ca_aston",base:"aston",shop:"auto",name:"Aston Martin",icon:"🏎️",price:2590,paint:"#1f5c4a",st:{},def:true,desc:"Britischer Sportwagen mit langer Motorhaube."},
@@ -9366,7 +9369,7 @@ function buildAero(){const A=MG.aero;if(!A||!(A.runways.length+A.taxi.length+A.a
 const SHOWS={rad:[],auto:[],flug:[]};
 {const R=RAD;const sc=VARS.filter(v=>v.base==="scoot"),bk=VARS.filter(v=>v.base==="bike");
   sc.forEach((v,i)=>SHOWS.rad.push({v,room:R,X:2.6-i*2.6,Z:-5.6,h:Math.PI/2}));bk.forEach((v,i)=>SHOWS.rad.push({v,room:R,X:3.2-i*2.2,Z:4.4,h:-Math.PI/2+.25}))}
-{const R=AUT,cars=VARS.filter(v=>v.shop==="auto"&&!/moped/.test(v.base));const slots=[[5.2,-10.5],[5.2,-3.5],[5.2,3.5],[5.2,10.5],[-2.4,-10.5],[-2.4,-3.5],[-2.4,3.5],[-2.4,10.5],[1.4,0]];
+{const R=AUT,cars=VARS.filter(v=>v.shop==="auto"&&!/moped/.test(v.base));const slots=[[5.2,-10.5],[5.2,-3.5],[5.2,3.5],[5.2,10.5],[-2.4,-10.5],[-2.4,-3.5],[-2.4,3.5],[-2.4,10.5],[1.4,0],[-8.4,-7],[-8.4,0],[-8.4,7]];
   cars.forEach((v,i)=>{const s=slots[i];if(s)SHOWS.auto.push({v,room:R,X:s[0],Z:s[1],h:Math.PI/2+(i%2?.55:-.55)})});
   VARS.filter(v=>v.base==="moped").forEach((v,i)=>SHOWS.auto.push({v,room:R,X:-8,Z:(i?1:-1)*8,h:Math.PI/2}))}
 {const air=VARS.filter(v=>v.base==="plane").concat(VARS.filter(v=>v.base==="heli"));air.forEach((v,i)=>{const p=FLUG.spots[i];if(p)SHOWS.flug.push({v,x:p[0],y:p[1],a:FLUG.a})})}
@@ -9827,7 +9830,7 @@ body.gfx-portrait #prompt{bottom:calc(118px + env(safe-area-inset-bottom,0px))!i
      mehrere Dachgauben je Dachseite, auf der Dachfläche hinter der Traufe.
      Reichweite und Anzahl je Grafikprofil. */
 const KIT={parts:{},ready:false,bld:[],grid:new Map(),cell:50,last:{x:1e9,y:1e9,t:0}};
-const KIT_CAP={schule:{r:28,win:70,door:16,pipe:24,dorm:16,shop:10,shopR:6,bikeP:8,scooP:3},standard:{r:42,win:200,door:36,pipe:50,dorm:40,shop:24,shopR:14,bikeP:24,scooP:8},hoch:{r:65,win:460,door:70,pipe:90,dorm:80,shop:40,shopR:24,bikeP:40,scooP:14}};
+const KIT_CAP={schule:{r:28,win:70,door:16,pipe:24,dorm:16,shop:10,shopR:6,bikeP:8,scooP:3,rhaus:3},standard:{r:42,win:200,door:36,pipe:50,dorm:40,shop:24,shopR:14,bikeP:24,scooP:8,rhaus:8},hoch:{r:65,win:460,door:70,pipe:90,dorm:80,shop:40,shopR:24,bikeP:40,scooP:14,rhaus:16}};
 /* Gebäude für den Bausatz merken (aus buildCity aufgerufen) */
 function gfxRecord(p,h,m,kind,ccw,GB,t){if(m>0||!(kind==="res"||kind==="brick"))return;let cx=0,cy=0;const n=p.length/2;for(let i=0;i<n;i++){cx+=p[2*i];cy+=p[2*i+1]}cx/=n;cy/=n;
   const B={p,h,ccw,kind,GB,cx,cy,i:KIT.bld.length,shopT:/retail|commercial|kiosk|supermarket|shop/.test(t||"")};KIT.bld.push(B);const k=Math.floor(cx/KIT.cell)+"_"+Math.floor(cy/KIT.cell);(KIT.grid.get(k)||KIT.grid.set(k,[]).get(k)).push(B)}
@@ -9873,6 +9876,13 @@ async function kitLamps(){const P=await kitLoad("lamp","stadt/Laterne.json");let
 const SHOP_STR=/^(Hauptstraße|Marktstraße|Markt|Limitenstraße|Stresemannstraße|Harmoniestraße|Am Neumarkt|Wilhelm-Strater-Straße|Langensgasse|Paulstraße|Gracht|Bahnhofstraße|Friedrich-Ebert-Straße)$/;
 function kitShopWall(B,x,y){if(B.shopT)return !!nearestRoad(x,y,10);if(!KIT.rheydt(x,y))return false;return !!nearestRoad(x,y,9,e=>e.r.h==="pedestrian"||SHOP_STR.test(e.r.n||""))}
 const KM={};
+/* Klinker-Reihenhaus (MG Teil 2) vor Straßenwänden: Rheydt häufig, sonst selten; nur Häuser ohne eigenes Satteldach */
+function kitRHWall(B,i,x0,z0,L,dx,dz,onx,onz,shop){if(!KM.rhaus||shop||B.GB||L<5.8||B.h<5||B.h>11)return null;
+  const mx=x0+dx*L/2,mz=z0+dz*L/2;if(!nearestRoad(mx+onx*7,mz+onz*7,9,e=>e.r&&e.r.w>=4.5&&!/footway|path|steps|cycleway|service/.test(e.r.h||"")))return null;
+  const o=MG.real&&MG.real.orte&&MG.real.orte.rheydt_marktplatz,rh=o&&Math.hypot(mx-o.x,mz-o.y)<1100;if(kitHash(B.i*13+i,77)>(rh?.75:.22))return null;
+  let dep=9.3;for(const f of [.2,.5,.8]){const ax=x0+dx*L*f,az=z0+dz*L*f;for(let t=.6;t<=9.3;t+=.4){if(!inPoly(ax-onx*t,az-onz*t,B.p)){dep=Math.min(dep,t-.4);break}}}
+  if(dep<4)return null;let n=Math.max(1,Math.round(L/6.8)),sx=L/(n*6.8);if(sx<.82&&n>1){n--;sx=L/(n*6.8)}if(sx>1.3||sx<.8)return null;
+  const sy=(B.h+.3)/(KIT.rhEave||7);if(sy<.85||sy>1.4)return null;return {n,sx,sz:Math.min(1,dep/9.3),sy}}
 /* frei begehbarer Gehweg? (kein Haus, keine Fahrbahn) */
 function kitWalk(x,y){const i=gi(x,y);return i>=0&&!hgt[i]&&!solid[i]&&!(surf[i]&4)&&!!(surf[i]&8)}
 const kitHash=(a,b)=>{let h=(a*73856093)^(b*19349663);h=(h^(h>>>13))*1274126177;return ((h^(h>>>16))>>>0)/4294967296};
@@ -9893,6 +9903,8 @@ function kitBuildInst(){const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;const R=cap.
       const dx=(x1-x0)/L,dz=(z1-z0)/L,onx=B.ccw?dz:-dz,onz=B.ccw?-dx:dx,ang=Math.atan2(onx,onz);if(L>longest){longest=L;li=i}
       const wallD=Math.hypot((x0+x1)/2-px,(z0+z1)/2-py);
       const shop=KIT.parts.shop&&L>4.5&&(B.sw[i]!==undefined?B.sw[i]:(B.sw[i]=kitShopWall(B,(x0+x1)/2+onx*1.5,(z0+z1)/2+onz*1.5)));
+      const RH=(B.rh=B.rh||[])[i]!==undefined?B.rh[i]:(B.rh[i]=kitRHWall(B,i,x0,z0,L,dx,dz,onx,onz,shop));
+      if(RH){if(wallD<R)for(let q=0;q<RH.n;q++){const uc=(q+.5)*L/RH.n;if(!put(KM.rhaus,x0+dx*uc+onx*.04,BASE_Y,z0+dz*uc+onz*.04,ang,RH.sy,RH.sx,RH.sz))break}u+=L;continue}
       if(wallD<R){const kStart=Math.ceil(u/WIN-.5),kEnd=Math.floor((u+L)/WIN-.5);let shopDone=false;
         for(let k=kStart;k<=kEnd;k++){const uc=(k+.5)*WIN-u;if(uc<.8||uc>L-.8)continue;const wx=x0+dx*uc+onx*.06,wz=z0+dz*uc+onz*.06,col=((k%8)+8)%8;
           for(let f=0;;f++){const y0=f*FLOOR,cy=y0+FLOOR*(64-32.5)/64;if(cy+1.05>B.h)break;
@@ -9915,12 +9927,87 @@ function kitBuildInst(){const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;const R=cap.
           for(let q=0;q<cnt;q++){const t=el*(q+.5)/cnt;put(KM.dorm,E0[0]+ex*t+nx*s0,BASE_Y+yb-Pd.min.y*sc,E0[1]+ez*t+nz*s0,Math.atan2(-nx,-nz),sc,sc,sc)}}}}}
   for(const k in KM){const K=KM[k];if(!K)continue;for(const im of K.ms){im.count=K.n;im.instanceMatrix.needsUpdate=true}}}
 async function kitInit(){try{await kitLamps()}catch(e){console.info("Laterne nicht geladen",e)}
-  const list=[["bikeP","fahrzeuge/Fahrrad.json"],["scooP","fahrzeuge/E-Scooter.json"],["win","bau/Fenster_Laibung_Fensterbank.json"],["door","bau/Hauseingang_mit_Stufe.json"],["pipe","bau/Regenrohr.json"],["dorm","bau/Dachgaube.json"],["shop","bau/Ladenerdgeschoss.json"],["shopR","bau/Ladenfassade_Rheydt.json"]];
+  const list=[["bikeP","fahrzeuge/Fahrrad.json"],["scooP","fahrzeuge/E-Scooter.json"],["win","bau/Fenster_Laibung_Fensterbank.json"],["door","bau/Hauseingang_mit_Stufe.json"],["pipe","bau/Regenrohr.json"],["dorm","bau/Dachgaube.json"],["shop","bau/Ladenerdgeschoss.json"],["shopR","bau/Ladenfassade_Rheydt.json"],["rhaus","bau/Rheydt_Klinker_Reihenhaus.json"]];
   const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;for(const [k,f] of list){try{await kitLoad(k,f);if(k==="bikeP")kitNormVeh(k,1.75);if(k==="scooP")kitNormVeh(k,1.12);KM[k]=kitMeshes(k,cap[k])}catch(e){console.info("Bausatz fehlt",k,e)}}
   KIT.oy={door:KIT.parts.door?-KIT.parts.door.box.min.y:1.23,win:KIT.parts.win?(KIT.parts.win.box.min.y+KIT.parts.win.box.max.y)/2:0,dorm:KIT.parts.dorm?-KIT.parts.dorm.box.min.y*.15:0};
+  if(KIT.parts.rhaus){const b=new THREE.Box3();for(const q of KIT.parts.rhaus.parts)if(/Schiefer/i.test(q.mat.name||"")){q.geo.computeBoundingBox();b.union(q.geo.boundingBox)}if(!b.isEmpty())KIT.rhEave=b.min.y}
   KIT.ready=true;kitBuildInst()}
 {const base=update;update=function(dt){base(dt);if(!KIT.ready)return;KIT.last.t-=dt;if(KIT.last.t>0)return;KIT.last.t=.5;if(Math.hypot(car.x-KIT.last.x,car.y-KIT.last.y)<6)return;KIT.last.x=car.x;KIT.last.y=car.y;kitBuildInst()}}
 {const base=loadVehicles;loadVehicles=async function(){const r=await base.apply(this,arguments);try{if(THREE.GLTFLoader)await kitInit()}catch(e){console.warn("Bausatz",e)}return r}}
+
+/* ================= Rheydt-Autos (MG Teil 2, 23.11.) =================
+   - Stadtverkehr: in Spielernähe fahren die Autos als Rheydt-Modelle (Stadtauto, Limousine, SUV Metallic) in der Farbe des Verkehrsautos;
+     weiter weg bleibt das einfache Modell (spart Rechenzeit).
+   - Parkende Autos am Straßenrand von Wohn- und Nebenstraßen, halb auf dem Gehweg wie in vielen Rheydter Straßen;
+     werden um die Spielfigur herum aufgebaut (Anzahl je Grafikprofil), mit Kollision.
+   - Autohaus: die drei Modelle als neue Fahrzeuge zum Kaufen und Selberfahren (fahrzeuge/Rheydt_*.json, mit Radknoten). */
+const RA={files:["Rheydt_Stadtauto","Rheydt_Limousine","Rheydt_SUV_Metallic"],ready:false,slots:[],grid:new Map(),cell:40,last:{x:1e9,y:1e9,t:0},pk:[]};
+const RA_CAP={schule:{r:55,park:10,trafR:45,traf:4},standard:{r:85,park:26,trafR:80,traf:10},hoch:{r:130,park:48,trafR:130,traf:20}};
+const RA_PARKCOL=["#e8eaf2","#2b2f3d","#9aa0a8","#1d3a5f","#6b6f78","#f2f2f2","#111111","#8a1f2b","#3f5f4f","#c9c3b4","#4a5d73","#b8262e"];
+const RA_COL=new THREE.Color();
+
+/* ---------- Kaufbare Fahrzeuge ---------- */
+{const add=[{id:"rstadt",name:"Rheydt Stadtauto",icon:"🚗",price:940,req:1,max:20,acc:7.5,rev:-4.5,r:1.12,grassF:.55,turn:2.6,cam:1,lights:true,nitro:true,desc:"Kompakter Kombi für die Stadt: wendig, sparsam und mit viel Platz."},
+  {id:"rlim",name:"Rheydt Limousine",icon:"🚘",price:1490,req:2,max:23,acc:7.5,rev:-4.5,r:1.12,grassF:.5,turn:2.3,cam:1.02,lights:true,nitro:true,desc:"Lange, ruhige Limousine mit Chromleisten – elegant über die Gracht."},
+  {id:"rsuv",name:"SUV Metallic",icon:"🚙",price:1890,req:2,max:22,acc:7,rev:-4.5,r:1.18,grassF:.7,turn:2.3,cam:1.06,lights:true,nitro:true,desc:"Hoher SUV mit Metalliclack und Dachreling."}];
+  let at=VEHICLES.findIndex(v=>v.id==="suv")+1;for(const v of add){VEHICLES.splice(at++,0,v);VEH[v.id]=v}
+  DEF_PAINT.rstadt="#c0392b";DEF_PAINT.rlim="#1d3a5f";DEF_PAINT.rsuv="#5b7a66";
+  VMOD.rstadt="Rheydt_Stadtauto";VMOD.rlim="Rheydt_Limousine";VMOD.rsuv="Rheydt_SUV_Metallic";VPAINT.rstadt=VPAINT.rlim=VPAINT.rsuv="Lack";
+  AXLE.rstadt=1.2;AXLE.rlim=1.4;AXLE.rsuv=1.2;
+}
+{const base=buildVehicles;buildVehicles=function(){base();for(const id of ["rstadt","rlim","rsuv"]){vehMeshes[id]=makeCar(pc(id),true,{type:id==="rlim"?"sedan":"hatch"});vehMeshes[id].visible=false}}}
+
+/* ---------- leichte Verkehrsmodelle laden ---------- */
+async function raInit(){for(let i=0;i<3;i++){try{const P=await kitLoad("ra"+i,"fahrzeuge/verkehr/"+RA.files[i]+".json");
+      for(const q of P.parts){const m=q.mat;if(/Glas/i.test(m.name||"")){m.transparent=false;m.opacity=1;m.depthWrite=true;m.color.setRGB(.035,.045,.055);m.roughness=.08;m.metalness=.2}
+        if(ENV){m.envMap=ENV;m.envMapIntensity=.7}if(/^Lack/.test(m.name||"")){q.lack=true;m.color.set(0xffffff)}}
+      // Modell: Front zeigt nach +Z → im Spiel nach +X
+      const R=new THREE.Matrix4().makeRotationY(Math.PI/2);for(const q of P.parts)q.geo.applyMatrix4(R);P.box.applyMatrix4(R)}catch(e){console.info("Verkehrsauto fehlt",i,e)}}
+  RA.ok=[0,1,2].filter(i=>KIT.parts["ra"+i]);if(!RA.ok.length)return;
+  const cap=RA_CAP[GFX.id]||RA_CAP.standard;RA.inst=RA.ok.map(i=>{const K=kitMeshes("ra"+i,cap.park);K.ms.forEach((im,j)=>{if(KIT.parts["ra"+i].parts[j].lack)im.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(cap.park*3).fill(1),3)});return K});
+  raSlots();raTraffic();RA.ready=true;raPark()}
+
+/* ---------- Parkplätze am Straßenrand (einmal berechnet) ---------- */
+function raSlots(){const P={x:0,y:0,dx:1,dy:0};const RT=/^(residential|living_street|unclassified|tertiary)$/;
+  const nearRoom=(x,y)=>(typeof ROOMS!=="undefined"?ROOMS:[]).some(r=>Math.hypot(r.cx-x,r.cy-y)<26);
+  for(const e of edges){if(!e.r||!RT.test(e.r.h||"")||e.r.w<6||e.len<34||e.r.o)continue;
+    for(const sd of [1,-1])for(let s=14;s<e.len-14;s+=6.3){const h=kitHash(e.id*2+(sd>0?1:0),Math.round(s));if(h>.42)continue;
+      edgePos(e,s,P);const nx=-P.dy*sd,ny=P.dx*sd,off=e.r.w/2+.3,x=P.x+nx*off,y=P.y+ny*off;
+      // innen Fahrbahn, außen kein Haus, keine Kreuzung/Einfahrt, nicht auf dem Schulgelände
+      let ok=true;for(const [o,a] of [[-.95,0],[1.05,0],[-.95,2.2],[-.95,-2.2],[1.05,2.2],[1.05,-2.2]]){const qx=x+nx*o+P.dx*a,qy=y+ny*o+P.dy*a,i=gi(qx,qy);if(i<0||hgt[i]||solid[i]){ok=false;break}if(o<0&&!(surf[i]&4)){ok=false;break}}
+      if(!ok)continue;if(typeof inSchool==="function"&&inSchool(x,y,3))continue;if(nearRoom(x,y))continue;
+      const o2=nearestRoad(x,y,e.r.w/2+5,q=>q!==e&&q.r&&q.r.w>=3.5&&!/footway|path|steps|cycleway/.test(q.r.h||""));if(o2)continue;
+      const S={x,y,ang:Math.atan2(P.dy,P.dx)+(kitHash(e.id,Math.round(s*3))<.5?Math.PI:0),roll:sd,m:Math.floor(kitHash(Math.round(s),e.id)*3),c:Math.floor(kitHash(e.id+7,Math.round(s))*RA_PARKCOL.length)};
+      RA.slots.push(S);const k=Math.floor(x/RA.cell)+"_"+Math.floor(y/RA.cell);(RA.grid.get(k)||RA.grid.set(k,[]).get(k)).push(S)}}}
+
+/* ---------- parkende Autos um die Spielfigur aufbauen ---------- */
+function raPark(){if(!RA.inst)return;const cap=RA_CAP[GFX.id]||RA_CAP.standard,R=cap.r,px=car.x,py=car.y,near=[];
+  for(let a=Math.floor((px-R)/RA.cell);a<=Math.floor((px+R)/RA.cell);a++)for(let b=Math.floor((py-R)/RA.cell);b<=Math.floor((py+R)/RA.cell);b++){const L=RA.grid.get(a+"_"+b);if(L)for(const S of L){const d=Math.hypot(S.x-px,S.y-py);if(d<R)near.push([d,S])}}
+  near.sort((a,b)=>a[0]-b[0]);for(const K of RA.inst)K.n=0;
+  // Kollision: alte Einträge entfernen, je Auto drei kleine Kreise längs
+  for(let i=parkedList.length-1;i>=0;i--)if(parkedList[i].ra)parkedList.splice(i,1);
+  const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler(),Pv=new THREE.Vector3(),S1=new THREE.Vector3(1,1,1);let n=0;
+  for(const [d,S] of near){if(n>=cap.park)break;const mi=RA.ok.indexOf(S.m)>=0?RA.ok.indexOf(S.m):0,K=RA.inst[mi];if(!K||K.n>=K.cap)continue;
+    // Räder auf der Gehwegseite 15 cm höher: Auto leicht um die Längsachse geneigt
+    const fx=Math.cos(S.ang),fy=Math.sin(S.ang);E.set(0,-S.ang,0);Q.setFromEuler(E);Q.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(fx,0,fy),raRoll(S)));
+    Pv.set(S.x,(ROAD_Y+SIDE_Y)/2,S.y);M.compose(Pv,Q,S1);
+    K.ms.forEach((im,j)=>{im.setMatrixAt(K.n,M);if(im.instanceColor){im.setColorAt(K.n,RA_COL.set(RA_PARKCOL[S.c]).convertSRGBToLinear());}});K.n++;n++;
+    for(const t of [-1.45,0,1.45])parkedList.push({x:S.x+fx*t,y:S.y+fy*t,bike:true,ra:true})}
+  for(const K of RA.inst)for(const im of K.ms){im.count=K.n;im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true}}
+/* Neigung: die Räder auf der Gehwegseite stehen 15 cm höher */
+function raRoll(S){const i=gi(S.x+(-Math.sin(S.ang))*.9,S.y+Math.cos(S.ang)*.9);const left=i>=0&&(surf[i]&8)&&!(surf[i]&4);return left?-.09:.09}
+
+/* ---------- Stadtverkehr: Rheydt-Modelle in der Nähe ---------- */
+function raTraffic(){RA.traf=[];for(const n of npcs){if(n.bike||n.police)continue;const i=RA.ok[Math.floor(kitHash(npcs.indexOf(n),5)*RA.ok.length)],P=KIT.parts["ra"+i];
+    const g=new THREE.Group();for(const q of P.parts){let m=q.mat;if(q.lack){m=q.mat.clone();m.color.set(n.col).convertSRGBToLinear()}const me=new THREE.Mesh(q.geo,m);me.castShadow=true;me.receiveShadow=true;g.add(me)}
+    g.visible=false;scene.add(g);n.ra=g;RA.traf.push(n)}}
+{const base=update;update=function(dt){base(dt);if(!RA.ready)return;
+  const cap=RA_CAP[GFX.id]||RA_CAP.standard;let shown=0;
+  const L=RA.traf.map(n=>[n.x===undefined?1e9:Math.hypot(n.x-car.x,n.y-car.y),n]).sort((a,b)=>a[0]-b[0]);
+  for(const [d,n] of L){const on=d<cap.trafR&&shown<cap.traf&&!n.police&&n.mesh&&n.mesh.parent;if(on){shown++;n.ra.position.copy(n.mesh.position);n.ra.rotation.copy(n.mesh.rotation)}
+    if(n.ra.visible!==on){n.ra.visible=on;if(n.mesh)n.mesh.visible=!on}}
+  RA.last.t-=dt;if(RA.last.t>0)return;RA.last.t=.5;if(Math.hypot(car.x-RA.last.x,car.y-RA.last.y)<8)return;RA.last.x=car.x;RA.last.y=car.y;raPark()}}
+{const base=kitInit;kitInit=async function(){await base.apply(this,arguments);try{await raInit()}catch(e){console.warn("Rheydt-Autos",e)}}}
 
 /* ================= Umzug auf die echte Karte: feste Orte aus dem Programmcode umrechnen ================= */
 if(MG.FX){

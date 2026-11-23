@@ -8,7 +8,7 @@
      mehrere Dachgauben je Dachseite, auf der Dachfläche hinter der Traufe.
      Reichweite und Anzahl je Grafikprofil. */
 const KIT={parts:{},ready:false,bld:[],grid:new Map(),cell:50,last:{x:1e9,y:1e9,t:0}};
-const KIT_CAP={schule:{r:28,win:70,door:16,pipe:24,dorm:16,shop:10,shopR:6,bikeP:8,scooP:3},standard:{r:42,win:200,door:36,pipe:50,dorm:40,shop:24,shopR:14,bikeP:24,scooP:8},hoch:{r:65,win:460,door:70,pipe:90,dorm:80,shop:40,shopR:24,bikeP:40,scooP:14}};
+const KIT_CAP={schule:{r:28,win:70,door:16,pipe:24,dorm:16,shop:10,shopR:6,bikeP:8,scooP:3,rhaus:3},standard:{r:42,win:200,door:36,pipe:50,dorm:40,shop:24,shopR:14,bikeP:24,scooP:8,rhaus:8},hoch:{r:65,win:460,door:70,pipe:90,dorm:80,shop:40,shopR:24,bikeP:40,scooP:14,rhaus:16}};
 /* Gebäude für den Bausatz merken (aus buildCity aufgerufen) */
 function gfxRecord(p,h,m,kind,ccw,GB,t){if(m>0||!(kind==="res"||kind==="brick"))return;let cx=0,cy=0;const n=p.length/2;for(let i=0;i<n;i++){cx+=p[2*i];cy+=p[2*i+1]}cx/=n;cy/=n;
   const B={p,h,ccw,kind,GB,cx,cy,i:KIT.bld.length,shopT:/retail|commercial|kiosk|supermarket|shop/.test(t||"")};KIT.bld.push(B);const k=Math.floor(cx/KIT.cell)+"_"+Math.floor(cy/KIT.cell);(KIT.grid.get(k)||KIT.grid.set(k,[]).get(k)).push(B)}
@@ -54,6 +54,13 @@ async function kitLamps(){const P=await kitLoad("lamp","stadt/Laterne.json");let
 const SHOP_STR=/^(Hauptstraße|Marktstraße|Markt|Limitenstraße|Stresemannstraße|Harmoniestraße|Am Neumarkt|Wilhelm-Strater-Straße|Langensgasse|Paulstraße|Gracht|Bahnhofstraße|Friedrich-Ebert-Straße)$/;
 function kitShopWall(B,x,y){if(B.shopT)return !!nearestRoad(x,y,10);if(!KIT.rheydt(x,y))return false;return !!nearestRoad(x,y,9,e=>e.r.h==="pedestrian"||SHOP_STR.test(e.r.n||""))}
 const KM={};
+/* Klinker-Reihenhaus (MG Teil 2) vor Straßenwänden: Rheydt häufig, sonst selten; nur Häuser ohne eigenes Satteldach */
+function kitRHWall(B,i,x0,z0,L,dx,dz,onx,onz,shop){if(!KM.rhaus||shop||B.GB||L<5.8||B.h<5||B.h>11)return null;
+  const mx=x0+dx*L/2,mz=z0+dz*L/2;if(!nearestRoad(mx+onx*7,mz+onz*7,9,e=>e.r&&e.r.w>=4.5&&!/footway|path|steps|cycleway|service/.test(e.r.h||"")))return null;
+  const o=MG.real&&MG.real.orte&&MG.real.orte.rheydt_marktplatz,rh=o&&Math.hypot(mx-o.x,mz-o.y)<1100;if(kitHash(B.i*13+i,77)>(rh?.75:.22))return null;
+  let dep=9.3;for(const f of [.2,.5,.8]){const ax=x0+dx*L*f,az=z0+dz*L*f;for(let t=.6;t<=9.3;t+=.4){if(!inPoly(ax-onx*t,az-onz*t,B.p)){dep=Math.min(dep,t-.4);break}}}
+  if(dep<4)return null;let n=Math.max(1,Math.round(L/6.8)),sx=L/(n*6.8);if(sx<.82&&n>1){n--;sx=L/(n*6.8)}if(sx>1.3||sx<.8)return null;
+  const sy=(B.h+.3)/(KIT.rhEave||7);if(sy<.85||sy>1.4)return null;return {n,sx,sz:Math.min(1,dep/9.3),sy}}
 /* frei begehbarer Gehweg? (kein Haus, keine Fahrbahn) */
 function kitWalk(x,y){const i=gi(x,y);return i>=0&&!hgt[i]&&!solid[i]&&!(surf[i]&4)&&!!(surf[i]&8)}
 const kitHash=(a,b)=>{let h=(a*73856093)^(b*19349663);h=(h^(h>>>13))*1274126177;return ((h^(h>>>16))>>>0)/4294967296};
@@ -74,6 +81,8 @@ function kitBuildInst(){const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;const R=cap.
       const dx=(x1-x0)/L,dz=(z1-z0)/L,onx=B.ccw?dz:-dz,onz=B.ccw?-dx:dx,ang=Math.atan2(onx,onz);if(L>longest){longest=L;li=i}
       const wallD=Math.hypot((x0+x1)/2-px,(z0+z1)/2-py);
       const shop=KIT.parts.shop&&L>4.5&&(B.sw[i]!==undefined?B.sw[i]:(B.sw[i]=kitShopWall(B,(x0+x1)/2+onx*1.5,(z0+z1)/2+onz*1.5)));
+      const RH=(B.rh=B.rh||[])[i]!==undefined?B.rh[i]:(B.rh[i]=kitRHWall(B,i,x0,z0,L,dx,dz,onx,onz,shop));
+      if(RH){if(wallD<R)for(let q=0;q<RH.n;q++){const uc=(q+.5)*L/RH.n;if(!put(KM.rhaus,x0+dx*uc+onx*.04,BASE_Y,z0+dz*uc+onz*.04,ang,RH.sy,RH.sx,RH.sz))break}u+=L;continue}
       if(wallD<R){const kStart=Math.ceil(u/WIN-.5),kEnd=Math.floor((u+L)/WIN-.5);let shopDone=false;
         for(let k=kStart;k<=kEnd;k++){const uc=(k+.5)*WIN-u;if(uc<.8||uc>L-.8)continue;const wx=x0+dx*uc+onx*.06,wz=z0+dz*uc+onz*.06,col=((k%8)+8)%8;
           for(let f=0;;f++){const y0=f*FLOOR,cy=y0+FLOOR*(64-32.5)/64;if(cy+1.05>B.h)break;
@@ -96,9 +105,10 @@ function kitBuildInst(){const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;const R=cap.
           for(let q=0;q<cnt;q++){const t=el*(q+.5)/cnt;put(KM.dorm,E0[0]+ex*t+nx*s0,BASE_Y+yb-Pd.min.y*sc,E0[1]+ez*t+nz*s0,Math.atan2(-nx,-nz),sc,sc,sc)}}}}}
   for(const k in KM){const K=KM[k];if(!K)continue;for(const im of K.ms){im.count=K.n;im.instanceMatrix.needsUpdate=true}}}
 async function kitInit(){try{await kitLamps()}catch(e){console.info("Laterne nicht geladen",e)}
-  const list=[["bikeP","fahrzeuge/Fahrrad.json"],["scooP","fahrzeuge/E-Scooter.json"],["win","bau/Fenster_Laibung_Fensterbank.json"],["door","bau/Hauseingang_mit_Stufe.json"],["pipe","bau/Regenrohr.json"],["dorm","bau/Dachgaube.json"],["shop","bau/Ladenerdgeschoss.json"],["shopR","bau/Ladenfassade_Rheydt.json"]];
+  const list=[["bikeP","fahrzeuge/Fahrrad.json"],["scooP","fahrzeuge/E-Scooter.json"],["win","bau/Fenster_Laibung_Fensterbank.json"],["door","bau/Hauseingang_mit_Stufe.json"],["pipe","bau/Regenrohr.json"],["dorm","bau/Dachgaube.json"],["shop","bau/Ladenerdgeschoss.json"],["shopR","bau/Ladenfassade_Rheydt.json"],["rhaus","bau/Rheydt_Klinker_Reihenhaus.json"]];
   const cap=KIT_CAP[GFX.id]||KIT_CAP.standard;for(const [k,f] of list){try{await kitLoad(k,f);if(k==="bikeP")kitNormVeh(k,1.75);if(k==="scooP")kitNormVeh(k,1.12);KM[k]=kitMeshes(k,cap[k])}catch(e){console.info("Bausatz fehlt",k,e)}}
   KIT.oy={door:KIT.parts.door?-KIT.parts.door.box.min.y:1.23,win:KIT.parts.win?(KIT.parts.win.box.min.y+KIT.parts.win.box.max.y)/2:0,dorm:KIT.parts.dorm?-KIT.parts.dorm.box.min.y*.15:0};
+  if(KIT.parts.rhaus){const b=new THREE.Box3();for(const q of KIT.parts.rhaus.parts)if(/Schiefer/i.test(q.mat.name||"")){q.geo.computeBoundingBox();b.union(q.geo.boundingBox)}if(!b.isEmpty())KIT.rhEave=b.min.y}
   KIT.ready=true;kitBuildInst()}
 {const base=update;update=function(dt){base(dt);if(!KIT.ready)return;KIT.last.t-=dt;if(KIT.last.t>0)return;KIT.last.t=.5;if(Math.hypot(car.x-KIT.last.x,car.y-KIT.last.y)<6)return;KIT.last.x=car.x;KIT.last.y=car.y;kitBuildInst()}}
 {const base=loadVehicles;loadVehicles=async function(){const r=await base.apply(this,arguments);try{if(THREE.GLTFLoader)await kitInit()}catch(e){console.warn("Bausatz",e)}return r}}

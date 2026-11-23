@@ -207,3 +207,15 @@ Ladezeit der Welt im Test: ca. 2 s. Ohne Begrenzung der Bäume waren es über 3 
 - Acht neu aufgebaute Passanten (Pythagoras_City_Passanten_Neue_Modelle_GLB, MakeHuman-Basis, CC0) ersetzen die vorherigen; Quellen in modelle_quelle/Figuren_Passanten_Neue_Modelle/README_Claude.txt.
 - Aufbereitung ohne Vereinfachung (9–11 Tsd. Dreiecke je Figur, Texturen 512 px), Fußhöhe und Schrittgeschwindigkeit neu gemessen (GLB_PREP).
 - Umfärbung kennt jetzt deutsche Materialnamen (Shirt/Pullover, Hose, Schuhe, Frisur/Haar, Haut, Kombi-Kleidung als Ganzes); Arbeitskleidung bleibt unverändert.
+
+## MG Teil 1 und 2 (23.11.)
+Eingebaut:
+- Rheydt-Autos (Stadtauto, Limousine, SUV Metallic):
+  - Stadtverkehr in Spielernähe mit leichter Fassung (fahrzeuge/verkehr, ca. 11 800 Dreiecke, ohne Innenraum), weiter weg das alte Modell.
+  - Parkende Autos am Straßenrand von Wohn- und Nebenstraßen, halb auf dem Gehweg, leicht geneigt, mit Kollision (tools/autos.js).
+  - Im Autohaus als neue Fahrzeuge (feine Fassung mit Radknoten), drei neue Stellplätze in der hinteren Reihe.
+  - Anzahl je Profil: Schul-iPad 10 parkend/4 im Verkehr, Standard 26/10, Hoch 48/20.
+- Klinker-Reihenhaus als Fassade an Straßenwänden (Rheydt bis 1,1 km um den Markt häufig, sonst selten), nur Gebäude ohne eigenes Satteldach und mit passender Traufhöhe; Breite und Tiefe angepasst. Schul-iPad 3, Standard 8, Hoch 16.
+Nicht eingebaut (Begründung):
+- Amtliche Wahrzeichen (Schule, Haupthaus, Hauptkirche, Schloss, Borussia-Park, Hbf): echte Umrisse, aber allgemeine Fenstertextur und Luftbild-Dächer mit Flecken; auf Straßenhöhe schlechter als die jetzigen Fassaden. Quellen liegen in modelle_quelle/MG_Teil_2/Gebaeude.
+- Karten (Stadtkarte, Rheydt-Detailkarte 64 MB, Schulumfeld): Das Spiel blendet ab ca. 1,1 km in Dunst über; ein Luftbild-Horizont wäre am Boden unsichtbar. Sinnvoll später als Ansicht beim Fliegen. Teil 1 nicht im Repo (Größe).

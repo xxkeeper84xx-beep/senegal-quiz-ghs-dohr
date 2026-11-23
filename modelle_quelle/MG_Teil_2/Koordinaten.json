@@ -1,0 +1,143 @@
+{
+  "origin_utm_nhn_m": [
+    322000,
+    5671000,
+    45
+  ],
+  "axes": {
+    "x": "E - 322000",
+    "y": "H_NHN - 45",
+    "z": "5671000 - N"
+  },
+  "freischaltphasen": [
+    {
+      "id": 1,
+      "name": "Rheydt und Schulumfeld",
+      "event": "start",
+      "stadtteile": [
+        "302",
+        "303",
+        "304",
+        "305",
+        "309"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Rheydter Süden",
+      "event": "rheydt_basis_abgeschlossen",
+      "stadtteile": [
+        "301",
+        "306",
+        "307",
+        "308",
+        "310",
+        "311",
+        "312",
+        "313",
+        "314"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Gladbach und Innenstadt",
+      "event": "sued_diagonale_abgeschlossen",
+      "stadtteile": [
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "206",
+        "207"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Nord und Ost",
+      "event": "innenstadt_vermessung_abgeschlossen",
+      "stadtteile": [
+        "101",
+        "109",
+        "110",
+        "111",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "208",
+        "209",
+        "210"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "West",
+      "event": "nord_ost_entfernung_abgeschlossen",
+      "stadtteile": [
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "407",
+        "408",
+        "409"
+      ]
+    }
+  ],
+  "gebaeude": {
+    "GHS_Dohr_Torfbend.glb": {
+      "position_xyz_m": [
+        827.829,
+        4.736,
+        419.804
+      ],
+      "amtliche_gebaeudeobjekte": 1
+    },
+    "GHS_Dohr_Haupthaus.glb": {
+      "position_xyz_m": [
+        609.785,
+        5.277,
+        1026.105
+      ],
+      "amtliche_gebaeudeobjekte": 8
+    },
+    "Rheydt_Hauptkirche.glb": {
+      "position_xyz_m": [
+        -526.743,
+        10.495,
+        -627.768
+      ],
+      "amtliche_gebaeudeobjekte": 1
+    },
+    "Schloss_Rheydt.glb": {
+      "position_xyz_m": [
+        1980.013,
+        -0.54,
+        -2084.215
+      ],
+      "amtliche_gebaeudeobjekte": 3
+    },
+    "Borussia_Park.glb": {
+      "position_xyz_m": [
+        -4761.567,
+        30.021,
+        -1494.251
+      ],
+      "amtliche_gebaeudeobjekte": 2
+    },
+    "Moenchengladbach_Hauptbahnhof.glb": {
+      "position_xyz_m": [
+        -486.135,
+        4.806,
+        -3818.346
+      ],
+      "amtliche_gebaeudeobjekte": 1
+    }
+  }
+}
