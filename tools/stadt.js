@@ -169,3 +169,44 @@ if(MG&&MG.roads&&MG.nodes&&(MG.region||"rheydt")==="rheydt"){const N=MG.nodes,ma
 function schulGehwegWeg(){try{let n=0;scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.parent||o.parent.type!=="Group")return;o.geometry.computeBoundingBox();const b=o.geometry.boundingBox;
   if(Math.abs(b.max.y-b.min.y)<.01&&b.min.y>.25&&b.min.y<.3&&b.min.z>-64&&b.max.z<-55&&b.max.x-b.min.x>100){o.visible=false;n++}});ALLEE.schulGehweg=n}catch(e){console.warn("Schulgehweg",e)}}
 {const base=kitInit;kitInit=async function(){schulGehwegWeg();await base.apply(this,arguments);schulGehwegWeg()}}
+
+/* ---------- 7. Weg vom Pausenhof zur Sporthalle (nach Fotos vom 23.11.) ----------
+   Vom Pausenhof (Westen) durch ein zweiflügeliges weißes Metalltor zwischen Backsteinpfeilern am Westende des Umkleidetrakts:
+   links davor die Giebelwand mit Rasenbeet und Baum, rechts die weiß gestrichene Backsteinmauer. Hinter dem Tor Verbundpflaster
+   am Trakt entlang nach Osten bis zur Eingangsnische (links), rechts Asphalt, am Ende Metallzaun; gebogene Laterne.
+   Maße in Schulkoordinaten (x Osten, z Süden). Die Hofmauer zur Feuerwehrzufahrt (x −262,2) und die Messlinien der Hof-Mission bleiben frei. */
+const HW={zW:-118,xG:-292,xF:-268,xW0:-299.5,gate:[-124.2,-121.0]};
+function hwBuild(){if(typeof hallR!=="function"||!MG.FX||HW.done)return;HW.done=true;const o=hallR(0,0),e1=hallR(1,0),A=Math.atan2(e1[1]-o[1],e1[0]-o[0]),G=new THREE.Group();G.name="hallenweg";
+  const tex=(f,w=256,h=256)=>{const c=document.createElement("canvas");c.width=w;c.height=h;f(c.getContext("2d"),w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t};
+  const brickW=tex((g,w,h)=>{g.fillStyle="#c9c7c0";g.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let k=0;k<6;k++){const x=k*52-(r%2)*26,y=r*32;g.fillStyle=`hsl(40,5%,${86+((r*7+k*3)%5)}%)`;g.fillRect(x+3,y+3,47,27)}});
+  const pav=tex((g,w,h)=>{g.fillStyle="#5d5c59";g.fillRect(0,0,w,h);for(let y=0;y<h;y+=16)for(let x=-16;x<w;x+=32){const q=(y/16)%2*16;g.fillStyle=`hsl(30,3%,${38+((x*3+y*5)%13)}%)`;g.fillRect(x+q+1,y+1,30,14)}});
+  const M={wall:new THREE.MeshLambertMaterial({map:brickW}),cap:new THREE.MeshLambertMaterial({color:0xbab7b0}),pillar:new THREE.MeshLambertMaterial({color:0x8a4b36}),
+    metal:new THREE.MeshLambertMaterial({color:0xe9ecef}),pav:new THREE.MeshLambertMaterial({map:pav,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),
+    asph:new THREE.MeshLambertMaterial({color:0x3a3c41,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}),grass:new THREE.MeshLambertMaterial({color:0x5f7d3b,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),
+    fence:new THREE.MeshLambertMaterial({color:0xb7bcc0}),lamp:new THREE.MeshLambertMaterial({color:0xc9ccd0})};
+  const put=(geo,mat,x,y,z,ry=0)=>{const m=new THREE.Mesh(geo,mat),p=hallR(x,z);m.position.set(p[0],y,p[1]);m.rotation.y=-A+ry;m.castShadow=true;m.receiveShadow=true;G.add(m);return m};
+  const box=(mat,x0,x1,z0,z1,y0,y1)=>{const g=new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0);if(mat.map){const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*Math.max(x1-x0,z1-z0)/1.4,uv.getY(i)*(y1-y0)/1.1)}return put(g,mat,(x0+x1)/2,BASE_Y+(y0+y1)/2,(z0+z1)/2)};
+  const flat=(mat,x0,x1,z0,z1,y,rep)=>{const g=new THREE.PlaneGeometry(x1-x0,z1-z0);g.rotateX(-Math.PI/2);if(rep){const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*(x1-x0)/rep,uv.getY(i)*(z1-z0)/rep)}const m=put(g,mat,(x0+x1)/2,BASE_Y+y,(z0+z1)/2);m.castShadow=false;return m};
+  const {zW,xG,xF,xW0}=HW,[g0,g1]=HW.gate,Hm=2.1;
+  // weiße Mauer: vom Hof her (rechts vom Tor) und weiter am Vorplatz entlang bis zum Zaun
+  box(M.wall,xW0,xF,zW-.12,zW+.12,0,Hm);box(M.cap,xW0-.05,xF+.05,zW-.17,zW+.17,Hm,Hm+.08);
+  // Tor-Linie an der Giebelecke: Mauerstücke, zwei Backsteinpfeiler, zwei geöffnete Flügel (nach innen, Osten)
+  box(M.wall,xG-.12,xG+.12,-125,g0-.25,0,Hm);box(M.wall,xG-.12,xG+.12,g1+.25,zW,0,Hm);
+  for(const z of [g0-.12,g1+.12]){box(M.pillar,xG-.25,xG+.25,z-.22,z+.22,0,Hm+.25);box(M.cap,xG-.3,xG+.3,z-.27,z+.27,Hm+.25,Hm+.33)}
+  const wing=(hinge,s)=>{const L=(g1-g0)/2,gg=new THREE.Group(),p=hallR(xG,hinge);gg.position.set(p[0],BASE_Y,p[1]);gg.rotation.y=-A+s*1.2;G.add(gg);
+    const bar=(z,y,w,h,d)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(d,h,w),M.metal);m.position.set(0,y,z);m.castShadow=true;gg.add(m)};
+    bar(0,1.0,.05,1.9,.05);bar(s*L,1.0,.05,1.9,.05);bar(s*L/2,1.9,L,.05,.05);bar(s*L/2,.12,L,.05,.05);for(let k=1;k<9;k++)bar(s*L*k/9,1.0,.025,1.75,.025)};
+  wing(g0,1);wing(g1,-1);
+  // Beläge: Pflaster am Trakt (3,8 m) und im Tor, daneben Asphalt; Rasenbeet mit Kante vor der Giebelwand (Hofseite)
+  flat(M.pav,xG-2.2,xF,-125,-121.2,.014,1.6);flat(M.asph,xG,xF,-121.2,zW-.12,.012);
+  flat(M.grass,xG-6.3,xG-.25,-131.6,-125.3,.02);box(M.cap,xG-6.4,xG-.25,-125.35,-125.2,0,.12);
+  // Metallzaun am Ostende
+  for(let z=-124.9;z<zW-.2;z+=2.5){const z2=Math.min(z+2.45,zW-.15);box(M.fence,xF-.03,xF+.03,z,z2,.05,.1);box(M.fence,xF-.03,xF+.03,z,z2,1.45,1.5);for(let q=z;q<z2;q+=.2)box(M.fence,xF-.015,xF+.015,q,q+.03,.05,1.5)}
+  // gebogene Laterne am Weg (Arm zum Gebäude)
+  {const lx=-276,lz=zW-.6,c=new THREE.CatmullRomCurve3([new THREE.Vector3(0,0,0),new THREE.Vector3(0,5.6,0),new THREE.Vector3(.35,6.6,0),new THREE.Vector3(1.4,7.0,0)]);
+    put(new THREE.TubeGeometry(c,24,.07,8,false),M.lamp,lx,BASE_Y,lz,-Math.PI/2);const h=new THREE.BoxGeometry(.6,.12,.25);h.translate(1.55,6.95,0);put(h,M.lamp,lx,BASE_Y,lz,-Math.PI/2)}
+  scene.add(G);HW.G=G;
+  // Kollision: Mauer, Mauerstücke an der Tor-Linie (Öffnung bleibt frei), Pfeiler, Zaun
+  const mark=(x0,x1,z0,z1)=>{for(let x=x0;x<=x1;x+=.35)for(let z=z0;z<=z1;z+=.35){const p=hallR(x,z),i=gi(p[0],p[1]);if(i>=0)solid[i]=Math.max(solid[i],1)}};
+  mark(xW0,xF,zW-.15,zW+.15);mark(xG-.15,xG+.15,-125,g0-.05);mark(xG-.15,xG+.15,g1+.05,zW);mark(xF-.1,xF+.1,-125,zW)}
+{const base=buildTreeMeshes;buildTreeMeshes=function(){try{hwBuild();if(HW.G){const p=hallR(HW.xG-3.3,-128.4);treeList.push({x:p[0],y:p[1],r:3.4,th:2.6,tw:1.4})}}catch(e){console.warn("Hallenweg",e)}return base.apply(this,arguments)}}
