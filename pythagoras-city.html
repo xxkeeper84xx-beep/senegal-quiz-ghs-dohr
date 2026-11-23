@@ -1685,7 +1685,7 @@ const qs=q=>save.q[q.id]||(save.q[q.id]={acc:false,m:{},calc:false,extra:false,d
 const QUESTS=[];
 if(QD.werkhof){const w=QD.werkhof;QUESTS.push({id:"werkhof",district:"Dohr/Torfbend",title:"Licht für den Werkhof",
   giver:{x:w.giver[0],y:w.giver[1],name:"Herr Ballhorn",role:"Hausmeister der GHS Dohr",shirt:"#2f8f5b"},
-  intro:"„Gut, dass du da bist! Ich bin Herr Ballhorn, der Hausmeister der GHS Dohr. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn Herr Maaß mit den Klassen zum Laufen geht. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
+  intro:"„Ah, gut, dass du da bist! Ich bin Herr Ballhorn, Hausmeister der GHS Dohr – seit über vierzig Jahren. Auf die Leiter komme ich mit meinen Knien nicht mehr, deshalb brauche ich jemanden, der für mich misst und rechnet. Durch den Werkhof geht es am schnellsten von Am Torfbend zu den Kleingärten, wenn Herr Maaß mit den Klassen zum Laufen geht. Aber am Werkhof gibt es kein Licht, deshalb bleibt das Tor zum Durchgang abends zu und alle müssen außen herum laufen. Der Anschlusskasten hängt hoch an der Hallenwand, die Kabeltrommel steht hier im Hof. Ich brauche ein Kabel, das auf geradem Weg von der Trommel bis zum Anschluss reicht. Miss bitte nach und rechne aus, wie lang es sein muss.“",
   measures:[{id:"a",label:"Höhe des Anschlusskastens über dem Boden",short:"Höhe",val:6,x:w.wall[0]+1.3,y:w.wall[1]+1.6,where:"am grauen Anschlusskasten an der Hallenwand",line:[w.wall[0]+.15,0,w.wall[1],w.wall[0]+.15,6,w.wall[1]]},
             {id:"b",label:"Abstand der Kabeltrommel von der Wand",short:"Abstand",val:8,x:w.drum[0]+.2,y:w.drum[1]+1.7,where:"an der Kabeltrommel im Hof",line:[w.wall[0],.35,w.wall[1],w.drum[0],.35,w.drum[1]]}],
   lab:{a:"Höhe",b:"Abstand",c:"Kabel"},ans:10,unit:"m",
@@ -8525,7 +8525,7 @@ if(MG.real)document.querySelectorAll(".mapnote").forEach(n=>n.insertAdjacentHTML
 const STANDS=[];
 {const base=standPerson;standPerson=function(x,y,a,shirt){const p=base(x,y,a,shirt);p.visible=!!GLB.failed;STANDS.push({p,x,y,a,shirt,glb:null});return p}}
 const STAND_MODEL={"Mats":"02_Fussballfan","Elif":"01_Schuelerin","Jana":"06_Joggerin","Tarik":"05_Strassenbauer","Kalle":"05_Strassenbauer",
-  "Herr Ballhorn":"05_Strassenbauer","Herr Brands":"04_Senior","Bäcker Hennes":"08_Passant"};
+  "Herr Ballhorn":"04_Senior","Herr Brands":"04_Senior","Bäcker Hennes":"08_Passant"};
 function standName(S){const p=S.p;for(const q of QUESTS)if(q.person===p)return q.giver.name;for(const t of TALK)if(t.person===p)return t.name;
   for(const G of XG)if(G.person===p)return G.name||G.talk||"";return ""}
 function standRole(S){const p=S.p;for(const q of QUESTS)if(q.person===p)return q.giver.role||"";for(const t of TALK)if(t.person===p)return t.role||"";for(const G of XG)if(G.person===p)return G.role||"";return ""}
@@ -8536,11 +8536,21 @@ function standGlbUpgrade(){for(const S of STANDS){if(S.glb||!S.p.parent)continue
   const rl=standRole(S),teach=/lehrer/i.test(rl);   /* alle Lehrkräfte mit heller Hautfarbe */
   tintGlb(I,Object.assign(randomTint(role),{shirt:S.shirt,outfit:-1},teach?{skin:pick(SKIN_MUL.slice(0,3))}:{}));
   if(act.idle){act.idle.play();act.idle.time=Math.random()*act.idle.getClip().duration}
+  if(n==="Herr Ballhorn")standAlt(I);
   obj.position.set(S.x,groundY(S.x,S.y)+M.offY,S.y);obj.rotation.y=Math.PI/2-S.a;scene.add(obj);S.p.visible=false;S.glb=I}}
+/* Herr Ballhorn: alter, gebrechlicher Hausmeister – gebeugt, langsam, mit Gehstock */
+function standAlt(I){I.mixer.timeScale=.65;I.alt=[["Spine",.16],["Spine1",.12],["Spine2",.08],["Neck",.14]].map(([n,a])=>[I.obj.getObjectByName(n),a]).filter(b=>b[0]);
+  const g=new THREE.CylinderGeometry(.016,.02,.9,8);g.translate(0,.45,0);const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:new THREE.Color(0x3b2a1e).convertSRGBToLinear()}));m.position.set(-.3,0,.16);m.rotation.set(.12,0,-.1);m.castShadow=true;
+  const k=new THREE.Mesh(new THREE.TorusGeometry(.055,.014,6,12,Math.PI),m.material);k.position.set(0,.9,.05);k.rotation.y=Math.PI/2;m.add(k);I.obj.add(m);
+  // Hausmeisterkittel statt Anzug (Jacke grau entsättigt, graublau getönt), ohne Hut – graues Haar sichtbar
+  I.obj.traverse(o=>{if(!o.isMesh)return;const mt=o.material,nm=(o.userData.srcMat||mt).name||"";
+    if(/^Hut$/i.test(nm)){o.visible=false;return}
+    if(/Sakko|Weste/i.test(nm)){const src=o.userData.srcMat||mt,c=src.clone();const g=src.map?recolorTex(src.map,0):null;if(g)c.map=g;c.color.set(0x3e4b5c).convertSRGBToLinear();c.needsUpdate=true;o.material=c;o.userData.kittel=1}})}
+const standAltPose=I=>{if(I.alt)for(const [b,a] of I.alt)b.rotation.x+=a};
 {const base=updateCrowd;updateCrowd=function(dt,now){base(dt,now);
   for(const S of STANDS){const I=S.glb;if(!I)continue;if(!S.p.parent){scene.remove(I.obj);S.glb=null;continue}S.p.visible=false;
     const d=Math.hypot(S.x-car.x,S.y-car.y);I.obj.visible=d<CR.radius;if(!I.obj.visible)continue;
-    const every=d>50?3:d>25?2:1;I.acc=(I.acc||0)+dt;I.k=(I.k||0)+1;if(I.k%every===0){I.mixer.update(I.acc);I.acc=0}}}}
+    const every=d>50?3:d>25?2:1;I.acc=(I.acc||0)+dt;I.k=(I.k||0)+1;if(I.k%every===0){I.mixer.update(I.acc);I.acc=0;standAltPose(I)}}}}
 
 /* ================= Spielfigur auf Roller, Fahrrad und Moped (Sitz- und Stehhaltung aus dem Skelett) =================
    Die Figuren haben nur Idle, Walk und Run. Die Haltung entsteht aus der Idle-Pose, deren Knochen gedreht werden.
