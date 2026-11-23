@@ -170,47 +170,52 @@ function schulGehwegWeg(){try{let n=0;scene.traverse(o=>{if(!o.isMesh||!o.geomet
   if(Math.abs(b.max.y-b.min.y)<.01&&b.min.y>.25&&b.min.y<.3&&b.min.z>-64&&b.max.z<-55&&b.max.x-b.min.x>100){o.visible=false;n++}});ALLEE.schulGehweg=n}catch(e){console.warn("Schulgehweg",e)}}
 {const base=kitInit;kitInit=async function(){schulGehwegWeg();await base.apply(this,arguments);schulGehwegWeg()}}
 
-/* ---------- 7. Weg vom Pausenhof zur Sporthalle (nach Fotos und Angabe vom 23.11.) ----------
-   Gasse zwischen Erweiterungsbau und weißer Hofmauer nach Norden; am Ende direkt an der Hofmauer ein zweiflügeliges weißes
-   Metalltor zwischen Backsteinpfeilern (offen). Dahinter Verbundpflaster am Umkleidetrakt entlang nach Westen bis zur
-   Eingangsnische der Sporthalle, daneben Asphalt; weiß gestrichene Mauer zum Pausenhof, am Westende Metallzaun.
-   Links vor dem Tor ein Rasenbeet mit Baum. Maße in Schulkoordinaten (x Osten, z Süden). Messlinien der Hof-Mission bleiben frei. */
-const HW={zW:-118,xW:-292,xGW:-266,xGE:-262.45};
-function hwBuild(){if(typeof hallR!=="function"||!MG.FX||HW.done)return;HW.done=true;const o=hallR(-280,-120),e1=hallR(-279,-120),A=Math.atan2(e1[1]-o[1],e1[0]-o[0]),G=new THREE.Group();G.name="hallenweg";
+/* ---------- 7. Weg vom Pausenhof zur Sporthalle (Fotos und Angaben vom 23.11.) ----------
+   Gasse zwischen Erweiterungsbau und weißer Hofmauer nach Norden. Am Südende des Durchgangs zwischen Halle und Hofmauer
+   ein zweiflügeliges weißes Metalltor (offen) zwischen Backsteinpfeilern: links der beige Umkleidetrakt, rechts die Hofmauer.
+   Dahinter an der Westseite des Durchgangs der Eingang der Sporthalle (Nische mit gelbem Klinker, Doppeltür in der Ostwand).
+   Pflasterweg im Durchgang, Metallzaun am Nordende, gebogene Laterne, Rasenbeet mit Baum links vor dem Tor.
+   Maße in Schulkoordinaten (x Osten, z Süden). Messlinien der Hof-Mission bleiben frei. */
+const HW={zT:-125,xGW:-266,xGE:-262.45,xH:-268,zN:-148};
+function hwBuild(){if(typeof hallR!=="function"||!MG.FX||HW.done)return;HW.done=true;const o=hallR(-268,-135),e1=hallR(-267,-135),A=Math.atan2(e1[1]-o[1],e1[0]-o[0]),G=new THREE.Group();G.name="hallenweg";
   const tex=(f,w=256,h=256)=>{const c=document.createElement("canvas");c.width=w;c.height=h;f(c.getContext("2d"),w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t};
-  const brickW=tex((g,w,h)=>{g.fillStyle="#c9c7c0";g.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let k=0;k<6;k++){const x=k*52-(r%2)*26,y=r*32;g.fillStyle=`hsl(40,5%,${86+((r*7+k*3)%5)}%)`;g.fillRect(x+3,y+3,47,27)}});
   const pav=tex((g,w,h)=>{g.fillStyle="#5d5c59";g.fillRect(0,0,w,h);for(let y=0;y<h;y+=16)for(let x=-16;x<w;x+=32){const q=(y/16)%2*16;g.fillStyle=`hsl(30,3%,${38+((x*3+y*5)%13)}%)`;g.fillRect(x+q+1,y+1,30,14)}});
+  const klinker=tex((g,w,h)=>{g.fillStyle="#cdbb86";g.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let k=0;k<6;k++){const x=k*52-(r%2)*26,y=r*32;g.fillStyle=`hsl(46,${38+((r+k)%3)*4}%,${66+((r*7+k*3)%6)}%)`;g.fillRect(x+3,y+3,47,27)}});
   const L=c=>new THREE.Color(c).convertSRGBToLinear();
-  const M={wall:new THREE.MeshLambertMaterial({map:brickW}),cap:new THREE.MeshLambertMaterial({color:L(0xbab7b0)}),pillar:new THREE.MeshLambertMaterial({color:L(0x8a4b36)}),
-    metal:new THREE.MeshLambertMaterial({color:L(0xe9ecef)}),pav:new THREE.MeshLambertMaterial({map:pav,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),
-    asph:new THREE.MeshLambertMaterial({color:L(0x3a3c41),polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}),grass:new THREE.MeshLambertMaterial({color:L(0x5f7d3b),polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),
-    fence:new THREE.MeshLambertMaterial({color:L(0xb7bcc0)}),lamp:new THREE.MeshLambertMaterial({color:L(0xc9ccd0)})};
+  const M={cap:new THREE.MeshLambertMaterial({color:L(0xbab7b0)}),pillar:new THREE.MeshLambertMaterial({color:L(0x8a4b36)}),metal:new THREE.MeshLambertMaterial({color:L(0xe9ecef)}),
+    pav:new THREE.MeshLambertMaterial({map:pav,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),grass:new THREE.MeshLambertMaterial({color:L(0x5f7d3b),polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),
+    fence:new THREE.MeshLambertMaterial({color:L(0xb7bcc0)}),lamp:new THREE.MeshLambertMaterial({color:L(0xc9ccd0)}),klinker:new THREE.MeshLambertMaterial({map:klinker}),
+    tuer:new THREE.MeshLambertMaterial({color:L(0x6b6f75)}),beton:new THREE.MeshLambertMaterial({color:L(0xb9b6ae)})};
   const put=(geo,mat,x,y,z,ry=0)=>{const m=new THREE.Mesh(geo,mat),p=hallR(x,z);m.position.set(p[0],y,p[1]);m.rotation.y=-A+ry;m.castShadow=true;m.receiveShadow=true;G.add(m);return m};
   const box=(mat,x0,x1,z0,z1,y0,y1)=>{const g=new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0);if(mat.map){const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*Math.max(x1-x0,z1-z0)/1.4,uv.getY(i)*(y1-y0)/1.1)}return put(g,mat,(x0+x1)/2,BASE_Y+(y0+y1)/2,(z0+z1)/2)};
   const flat=(mat,x0,x1,z0,z1,y,rep)=>{const g=new THREE.PlaneGeometry(x1-x0,z1-z0);g.rotateX(-Math.PI/2);if(rep){const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*(x1-x0)/rep,uv.getY(i)*(z1-z0)/rep)}const m=put(g,mat,(x0+x1)/2,BASE_Y+y,(z0+z1)/2);m.castShadow=false;return m};
-  const {zW,xW,xGW,xGE}=HW,Hm=2.1;
-  // weiße Mauer zum Pausenhof vom Westende bis zum Torpfeiler
-  box(M.wall,xW,xGW-.25,zW-.12,zW+.12,0,Hm);box(M.cap,xW-.05,xGW-.2,zW-.17,zW+.17,Hm,Hm+.08);
-  // zwei Backsteinpfeiler (der östliche direkt an der Hofmauer) und zwei geöffnete Flügel (nach Norden, ins Innere)
-  for(const x of [xGW-.12,xGE+.1]){box(M.pillar,x-.22,x+.22,zW-.25,zW+.25,0,Hm+.25);box(M.cap,x-.27,x+.27,zW-.3,zW+.3,Hm+.25,Hm+.33)}
-  const wing=(hx,s)=>{const Lw=(xGE-xGW)/2,gg=new THREE.Group(),p=hallR(hx,zW);gg.position.set(p[0],BASE_Y,p[1]);gg.rotation.y=-A-s*1.2;G.add(gg);
+  const {zT,xGW,xGE,xH,zN}=HW,Hm=2.1,dz=HALL.doorIn[1];
+  // Tor: Pfeiler an der Trakt-Ecke und an der Hofmauer, zwei geöffnete Flügel (nach Norden)
+  for(const x of [xGW+.22,xGE+.1]){box(M.pillar,x-.22,x+.22,zT-.25,zT+.25,0,Hm+.25);box(M.cap,x-.27,x+.27,zT-.3,zT+.3,Hm+.25,Hm+.33)}
+  const wing=(hx,s)=>{const Lw=(xGE-xGW-.44)/2,gg=new THREE.Group(),p=hallR(hx,zT);gg.position.set(p[0],BASE_Y,p[1]);gg.rotation.y=-A-s*1.2;G.add(gg);
     const bar=(x,y,w,h,d)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M.metal);m.position.set(x,y,0);m.castShadow=true;gg.add(m)};
     bar(0,1.0,.05,1.9,.05);bar(s*Lw,1.0,.05,1.9,.05);bar(s*Lw/2,1.9,Lw,.05,.05);bar(s*Lw/2,.12,Lw,.05,.05);for(let k=1;k<9;k++)bar(s*Lw*k/9,1.0,.025,1.75,.025)};
-  wing(xGW+.1,1);wing(xGE-.1,-1);
-  // Beläge: Pflaster am Trakt und im Tor, sonst Asphalt
-  flat(M.pav,xW,xGE,-125,-121.2,.014,1.6);flat(M.asph,xW,xGE,-121.2,zW-.12,.012);flat(M.pav,xGW,xGE,zW-.12,zW+2.0,.014,1.6);
-  // Rasenbeet mit Baum links vor dem Tor (Gassenseite)
-  flat(M.grass,xGW-6.4,xGW-.5,zW+.3,zW+4.2,.02);box(M.cap,xGW-6.5,xGW-.4,zW+4.2,zW+4.35,0,.12);
-  // Metallzaun am Westende des Vorplatzes
-  for(let z=-124.9;z<zW-.2;z+=2.5){const z2=Math.min(z+2.45,zW-.15);box(M.fence,xW-.03,xW+.03,z,z2,.05,.1);box(M.fence,xW-.03,xW+.03,z,z2,1.45,1.5);for(let q=z;q<z2;q+=.2)box(M.fence,xW-.015,xW+.015,q,q+.03,.05,1.5)}
-  // gebogene Laterne am Weg (Arm zum Gebäude)
-  {const lx=-276,lz=zW-.6,c=new THREE.CatmullRomCurve3([new THREE.Vector3(0,0,0),new THREE.Vector3(0,5.6,0),new THREE.Vector3(.35,6.6,0),new THREE.Vector3(1.4,7.0,0)]);
-    put(new THREE.TubeGeometry(c,24,.07,8,false),M.lamp,lx,BASE_Y,lz,-Math.PI/2);const h=new THREE.BoxGeometry(.6,.12,.25);h.translate(1.55,6.95,0);put(h,M.lamp,lx,BASE_Y,lz,-Math.PI/2)}
+  wing(xGW+.48,1);wing(xGE-.15,-1);
+  // Pflaster im Durchgang (vom Tor bis zum Zaun) und unter dem Tor
+  flat(M.pav,xH,xGE,zN+.2,zT+1.2,.014,1.6);
+  // Eingang in der Ostwand der Halle: Nische mit gelbem Klinker, Doppeltür, Vordach
+  const xf=xH;box(M.klinker,xf,xf+.55,dz-1.45,dz-1.15,0,3.0);box(M.klinker,xf,xf+.55,dz+1.15,dz+1.45,0,3.0);box(M.beton,xf,xf+.75,dz-1.6,dz+1.6,3.0,3.14);
+  box(M.klinker,xf,xf+.04,dz-1.15,dz+1.15,2.55,3.0);box(M.tuer,xf+.02,xf+.07,dz-1.05,dz+1.05,0,2.5);box(M.metal,xf+.06,xf+.09,dz-.03,dz+.03,0,2.5);box(M.beton,xf,xf+.9,dz-1.15,dz+1.15,0,.05);
+  // Regenrohr neben der Nische
+  {const g=new THREE.CylinderGeometry(.05,.05,6.6,8);put(g,M.metal,xf+.12,BASE_Y+3.3,dz-1.75)}
+  // Metallzaun am Nordende des Durchgangs
+  {const z=zN+.2;box(M.fence,xH,xGE,z-.03,z+.03,.05,.1);box(M.fence,xH,xGE,z-.03,z+.03,1.45,1.5);for(let x=xH;x<xGE;x+=.2)box(M.fence,x,x+.03,z-.015,z+.015,.05,1.5)}
+  // gebogene Laterne im Durchgang (Arm zur Halle)
+  {const lx=xGE-.55,lz=-140,c=new THREE.CatmullRomCurve3([new THREE.Vector3(0,0,0),new THREE.Vector3(0,5.6,0),new THREE.Vector3(.35,6.6,0),new THREE.Vector3(1.4,7.0,0)]);
+    put(new THREE.TubeGeometry(c,24,.07,8,false),M.lamp,lx,BASE_Y,lz,Math.PI);const h=new THREE.BoxGeometry(.6,.12,.25);h.translate(1.55,6.95,0);put(h,M.lamp,lx,BASE_Y,lz,Math.PI)}
+  // Rasenbeet mit Baum links vor dem Tor (vor der Südseite des Trakts)
+  flat(M.grass,-272,xGW-.4,zT+.35,zT+4.0,.02);box(M.cap,-272.1,xGW-.3,zT+4.0,zT+4.15,0,.12);
   scene.add(G);HW.G=G;
-  // Kollision: Mauer, Pfeiler, Zaun (Toröffnung bleibt frei)
+  // Kollision: Torpfeiler und Zaun am Nordende
   const mark=(x0,x1,z0,z1)=>{for(let x=x0;x<=x1;x+=.35)for(let z=z0;z<=z1;z+=.35){const p=hallR(x,z),i=gi(p[0],p[1]);if(i>=0)solid[i]=Math.max(solid[i],1)}};
-  mark(xW,xGW-.05,zW-.15,zW+.15);mark(xW-.1,xW+.1,-125,zW)}
-{const base=buildTreeMeshes;buildTreeMeshes=function(){try{hwBuild();if(HW.G){const p=hallR(HW.xGW-3.4,HW.zW+2.2);treeList.push({x:p[0],y:p[1],r:3.4,th:2.6,tw:1.4})}}catch(e){console.warn("Hallenweg",e)}return base.apply(this,arguments)}}
+  mark(xH,xGE,zN+.05,zN+.35)}
+{const base=buildTreeMeshes;buildTreeMeshes=function(){try{hwBuild();if(HW.G){const p=hallR(-269,zT0()+2.2);treeList.push({x:p[0],y:p[1],r:3.4,th:2.6,tw:1.4})}}catch(e){console.warn("Hallenweg",e)}return base.apply(this,arguments)}}
+const zT0=()=>HW.zT;
 
 /* ---------- 8. Kellerabgang am Erweiterungsbau (Foto 23.11.): Treppe entlang der Ostfassade nach unten ----------
    Zwischen Fassade (x −268) und Brüstung mit Geländer (x −267). Eingang am Südende, 14 Stufen bis 2,6 m tief, unten Kellertür

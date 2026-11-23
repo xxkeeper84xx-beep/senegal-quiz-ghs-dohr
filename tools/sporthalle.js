@@ -1,12 +1,12 @@
 /* ================= Sporthalle der GHS Dohr (begehbar) =================
    Nach den Fotos vom 19.11.: Halle mit Holzverkleidung, dunkler Prallschutz unten, hohe Fenster, Rasterdecke mit Leuchtbändern,
    Basketballkörbe mit aufgemaltem Tor an den Stirnwänden, Sprossenwand mit Weichbodenmatte, Turnringe, Langbank, Geräteraum mit Kasten.
-   Betreten durch die Tür am Umkleidetrakt (E / Tippen), drinnen ist die Halle frei begehbar.
+   Betreten durch die Tür in der Ostwand (Durchgang zwischen Halle und Hofmauer, hinter dem Tor; E / Tippen), drinnen ist die Halle frei begehbar.
    Hauptmission „Der Diagonal-Sprint“ bei Herrn Maaß (Sportlehrer): Spielfeld 15 m × 8 m vermessen, Diagonale berechnen (17 m),
    Zusatzfrage zur Weichbodenmatte an der Sprossenwand, Anzahl der Diagonalen für 100 m – dann den Sprint selbst laufen.
    Alle Maße in Spielkarten-Koordinaten der Schule (x nach Osten, z nach Süden); fx_pass.js setzt sie auf das echte Grundstück. */
 const HALL={x0:-289.6,x1:-268.4,z0:-147.6,z1:-132.4,h:6.8,ex:[-290,-268,-148,-132],
-  doorOut:[-277.5,-124.6],doorIn:[-277.5,-133.4],field:{x0:-286.5,x1:-271.5,z0:-144,z1:-136},chimney:[-270,-269.2,-133.4,-132.6]};
+  doorOut:[-266.5,-134.6],doorIn:[-269.3,-134.6],field:{x0:-286.5,x1:-271.5,z0:-144,z1:-136},chimney:[-270,-269.2,-133.4,-132.6]};
 const hallR=(x,z)=>MG.FX?MG.FX(x,z):[x,z];
 function hallL(x,y){const S=MG.XF&&MG.XF.find(c=>c.id==="S");if(!S)return [x,y];const dx=x-S.t[0],dy=y-S.t[1],co=Math.cos(S.r),si=Math.sin(S.r);
   return [S.f[0]+dx*co+dy*si,S.f[1]-dx*si+dy*co]}
@@ -110,10 +110,10 @@ function buildHall(){
     for(const d of [-1.45,1.45])box(col("#6b4a2e",.35),gx+d,B0+1.2,z0+.04,.1,2.4,.08);box(col("#6b4a2e",.35),gx,B0+2.43,z0+.04,3.0,.08,.08);
     for(let i=0;i<5;i++)box(col(i?"#b07f4a":"#e6dccb",.42),gx-.4,B0+.12+i*.22,z0+.55,1.2-(i?0:.04),.2,.5);
     const bock=col("#8a5a32",.4);box(bock,gx+.75,B0+.95,z0+.5,.9,.32,.35);for(const [dx,dz] of [[-.3,-.12],[.3,-.12],[-.3,.12],[.3,.12]])box(col("#6d4526",.4),gx+.75+dx,B0+.4,z0+.5+dz,.06,.8,.06)}
-  /* Eingangstür (Doppeltür, geöffnet) in der Südwand */
-  {const dx=HALL.doorIn[0];plane(col("#7a4a32",.25),dx,B0+1.25,z1-.01,2.0,2.5,Math.PI);
-    for(const s of [-1,1]){const d=box(col("#c08a4e",.45),dx+s*1.0,B0+1.25,z1-.5,.05,2.5,.95)}box(col("#3a2a1f",.3),dx,B0+2.55,z1-.04,2.2,.1,.08);
-    const exitT=canvasTex(128,48,(g)=>{g.fillStyle="#14a44d";g.fillRect(0,0,128,48);g.fillStyle="#fff";g.font="bold 26px sans-serif";g.fillText("🚶 →",30,34)});box(new THREE.MeshBasicMaterial({map:exitT}),dx,B0+2.85,z1-.06,.6,.22,.03)}
+  /* Eingangstür (Doppeltür, geöffnet) in der Ostwand, nahe der Südostecke (Durchgang zur Hofmauer) */
+  {const dz=HALL.doorIn[1];plane(col("#7a4a32",.25),x1-.01,B0+1.25,dz,2.0,2.5,-Math.PI/2);
+    for(const s of [-1,1]){box(col("#c08a4e",.45),x1-.5,B0+1.25,dz+s*1.0,.95,2.5,.05)}box(col("#3a2a1f",.3),x1-.04,B0+2.55,dz,.08,.1,2.2);
+    const exitT=canvasTex(128,48,(g)=>{g.fillStyle="#14a44d";g.fillRect(0,0,128,48);g.fillStyle="#fff";g.font="bold 26px sans-serif";g.fillText("🚶 →",30,34)});box(new THREE.MeshBasicMaterial({map:exitT}),x1-.06,B0+2.85,dz,.03,.22,.6)}
   /* Hütchen an den Ecken des grünen Spielfelds */
   {const F=HALL.field,cone=new THREE.ConeGeometry(.16,.4,12),cm=col("#ff7b00",.45);for(const [x,z] of [[F.x0,F.z1],[F.x1,F.z0],[F.x0,F.z0],[F.x1,F.z1]])add(cone,cm,x,B0+.2,z)}
   G.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false}});scene.add(G);HALL.group=G}
@@ -128,7 +128,7 @@ function hallGrid(){const pts=HALL.ex,c=[[pts[0],pts[2]],[pts[1],pts[2]],[pts[0]
 {const base=buildSchool;buildSchool=function(){base();buildHall();try{hallGrid()}catch(e){console.warn("Sporthalle Raster",e)}}}
 
 /* ---------- Betreten und Verlassen ---------- */
-function hallTeleport(inside){fade(()=>{const r=hallRot(),p=inside?hallR(HALL.doorIn[0],HALL.doorIn[1]-1.2):hallR(...HALL.doorOut),a=inside?-Math.PI/2+r:Math.PI/2+r;
+function hallTeleport(inside){fade(()=>{const r=hallRot(),p=inside?hallR(HALL.doorIn[0]-1.2,HALL.doorIn[1]):hallR(...HALL.doorOut),a=inside?Math.PI+r:r;
   car.x=p[0];car.y=p[1];car.a=a;car.v=0;camYaw=a;camPos.set(car.x-Math.cos(a)*3.5,car.alt+2.4,car.y-Math.sin(a)*3.5);
   if(inside)toast("🏀 Sporthalle der GHS Dohr",QUESTS.find(q=>q.id==="sporthalle")&&!qs(QUESTS.find(q=>q.id==="sporthalle")).done?"Herr Maaß wartet am Spielfeld.":"Zum Verlassen zur Doppeltür gehen.","#e2611b")})}
 {const base=interactables;interactables=function(VH){const L=base(VH);if(VH.id!=="walk")return L;
