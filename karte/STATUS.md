@@ -261,3 +261,8 @@ Offen (Stufe 2): Kachelwechsel ohne Neuladen, feine Luftbilder für alle Bezirke
 ## Wahrzeichen nach Fotos (24.11., tools/wahrzeichen.js)
 - Schloss Rheydt (Herrenhaus), Hauptbahnhof, Stadion im Borussia-Park selbst modelliert nach Commons-Fotos (Quellen: modelle_quelle/fotos_wahrzeichen/QUELLEN.md); ersetzen das amtliche Ersatzmodell; Ausrichtung nach Grundriss, Front zur Straße; ohne Logos.
 - Alle Wahrzeichen haben jetzt Kollision (vorher durchlaufbar). Hauptkirche und Haupthaus behalten die amtliche Form.
+
+## Schule innen (24.11., tools/schule_innen.js, Fotos in modelle_quelle/fotos_schule_innen)
+- Eingang an der Hofseite (Erweiterungsbau, Laubengang): „🏫 Schule betreten“ → Windfang (Holzdecke, Glaswand, Klinker, Matte, Glas-Doppeltür) → 5 Stufen (+0,8 m) → Flur (Terrazzo, Nischen, blaue Türzargen, Pinnwand, Heizkörper, Glastür) → Treppenhaus (Treppe mit rotem Handlauf und Schmiedegeländer, blaue Türen) → rechts in den Klassenraum (vorläufig; Tafel mit „📐 Aufgabe an der Tafel“).
+- Drinnen wird die Außenhülle der Schule ausgeblendet, Kollision für Räume/Wände/Durchgänge umgeschaltet, Kamera bleibt im Raum, Bodenhöhe folgt den Stufen.
+- Offen: Klassenraum nach Foto; Obergeschoss nicht begehbar.
