@@ -252,3 +252,8 @@ Offen (Stufe 2): Kachelwechsel ohne Neuladen, feine Luftbilder für alle Bezirke
 - 3D-Pythagoras: Karton, Container, Klassenraum (Raumdiagonale), „Passt der Stab?“; Quader-Skizze mit Boden- und Raumdiagonale; Lösungsweg in zwei Schritten. Ab mittlerer Schwierigkeit bei Elektromarkt, Baustelle, Rathaus.
 - Prüfungsmodus: 10 Aufgaben (Hypotenuse, Kathete, Umkehrung, 3D), 15 min, keine Tipps, ein Versuch; Auswertung mit Note, Lösungswegen und Fehlerart; Ergebnis im Fortschrittscode.
 - Wochen-Challenge: Lehrkraft startet auf der Klassenübersicht Thema + Klassenziel, bekommt Code (z. B. R48-C, gilt nur in der Kalenderwoche, an den Klassencode gebunden). Im Spiel Code eintragen, „Challenge-Aufgabe lösen“ (1. Versuch 3 Pkt., sonst 1). Klassenübersicht zeigt Fortschritt zum Ziel und die besten 5 (Spitznamen).
+
+## Jahreszeiten (24.11., tools/saison.js)
+- Automatisch nach Kalender, im Menü umstellbar (🍂 Jahreszeit: automatisch → Frühling → Sommer → Herbst → Winter).
+- Frühling: hellgrünes Laub, rosa Blüten in ca. 20 % der Kronen, frischer Rasen. Sommer: sattes Grün, trockenerer Rasen, wärmeres Licht. Herbst: Gold-, Orange- und Rotbrauntöne je Baum, fallendes Laub um die Kamera. Winter: kahle Bäume, Schnee auf Dächern und Rasen (nur nach oben zeigende Flächen), Schneefall, kühleres Licht.
+- Laubfarbe per Shader-Mischung (Helligkeit der Blatttextur bleibt), Schnee per Shader auf Dach- und Rasenmaterialien; Partikel 500 (Touch) bzw. 1100.
