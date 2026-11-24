@@ -257,3 +257,7 @@ Offen (Stufe 2): Kachelwechsel ohne Neuladen, feine Luftbilder für alle Bezirke
 - Automatisch nach Kalender, im Menü umstellbar (🍂 Jahreszeit: automatisch → Frühling → Sommer → Herbst → Winter).
 - Frühling: hellgrünes Laub, rosa Blüten in ca. 20 % der Kronen, frischer Rasen. Sommer: sattes Grün, trockenerer Rasen, wärmeres Licht. Herbst: Gold-, Orange- und Rotbrauntöne je Baum, fallendes Laub um die Kamera. Winter: kahle Bäume, Schnee auf Dächern und Rasen (nur nach oben zeigende Flächen), Schneefall, kühleres Licht.
 - Laubfarbe per Shader-Mischung (Helligkeit der Blatttextur bleibt), Schnee per Shader auf Dach- und Rasenmaterialien; Partikel 500 (Touch) bzw. 1100.
+
+## Wahrzeichen nach Fotos (24.11., tools/wahrzeichen.js)
+- Schloss Rheydt (Herrenhaus), Hauptbahnhof, Stadion im Borussia-Park selbst modelliert nach Commons-Fotos (Quellen: modelle_quelle/fotos_wahrzeichen/QUELLEN.md); ersetzen das amtliche Ersatzmodell; Ausrichtung nach Grundriss, Front zur Straße; ohne Logos.
+- Alle Wahrzeichen haben jetzt Kollision (vorher durchlaufbar). Hauptkirche und Haupthaus behalten die amtliche Form.
