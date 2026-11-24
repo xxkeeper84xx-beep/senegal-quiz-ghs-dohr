@@ -1,0 +1,10 @@
+const {chromium}=require('playwright');const fs=require('fs'),path=require('path');
+(async()=>{const b=await chromium.launch();const p=await (await b.newContext({viewport:{width:1200,height:1000},colorScheme:process.env.DARK?'dark':'light'})).newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.route(/cdn\.jsdelivr\.net\/npm\/jsqr/,r=>r.fulfill({path:path.join(__dirname,'../qrlib/node_modules/jsqr/dist/jsQR.js'),contentType:'application/javascript'}));await p.route(/fonts\.g/,r=>r.abort());
+await p.goto('http://localhost:8768/index.html');await p.evaluate(()=>{localStorage.setItem("pc-klassen",JSON.stringify([{typ:"klasse",code:"9C-K7QS",name:"9C",id:"k_9C-K7QS",angelegt:Date.now()}]))});
+await p.goto('http://localhost:8768/index.html');await p.waitForTimeout(400);
+await p.selectOption('#chT','R');await p.fill('#chZiel','20');await p.click('#chMake');await p.waitForTimeout(300);
+const chCode=await p.textContent('#chNow .code');
+await p.fill('#tCode',fs.readFileSync(__dirname+'/ln_code.txt','utf8'));await p.click('#bCode');await p.waitForTimeout(400);
+const r={chCode,msg:await p.textContent('#msg'),ch:await p.innerText('#chNow'),row:await p.innerText('#tb'),errs};console.log(JSON.stringify(r));
+await p.screenshot({path:__dirname+'/lehrer2'+(process.env.DARK?'_dark':'')+'.png',fullPage:true});await p.setViewportSize({width:400,height:900});console.log('sw',await p.evaluate(()=>document.documentElement.scrollWidth));await b.close()})();

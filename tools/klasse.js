@@ -4,25 +4,15 @@
      Freischaltungen und Fehlertypen. Keine Namen außer dem Spitznamen, keine Daten verlassen das Gerät von selbst.
    - Fehlertypen werden bei falschen Antworten erkannt: Strecken addiert, Wurzel vergessen, Plus/Minus vertauscht, Rundung, sonstige.
    Format des Fortschrittscodes: „PC1.“ + base64url(JSON) + „.“ + Prüfsumme (FNV-1a über Inhalt und Klassencode). */
-const KL={ALPHA:"ABCDEFGHJKMNPQRSTUVWXYZ23456789",ERR:["add","root","op","round","other"]};
+const KL={ALPHA:"ABCDEFGHJKMNPQRSTUVWXYZ23456789",ERR:["add","root","op","round","other","flaeche"]};
 function klHash(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h>>>0}
 function klCheckChar(body){return KL.ALPHA[klHash("PC-KLASSE|"+body)%KL.ALPHA.length]}
 function klNorm(c){return String(c||"").toUpperCase().replace(/\s+/g,"").replace(/[–—_]/g,"-")}
 function klValid(c){c=klNorm(c);const m=/^([A-Z0-9]{1,4})-([A-Z0-9]{3})([A-Z0-9])$/.exec(c);return !!m&&klCheckChar(m[1]+"-"+m[2])===m[3]}
 const klB64=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 
-/* ---------- Fehlertypen erkennen ---------- */
+/* Fehlertypen: Erkennung und Erklärung in lernen.js (lnErrType) */
 function klErr(kind){save.klErr=save.klErr||{};save.klErr[kind]=(save.klErr[kind]||0)+1}
-function klClassify(v,unk,a,b,c,ans){const n=x=>typeof x==="number"&&isFinite(x),near=(x,y,t=.06)=>n(y)&&Math.abs(x-y)<t;
-  if(near(v,ans,.6))return "round";
-  if(unk==="c"){if(near(v,a+b))return "add";if(near(v,a*a+b*b,.6))return "root";if(near(v,Math.sqrt(Math.abs(a*a-b*b))))return "op"}
-  else{const k=unk==="a"?b:a;if(near(v,c-k)||near(v,c+k))return "add";if(near(v,c*c-k*k,.6))return "root";if(near(v,Math.hypot(c,k)))return "op"}
-  return "other"}
-document.addEventListener("submit",e=>{try{const id=e.target&&e.target.id,num=x=>parseFloat(String(x).trim().replace(",",".").replace(/\s/g,""));
-  if(id==="dNum"&&typeof cur!=="undefined"&&cur&&!cur.solved){const v=num($("ans").value);if(isNaN(v))return;const ok=Math.abs(v-cur.ans)<.051||Math.abs(v-Math.round(cur.ans*10)/10)<.001;
-    if(!ok&&cur.unk)klErr(klClassify(v,cur.unk,cur.a,cur.b,cur.c,cur.ans))}
-  if(id==="qForm"&&typeof curQ!=="undefined"&&curQ&&curQ.measures){const v=num($("qAns").value);if(isNaN(v)||Math.abs(v-curQ.ans)<.051)return;
-    klErr(klClassify(v,"c",curQ.measures[0].val,curQ.measures[1].val,null,curQ.ans))}}catch(err){console.warn("Fehlertyp",err)}},true);
 
 /* ---------- Fortschrittscode ---------- */
 function klPayload(){const main=MAIN.filter(id=>id!=="intro"),done=main.filter(id=>{const q=questById(id);return q&&qs(q).done});

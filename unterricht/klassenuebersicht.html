@@ -101,6 +101,17 @@ ol.steps{margin:4px 0 0;padding-left:1.3em;color:var(--muted)}
     </section>
   </div>
 
+  <section class="panel" aria-labelledby="hC">
+    <div class="row" style="justify-content:space-between"><h2 id="hC">🏆 Wochen-Challenge</h2><span class="store" id="chWeek"></span></div>
+    <div id="chNow"></div>
+    <form id="fCh" class="row">
+      <label style="flex:1 1 200px">Thema<select id="chT"><option value="L">Leitern und Rampen</option><option value="U">Rechter Winkel? (Umkehrung)</option><option value="R">3D-Pythagoras</option><option value="M">Gemischt</option></select></label>
+      <label style="flex:0 1 150px">Klassenziel (Punkte)<input type="text" id="chZiel" inputmode="numeric" value="150"></label>
+      <button type="submit" id="chMake">Challenge für diese Woche starten</button>
+    </form>
+    <p style="margin:0;font-size:13px;color:var(--muted)">Im Spiel: „🏫 Klasse &amp; Fortschritt“ → Challenge-Code eintragen → „Challenge-Aufgabe lösen“. Erster Versuch richtig = 3 Punkte, sonst 1. Der Code gilt nur in dieser Kalenderwoche.</p>
+  </section>
+
   <section class="panel" aria-labelledby="hP">
     <div class="row" style="justify-content:space-between"><h2 id="hP">Klassenprofil</h2><button type="button" class="sec" id="bCsv">⬇ Liste als CSV</button></div>
     <div class="stats" id="stats"></div>
@@ -113,7 +124,7 @@ ol.steps{margin:4px 0 0;padding-left:1.3em;color:var(--muted)}
   <section class="panel" aria-labelledby="hL">
     <h2 id="hL">Schülerinnen und Schüler</h2>
     <div class="tbl"><table>
-      <thead><tr><th>Spitzname</th><th>Rang</th><th class="num">XP</th><th>Hauptmissionen</th><th class="num">Aufgaben</th><th class="num">1. Versuch</th><th>Häufigster Fehler</th><th>Stand</th><th><span class="sr" style="position:absolute;left:-9999px">Aktion</span></th></tr></thead>
+      <thead><tr><th>Spitzname</th><th>Rang</th><th class="num">XP</th><th>Hauptmissionen</th><th class="num">Aufgaben</th><th class="num">1. Versuch</th><th>Häufigster Fehler</th><th>Prüfung</th><th>Stand</th><th><span class="sr" style="position:absolute;left:-9999px">Aktion</span></th></tr></thead>
       <tbody id="tb"></tbody>
     </table></div>
   </section>
@@ -125,7 +136,10 @@ ol.steps{margin:4px 0 0;padding-left:1.3em;color:var(--muted)}
 const $=id=>document.getElementById(id);
 const ALPHA="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const MIS=[["werkhof","Licht für den Werkhof"],["graben","Ein Graben für die Wasserleitung"],["treppe","Handlauf für die Außentreppe"],["schulhof","Quer über den Schulhof"],["sporthalle","Der Diagonal-Sprint"],["markt","Quer über den Markt"]];
-const ERR=[["add","Strecken addiert statt quadriert"],["root","Wurzel vergessen"],["op","Plus und Minus vertauscht"],["round","Rundung / knapp daneben"],["other","Sonstige Fehler"]];
+const ERR=[["add","Strecken addiert statt quadriert"],["root","Wurzel vergessen"],["op","Plus und Minus vertauscht"],["round","Rundung / knapp daneben"],["other","Sonstige Fehler"],["flaeche","3D: nur Flächendiagonale"]];
+const THEMEN={L:"Leitern und Rampen",U:"Rechter Winkel? (Umkehrung)",R:"3D-Pythagoras",M:"Gemischt"};
+function week(t=Date.now()){const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w1=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-w1)/864e5-3+(w1.getDay()+6)%7)/7)}
+const chCheck=(k,b)=>ALPHA[hash("PC-CH|"+norm(k)+"|"+b)%ALPHA.length];
 const RANK=["Rechen-Rookie","Kathetenkurier","Hypotenusen-Held","Wurzel-Profi","Pythagoras-Legende"];
 
 function hash(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h>>>0}
@@ -158,6 +172,19 @@ $("fK").addEventListener("submit",async e=>{e.preventDefault();const n=$("kName"
   try{sessionStorage.setItem("pc-aktiv",code)}catch(x){}await put("k_"+code,{typ:"klasse",code,name:norm(n).replace(/[^A-Z0-9]/g,"").slice(0,4),angelegt:Date.now()});$("kName").value="";$("newK").open=false;flash("Klasse angelegt. Klassencode: "+code,"ok")});
 $("selK").addEventListener("change",e=>{S.active=e.target.value;try{sessionStorage.setItem("pc-aktiv",S.active)}catch(x){}render()});
 
+/* ---------- Wochen-Challenge ---------- */
+$("fCh").addEventListener("submit",async e=>{e.preventDefault();if(!S.active){flash("Lege zuerst eine Klasse an.","bad");return}const K=S.docs.get("k_"+S.active);if(!K)return;
+  const t=$("chT").value,w=String(week()).padStart(2,"0"),code=t+w+"-"+chCheck(S.active,t+w),ziel=Math.max(10,Math.min(5000,parseInt($("chZiel").value,10)||150));
+  const {id,...rest}=K;await put("k_"+S.active,{...rest,ch:{code,t,w:+w,ziel,start:Date.now()}});flash("Challenge gestartet: "+code,"ok")});
+function renderCh(L){$("chWeek").textContent="Diese Woche: KW "+week();const K=S.active&&S.docs.get("k_"+S.active),c=K&&K.ch,box=$("chNow");
+  if(!S.active){box.innerHTML="";$("fCh").hidden=true;return}$("fCh").hidden=false;
+  if(!c||c.w!==week()){box.innerHTML=`<p style="margin:0;color:var(--muted)">${c?"Die Challenge aus KW "+c.w+" ist beendet. ":""}Für diese Woche läuft noch keine Challenge.</p>`;$("chMake").textContent="Challenge für diese Woche starten";return}
+  $("chMake").textContent="Neue Challenge statt dieser starten";const T=L.filter(s=>s.ch&&s.ch[0]===c.code).map(s=>({n:s.n,p:s.ch[1]|0,a:s.ch[2]|0})).sort((a,b)=>b.p-a.p),sum=T.reduce((a,s)=>a+s.p,0),pc=Math.min(100,sum/c.ziel*100);
+  box.innerHTML=`<div class="row" style="align-items:flex-start;gap:18px"><div><div style="font-size:13px;color:var(--muted)">Challenge-Code für die Tafel</div><div class="code">${esc(c.code)}</div><div style="font-size:14px">${esc(THEMEN[c.t]||"")}</div></div>
+    <div style="flex:1 1 260px;min-width:0"><div class="bar m" style="grid-template-columns:minmax(0,1fr) 7em"><span class="t" style="height:16px"><i style="width:${pc}%"></i></span><span class="n"><b>${sum}</b> / ${c.ziel} Pkt.</span></div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">${T.length} von ${L.length} mit Challenge-Punkten · Stand der eingelesenen Codes</div>
+      ${T.length?`<ol style="margin:8px 0 0;padding-left:1.3em;font-size:14px">${T.slice(0,5).map(s=>`<li>${esc(s.n)} – <b>${s.p}</b> Pkt. (${s.a} ${s.a===1?"Aufgabe":"Aufgaben"})</li>`).join("")}</ol>`:""}</div></div>`}
+
 /* ---------- Codes einlesen ---------- */
 let msgT;function flash(t,c){$("msg").textContent=t;$("msg").className="msg "+(c||"");clearTimeout(msgT);msgT=setTimeout(()=>{$("msg").textContent=""},9000)}
 async function take(code){const r=decode(code);if(r.err)return {ok:false,why:r.err};const P=r.P;
@@ -166,7 +193,7 @@ async function take(code){const r=decode(code);if(r.err)return {ok:false,why:r.e
   const id="s_"+P.k+"_"+hash(P.n.trim().toLowerCase()).toString(36),old=S.docs.get(id);
   if(old&&(old.d>P.d||(old.d===P.d&&old.x>P.x)))return {ok:true,name:P.n,alt:true};
   if(S.active!==P.k){S.active=P.k;try{sessionStorage.setItem("pc-aktiv",P.k)}catch(x){}}
-  await put(id,{typ:"schueler",k:P.k,n:P.n,x:P.x,r:P.r,s:P.s,f:P.f,w:P.w,m:P.m,mt:P.mt,q:P.q,p:P.p,e:P.e,d:P.d,eingelesen:Date.now()});return {ok:true,name:P.n}}
+  await put(id,{typ:"schueler",k:P.k,n:P.n,x:P.x,r:P.r,s:P.s,f:P.f,w:P.w,m:P.m,mt:P.mt,q:P.q,p:P.p,e:P.e,d:P.d,ch:P.ch||null,ex:P.ex||null,eingelesen:Date.now()});return {ok:true,name:P.n}}
 async function takeMany(codes){let ok=[],bad=[];for(const c of codes){const r=await take(c);if(r.ok)ok.push(r.name+(r.alt?" (älterer Stand, nicht übernommen)":""));else bad.push(r.why)}
   if(bad.length)flash((ok.length?"Übernommen: "+ok.join(", ")+". ":"")+bad.join(" "),"bad");else if(ok.length)flash("Übernommen: "+ok.join(", "),"ok");else flash("Kein Code gefunden.","bad")}
 $("bCode").onclick=()=>{const L=$("tCode").value.split(/\s+/).map(s=>s.trim()).filter(Boolean);if(!L.length){flash("Füge zuerst einen Code ein.","bad");return}takeMany(L).then(()=>{$("tCode").value=""})};
@@ -197,21 +224,23 @@ function render(){const K=klassen(),sel=$("selK");if(!S.active||!K.some(k=>k.cod
   const et=ERR.map((e,i)=>[e[1],sum(s=>(s.e||[])[i])]),em=Math.max(1,...et.map(x=>x[1]));
   $("eBars").innerHTML='<h3 style="margin:0;font:600 15px var(--f-display)">Häufigste Fehler der Klasse</h3>'+et.map(([t,c])=>`<div class="bar"><span>${esc(t)}</span><span class="t"><i style="width:${c/em*100}%"></i></span><span class="n">${c}</span></div>`).join("")
     +(n&&!et.some(x=>x[1])?'<p style="margin:0;color:var(--muted);font-size:14px">Bisher keine Fehler erfasst.</p>':"");
-  const tb=$("tb");if(!S.active){tb.innerHTML='<tr><td colspan="9" class="empty">Lege oben eine Klasse an.</td></tr>';return}
-  if(!n){tb.innerHTML=`<tr><td colspan="9" class="empty">Noch keine Fortschrittscodes für ${esc(S.active)}.<br>Lass die Klasse im Spiel „🏫 Klasse &amp; Fortschritt“ öffnen und fotografiere die QR-Codes.</td></tr>`;return}
+  renderCh(L);
+  const tb=$("tb");if(!S.active){tb.innerHTML='<tr><td colspan="10" class="empty">Lege oben eine Klasse an.</td></tr>';return}
+  if(!n){tb.innerHTML=`<tr><td colspan="10" class="empty">Noch keine Fortschrittscodes für ${esc(S.active)}.<br>Lass die Klasse im Spiel „🏫 Klasse &amp; Fortschritt“ öffnen und fotografiere die QR-Codes.</td></tr>`;return}
   tb.innerHTML=L.map(s=>{const ei=(s.e||[]).reduce((b,v,i,a)=>v>a[b]?i:b,0),ev=(s.e||[])[ei]||0,old=today()-s.d>7;
     return `<tr><td><b>${esc(s.n)}</b></td><td><span class="pill">${esc(RANK[(s.r||1)-1]||"–")}</span></td><td class="num">${s.x|0}</td>
       <td><span class="mis" title="${esc(MIS.map(([id,t])=>((s.m||[]).includes(id)?"✓ ":"– ")+t).join("\n"))}">${MIS.map(([id])=>`<i class="${(s.m||[]).includes(id)?"d":""}"></i>`).join("")}</span> <span style="font-size:13px;color:var(--muted)">${(s.m||[]).length}/${s.mt||MIS.length}</span></td>
       <td class="num">${s.s|0}</td><td class="num">${s.s?Math.round((s.f|0)/s.s*100)+" %":"–"}</td>
       <td>${ev?`<span class="pill w">${esc(ERR[ei][1])} · ${ev}×</span>`:'<span style="color:var(--muted)">–</span>'}</td>
+      <td>${s.ex?`<b>${s.ex[0]}/${s.ex[1]}</b> <span style="font-size:12px;color:var(--muted)">${esc(stand(s.ex[2]))}</span>`:'<span style="color:var(--muted)">–</span>'}</td>
       <td>${esc(stand(s.d))}${old?' <span class="old">· alt</span>':""}</td>
       <td>${pendingDel===s.id?`<span class="confirm"><button type="button" class="sec" data-del="${esc(s.id)}">Löschen</button><button type="button" class="quiet" data-keep="1">Abbrechen</button></span>`:`<button type="button" class="quiet" data-ask="${esc(s.id)}" aria-label="${esc(s.n)} entfernen">Entfernen</button>`}</td></tr>`}).join("")}
 $("tb").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.ask){pendingDel=b.dataset.ask;render()}else if(b.dataset.keep){pendingDel=null;render()}else if(b.dataset.del){pendingDel=null;del(b.dataset.del)}});
 
 /* ---------- CSV ---------- */
 $("bCsv").onclick=async()=>{if(!S.active){flash("Wähle zuerst eine Klasse.","bad");return}const L=schueler(S.active).sort((a,b)=>a.n.localeCompare(b.n,"de"));
-  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',head=["Spitzname","Rang","XP","Hauptmissionen"].concat(MIS.map(m=>m[1]),["Aufgaben gelöst","beim 1. Versuch","falsche Antworten"],ERR.map(e=>e[1]),["Stand (Tage her)"]);
-  const rows=L.map(s=>[s.n,RANK[(s.r||1)-1]||"",s.x|0,(s.m||[]).length].concat(MIS.map(([id])=>(s.m||[]).includes(id)?"ja":"nein"),[s.s|0,s.f|0,s.w|0],ERR.map((e,i)=>(s.e||[])[i]|0),[today()-s.d]));
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',head=["Spitzname","Rang","XP","Hauptmissionen"].concat(MIS.map(m=>m[1]),["Aufgaben gelöst","beim 1. Versuch","falsche Antworten"],ERR.map(e=>e[1]),["Prüfung Punkte","Prüfung von","Challenge-Punkte","Stand (Tage her)"]);
+  const rows=L.map(s=>[s.n,RANK[(s.r||1)-1]||"",s.x|0,(s.m||[]).length].concat(MIS.map(([id])=>(s.m||[]).includes(id)?"ja":"nein"),[s.s|0,s.f|0,s.w|0],ERR.map((e,i)=>(s.e||[])[i]|0),[s.ex?s.ex[0]:"",s.ex?s.ex[1]:"",s.ch?s.ch[1]:"",today()-s.d]));
   const csv="﻿"+[head].concat(rows).map(r=>r.map(q).join(";")).join("\r\n");
   try{const dl=window.claude&&await window.claude.use("downloads");if(!dl){flash("Herunterladen ist hier nicht möglich.","bad");return}await dl.save({filename:`Pythagoras-City_${S.active}.csv`,data:new Blob([csv],{type:"text/csv"})});flash("CSV gespeichert.","ok")}
   catch(e){if(e&&e.code!=="declined")flash("CSV konnte nicht gespeichert werden.","bad")}};
